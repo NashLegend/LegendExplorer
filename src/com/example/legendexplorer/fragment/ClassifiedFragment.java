@@ -1,4 +1,4 @@
-package com.example.legendexplorer;
+package com.example.legendexplorer.fragment;
 
 import android.app.Fragment;
 import android.content.Intent;

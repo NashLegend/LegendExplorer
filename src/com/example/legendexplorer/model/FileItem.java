@@ -1,7 +1,10 @@
-package com.example.legendexplorer;
+package com.example.legendexplorer.model;
 
 import java.io.File;
 import java.net.URI;
+
+import com.example.legendexplorer.R;
+import com.example.legendexplorer.R.drawable;
 
 /**
  * 文件对象，继承自File
@@ -76,6 +79,15 @@ public class FileItem extends File {
 	 * 文件后缀
 	 */
 	private String suffix = "";
+
+	/**
+	 * 是否处于可选状态（可显示选择复）
+	 */
+	private boolean inSelectMode = false;
+	/**
+	 * FileItem类型，普通文件，收藏文件，或者类型文件
+	 */
+	private int ItemTyle = 0;
 
 	public FileItem(File file) {
 		this(file.getAbsolutePath());
@@ -219,5 +231,13 @@ public class FileItem extends File {
 
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
+	}
+
+	public boolean isInSelectMode() {
+		return inSelectMode;
+	}
+
+	public void setInSelectMode(boolean inSelectMode) {
+		this.inSelectMode = inSelectMode;
 	}
 }
