@@ -1,5 +1,5 @@
 
-package com.example.legendexplorer;
+package com.example.legendexplorer.adapter;
 
 import java.util.ArrayList;
 
