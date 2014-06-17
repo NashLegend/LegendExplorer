@@ -1,31 +1,28 @@
 
 package com.example.legendexplorer.view;
 
-import java.io.File;
-
 import com.example.legendexplorer.R;
-import com.example.legendexplorer.R.id;
-import com.example.legendexplorer.R.layout;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
 
 import android.app.Service;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 
@@ -80,14 +77,22 @@ public class FileItemView extends FrameLayout implements OnClickListener,
      * 切换选中、未选中状态,fileItem.setSelected(boolean)先发生;
      */
     public void toggleSelectState() {
+        toggleSelectState(false);
+    }
+
+    private void toggleSelectState(boolean manual) {
+        if (!fileItem.isInSelectMode()) {
+            return;
+        }
         if (fileItem.isSelected()) {
             rootFileItemView.setBackgroundColor(Color.CYAN);
         } else {
             rootFileItemView.setBackgroundColor(Color.WHITE);
-
-            Intent intent = new Intent();
-            intent.setAction(FileConst.Action_FileItem_Unselect);
-            getContext().sendBroadcast(intent);
+            if (manual) {
+                Intent intent = new Intent();
+                intent.setAction(FileConst.Action_FileItem_Unselect);
+                getContext().sendBroadcast(intent);
+            }
         }
         checkBox.setOnCheckedChangeListener(null);
         checkBox.setChecked(fileItem.isSelected());
@@ -114,19 +119,74 @@ public class FileItemView extends FrameLayout implements OnClickListener,
      * 打开文件
      */
     private void openFile() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        Uri data = Uri.fromFile(fileItem);
+        intent.setDataAndType(data, "*/*");
+        switch (fileItem.getFileType()) {
+            case FileItem.FILE_TYPE_APK:
+                intent.setDataAndType(data, "application/vnd.android.package-archive");
+                break;
+            case FileItem.FILE_TYPE_IMAGE:
+                intent.setDataAndType(data, "image/*");
+                break;
+            case FileItem.FILE_TYPE_AUDIO:
+                intent.putExtra("oneshot", 0);
+                intent.putExtra("configchange", 0);
+                intent.setDataAndType(data, "audio/*");
+                break;
+            case FileItem.FILE_TYPE_TXT:
+                intent.setDataAndType(data, "text/plain");
+                break;
+            case FileItem.FILE_TYPE_VIDEO:
+                intent.putExtra("oneshot", 0);
+                intent.putExtra("configchange", 0);
+                intent.setDataAndType(data, "video/*");
+                break;
+            case FileItem.FILE_TYPE_ZIP:
+                intent.setDataAndType(data, "application/zip");
+                break;
+            case FileItem.FILE_TYPE_WORD:
+                intent.setDataAndType(data, "application/msword");
+                break;
+            case FileItem.FILE_TYPE_PPT:
+                intent.setDataAndType(data, "application/vnd.ms-powerpoint");
+                break;
+            case FileItem.FILE_TYPE_EXCEL:
+                intent.setDataAndType(data, "application/vnd.ms-excel");
+                break;
+            case FileItem.FILE_TYPE_HTML:
+                intent.setDataAndType(data, "text/html");
+                break;
+            case FileItem.FILE_TYPE_PDF:
+                intent.setDataAndType(data, "application/pdf");
+                break;
+            case FileItem.FILE_TYPE_TORRENT:
+                intent.setDataAndType(data, "torrent/*");
+                break;
+            case FileItem.FILE_TYPE_CHM:
+                intent.setDataAndType(data, "application/mshelp");
+                break;
 
+            default:
+                break;
+        }
+        try {
+            getContext().startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(getContext(), "Cannot open this file type", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
     public void selectOne() {
         if (fileItem.isInSelectMode()) {
             fileItem.setSelected(!fileItem.isSelected());
-            toggleSelectState();
+            toggleSelectState(true);
         }
     }
 
-    /**
-     * 打开文件夹
-     */
     public void openFolder() {
         adapter.openFolder(fileItem);
     }
@@ -138,12 +198,11 @@ public class FileItemView extends FrameLayout implements OnClickListener,
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         fileItem.setSelected(isChecked);
-        toggleSelectState();
+        toggleSelectState(true);
     }
 
     @Override
     public boolean onLongClick(View v) {
-        Log.i("file", "long");
         Vibrator vibrator = (Vibrator) getContext().getSystemService(
                 Service.VIBRATOR_SERVICE);
         vibrator.vibrate(20);

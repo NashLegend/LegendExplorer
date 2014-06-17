@@ -85,23 +85,33 @@ public class BookmarkHelper {
 
     public void initBookmarks() {
 
+        // 当文件不存在时isDirectory和isFile都返回false
         ArrayList<FileItem> fileItems = new ArrayList<FileItem>();
         FileItem item_download = new FileItem(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+        if (item_download.exists() && item_download.isDirectory()) {
+            fileItems.add(item_download);
+        }
         FileItem item_camera = new FileItem(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
+        if (item_camera.exists() && item_camera.isDirectory()) {
+            fileItems.add(item_camera);
+        }
         FileItem item_movie = new FileItem(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES));
+        if (item_movie.exists() && item_movie.isDirectory()) {
+            fileItems.add(item_movie);
+        }
         FileItem item_music = new FileItem(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC));
+        if (item_music.exists() && item_music.isDirectory()) {
+            fileItems.add(item_music);
+        }
         FileItem item_picture = new FileItem(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
-
-        fileItems.add(item_picture);
-        fileItems.add(item_music);
-        fileItems.add(item_movie);
-        fileItems.add(item_camera);
-        fileItems.add(item_download);
+        if (item_picture.exists() && item_picture.isDirectory()) {
+            fileItems.add(item_picture);
+        }
 
         open();
         truncate();

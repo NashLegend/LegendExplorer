@@ -78,31 +78,25 @@ public class FileListAdapter extends BaseAdapter {
      */
     public boolean openFolder(File file) {
         if (file != null && file.exists() && file.isDirectory()) {
-            if (!file.equals(currentDirectory)) {
-                // 与当前目录不同
-                currentDirectory = file;
-                list.clear();
-                File[] files = file.listFiles();
-                if (files != null) {
-                    for (int i = 0; i < files.length; i++) {
-                        list.add(new FileItem(files[i]));
-                    }
+            currentDirectory = file;
+            list.clear();
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    list.add(new FileItem(files[i]));
                 }
-                files = null;
-                sortList();
-                notifyDataSetChanged();
-
-                Intent intent = new Intent();
-                intent.setAction(FileConst.Action_Open_Folder);
-                intent.putExtra(FileConst.Extra_File_Path, file.getAbsolutePath());
-                mContext.sendBroadcast(intent);
-
-                return true;
             }
+            files = null;
+            sortList();
+            notifyDataSetChanged();
+
+            Intent intent = new Intent();
+            intent.setAction(FileConst.Action_Open_Folder);
+            intent.putExtra(FileConst.Extra_File_Path, file.getAbsolutePath());
+            mContext.sendBroadcast(intent);
+            return true;
         }
         return false;
-        // TODO
-        // dialogView.getPathText().setText(file.getAbsolutePath());
     }
 
     /**

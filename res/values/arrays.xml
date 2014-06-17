@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="TypeImage">
+        <item>png</item>
+        <item>gif</item>
+        <item>jpg</item>
+        <item>jpeg</item>
+        <item>bmp</item>
+    </array>
+    <array name="TypeAudio">
+        <item>mp3</item>
+        <item>wav</item>
+        <item>ogg</item>
+        <item>midi</item>
+    </array>
+    <array name="TypeVideo">
+        <item>mp4</item>
+        <item>rmvb</item>
+        <item>avi</item>
+        <item>flv</item>
+        <item>mkv</item>
+        <item>wmv</item>
+    </array>
+    <array name="TypePackage">
+        <item>apk</item>
+    </array>
+    <array name="TypeZip">
+        <item>jar</item>
+        <item>zip</item>
+        <item>rar</item>
+        <item>gz</item>
+        <item>7z</item>
+        <item>img</item>
+        <item>tar</item>
+    </array>
+    <array name="TypeHTML">
+        <item>htm</item>
+        <item>html</item>
+        <item>php</item>
+        <item>jsp</item>
+        <item>asp</item>
+    </array>
+    <array name="TypeText">
+        <item>txt</item>
+        <item>java</item>
+        <item>c</item>
+        <item>cpp</item>
+        <item>py</item>
+        <item>xml</item>
+        <item>json</item>
+        <item>log</item>
+    </array>
+    <array name="TypeWord">
+        <item>doc</item>
+        <item>docx</item>
+    </array>
+    <array name="TypeExcel">
+        <item>xls</item>
+        <item>xlsx</item>
+    </array>
+    <array name="TypePPT">
+        <item>ppt</item>
+        <item>pptx</item>
+    </array>
+    <array name="TypePDF">
+        <item>pdf</item>
+    </array>
+    <array name="TypeEBook">
+        <item>epub</item>
+        <item>caj</item>
+        <item>umd</item>
+        <item>ebk2</item>
+        <item>ebk3</item>
+    </array>
+    <array name="TypeTorrent">
+        <item>torrent</item>
+    </array>
+    <array name="TypeChm">
+        <item>chm</item>
+    </array>
+
+</resources>
