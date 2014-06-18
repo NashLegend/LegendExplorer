@@ -35,6 +35,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        getActionBar().setDisplayShowTitleEnabled(false);
 
         filesFragment = new FilesFragment();
         bookMarksFragment = new BookMarksFragment();
