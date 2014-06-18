@@ -67,6 +67,7 @@ public class BookmarkHelper {
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
                 String filePath = cursor.getString(BookmarkColumn.FILE_PATH_COLUMN);
                 FileItem item = new FileItem(filePath);
+                item.setItemType(FileItem.Item_type_Bookmark);
                 list.add(item);
             }
         }
@@ -84,7 +85,6 @@ public class BookmarkHelper {
     }
 
     public void initBookmarks() {
-
         // 当文件不存在时isDirectory和isFile都返回false
         ArrayList<FileItem> fileItems = new ArrayList<FileItem>();
         FileItem item_download = new FileItem(

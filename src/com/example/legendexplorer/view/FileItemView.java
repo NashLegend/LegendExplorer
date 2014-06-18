@@ -188,6 +188,7 @@ public class FileItemView extends FrameLayout implements OnClickListener,
         Intent intent = new Intent();
         intent.setAction(FileConst.Action_Open_Folder);
         intent.putExtra(FileConst.Extra_File_Path, fileItem.getAbsolutePath());
+        intent.putExtra(FileConst.Extra_Item_Type, fileItem.getItemType());
         getContext().sendBroadcast(intent);
     }
 

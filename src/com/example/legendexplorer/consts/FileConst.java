@@ -10,6 +10,7 @@ public class FileConst {
 
     // Extras
     public static final String Extra_File_Path = "filepath";
+    public static final String Extra_Item_Type = "itemtype";
 
     // Keys
     public static final String Key_Is_First_Open = "isfirstopen";

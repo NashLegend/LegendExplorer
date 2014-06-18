@@ -34,11 +34,11 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listview_files"
+    <FrameLayout
+        android:id="@+id/content_bookmark"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
-    </ListView>
+    </FrameLayout>
 
 </LinearLayout>

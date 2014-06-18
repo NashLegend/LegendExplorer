@@ -111,7 +111,10 @@ public class FileItem extends File {
     /**
      * FileItem类型，普通文件，收藏文件，或者类型文件
      */
-    private int ItemTyle = 0;
+    private int itemType = 0;
+
+    public static final int Item_Type_File_Or_Folder = 0;
+    public static final int Item_type_Bookmark = 1;
 
     public FileItem(File file) {
         this(file.getAbsolutePath());
@@ -306,5 +309,13 @@ public class FileItem extends File {
 
     public void setInSelectMode(boolean inSelectMode) {
         this.inSelectMode = inSelectMode;
+    }
+
+    public int getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(int itemType) {
+        this.itemType = itemType;
     }
 }

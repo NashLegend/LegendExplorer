@@ -5,28 +5,20 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.example.legendexplorer.R;
-import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
-import com.example.legendexplorer.db.BookmarkHelper;
 import com.example.legendexplorer.model.FileItem;
-import com.example.legendexplorer.view.FileItemView;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 /**
@@ -36,13 +28,12 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
  */
 public class BookMarksFragment extends BaseFragment implements OnClickListener,
         OnCheckedChangeListener {
-    private FileListAdapter adapter;
-    private ListView listView;
     private EditText pathText;
     private ImageButton backButton;
     private CheckBox selectAllButton;
     private boolean inSelectMode = false;
     private FileItem currentFileItem = null;
+    private ArrayList<FileListFragment> fakeBackStack = new ArrayList<FileListFragment>();
 
     public BookMarksFragment() {
 
@@ -51,20 +42,15 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_file_explorer, null);
-        listView = (ListView) view.findViewById(R.id.listview_files);
+        View view = inflater.inflate(R.layout.layout_file_bookmark, null);
         pathText = (EditText) view.findViewById(R.id.edittext_file_path);
         backButton = (ImageButton) view
                 .findViewById(R.id.imagebutton_file_back);
         selectAllButton = (CheckBox) view.findViewById(R.id.checkbox_file_all);
-
         backButton.setOnClickListener(this);
         selectAllButton.setOnCheckedChangeListener(this);
         selectAllButton.setVisibility(View.GONE);
         pathText.setKeyListener(null);
-
-        adapter = new FileListAdapter(getActivity());
-        listView.setAdapter(adapter);
         openBookMarks();
 
         return view;
@@ -81,13 +67,17 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
      */
     public void openFolder(File file) {
         if (file.exists() && file.isDirectory()) {
-            adapter.openFolder(file);
-            String path = file.getAbsolutePath();
-            if (currentFileItem == null) {
-                currentFileItem = new FileItem(file);
-            }
-            pathText.setText(path.replace(currentFileItem.getAbsolutePath(),
-                    FileConst.Value_Bookmark_Path + currentFileItem.getName()));
+            FileListFragment fragment = new FileListFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(FileConst.Extra_File_Path, file.getAbsolutePath());
+            bundle.putInt(FileConst.Extra_Item_Type, FileItem.Item_type_Bookmark);
+            fragment.setArguments(bundle);
+
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.content_bookmark, fragment, file.getAbsolutePath());
+            transaction.commit();
+            fakeBackStack.add(fragment);
+            pathText.setText(fragment.getFilePath());
         } else {
             throw new NullPointerException("openFolder://file.exists() && file.isDirectory()");
         }
@@ -97,19 +87,16 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
      * 打开收藏夹目录
      */
     public void openBookMarks() {
-        ArrayList<FileItem> fileItems;
-        BookmarkHelper helper = new BookmarkHelper(getActivity());
-        helper.open();
-        fileItems = helper.getBookmarks();
-        helper.close();
-
-        if (fileItems != null && fileItems.size() > 0) {
-            adapter.setList(fileItems);
-            adapter.notifyDataSetChanged();
-        } else {
-            // 没有收藏
-        }
-        pathText.setText(FileConst.Value_Bookmark_Path);
+        FileListFragment fragment = new FileListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(FileConst.Extra_File_Path, FileConst.Value_Bookmark_Path);
+        bundle.putInt(FileConst.Extra_Item_Type, FileItem.Item_type_Bookmark);
+        fragment.setArguments(bundle);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_bookmark, fragment, FileConst.Value_Bookmark_Path);
+        transaction.commit();
+        fakeBackStack.add(fragment);
+        pathText.setText(fragment.getFilePath());
         currentFileItem = null;
     }
 
@@ -125,16 +112,15 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
      * 返回上级目录
      */
     private void back2ParentLevel() {
-        File file = adapter.getCurrentDirectory();
-        if (file != null && file.getParentFile() != null) {
-            if (file.equals(currentFileItem)) {
-                openBookMarks();
-            } else {
-                openFolder(file.getParentFile());
-            }
+        if (fakeBackStack.size() > 1) {
+            fakeBackStack.remove(fakeBackStack.size() - 1);
+            FileListFragment fragment = fakeBackStack.get(fakeBackStack.size() - 1);
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.content_bookmark, fragment, fragment.getFilePath());
+            transaction.commit();
+            pathText.setText(fragment.getFilePath());
         } else {
-            throw new NullPointerException(
-                    "back2ParentLevel://file != null && file.getParentFile() != null");
+            // do nothing
         }
     }
 
@@ -142,14 +128,18 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
      * 选中当前目录所有文件
      */
     private void selectAll() {
-        adapter.selectAll();
+        if (fakeBackStack.size() > 0) {
+            fakeBackStack.get(fakeBackStack.size() - 1).selectAll();
+        }
     }
 
     /**
      * 取消选中当前目录所有文件
      */
     private void unselectAll() {
-        adapter.unselectAll();
+        if (fakeBackStack.size() > 0) {
+            fakeBackStack.get(fakeBackStack.size() - 1).unselectAll();
+        }
     }
 
     public void unselectCheckBox() {
@@ -162,7 +152,11 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
      * @return 返回选中的文件列表
      */
     public ArrayList<File> getSelectedFiles() {
-        return adapter.getSelectedFiles();
+        if (fakeBackStack.size() > 0) {
+            return fakeBackStack.get(fakeBackStack.size() - 1).getSelectedFiles();
+        } else {
+            return new ArrayList<File>();
+        }
     }
 
     @Override
@@ -190,28 +184,20 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
         return selectAllButton;
     }
 
-    /**
-     * 是否在收藏夹根目录下
-     */
-    private boolean isInRootPlace() {
-        return false;
-    }
-
-    private boolean isInRootPlace(File file) {
-        return true;
-    }
-
     private void change2SelectMode() {
-        selectAllButton.setVisibility(View.VISIBLE);
-        inSelectMode = true;
-        adapter.change2SelectMode();
+        if (fakeBackStack.size() > 0) {
+            selectAllButton.setVisibility(View.VISIBLE);
+            inSelectMode = true;
+            fakeBackStack.get(fakeBackStack.size() - 1).change2SelectMode();
+        }
     }
 
     private void exitSelectMode() {
-        selectAllButton.setVisibility(View.GONE);
-        inSelectMode = false;
-        adapter.exitSelectMode();
-        // TODO修改ActionBar
+        if (fakeBackStack.size() > 0) {
+            selectAllButton.setVisibility(View.GONE);
+            inSelectMode = false;
+            fakeBackStack.get(fakeBackStack.size() - 1).exitSelectMode();
+        }
     }
 
     @Override
@@ -220,7 +206,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
             exitSelectMode();
             return true;
         } else {
-            if (currentFileItem != null) {
+            if (fakeBackStack.size() > 1) {
                 back2ParentLevel();
                 return true;
             }
