@@ -14,4 +14,7 @@ public class FileConst {
     // Keys
     public static final String Key_Is_First_Open = "isfirstopen";
 
+    // Values
+    public static final String Value_Bookmark_Path = "Bookmark://";
+
 }

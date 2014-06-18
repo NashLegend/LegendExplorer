@@ -97,6 +97,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
         } else {
             // 没有收藏
         }
+        pathText.setText(FileConst.Value_Bookmark_Path);
         currentFileItem = null;
     }
 
@@ -174,20 +175,6 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
         return selectAllButton;
     }
 
-    @Override
-    public boolean doBackAction() {
-        if (inSelectMode) {
-            exitSelectMode();
-            return true;
-        } else {
-            if (currentFileItem != null) {
-                back2ParentLevel();
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * 是否在收藏夹根目录下
      */
@@ -213,6 +200,20 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     }
 
     @Override
+    public boolean doBackAction() {
+        if (inSelectMode) {
+            exitSelectMode();
+            return true;
+        } else {
+            if (currentFileItem != null) {
+                back2ParentLevel();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean doVeryAction(Intent intent) {
         String action = intent.getAction();
         if (FileConst.Action_Open_Folder.equals(action)) {
@@ -221,7 +222,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
                 currentFileItem = new FileItem(path);
             }
             pathText.setText(path.replace(currentFileItem.getAbsolutePath(),
-                    currentFileItem.getName()));
+                    FileConst.Value_Bookmark_Path + currentFileItem.getName()));
         } else if (FileConst.Action_FileItem_Long_Click.equals(action)) {
             change2SelectMode();
         } else if (FileConst.Action_FileItem_Unselect.equals(action)) {

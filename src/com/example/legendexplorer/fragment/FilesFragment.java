@@ -5,25 +5,16 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.example.legendexplorer.R;
-import com.example.legendexplorer.R.id;
-import com.example.legendexplorer.R.layout;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
-import com.example.legendexplorer.view.FileItemView;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -195,14 +186,12 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
         selectAllButton.setVisibility(View.VISIBLE);
         inSelectMode = true;
         adapter.change2SelectMode();
-        // TODO 修改ActionBar
     }
 
     private void exitSelectMode() {
         selectAllButton.setVisibility(View.GONE);
         inSelectMode = false;
         adapter.exitSelectMode();
-        // TODO修改ActionBar
     }
 
     @Override
