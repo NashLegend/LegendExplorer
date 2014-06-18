@@ -89,11 +89,6 @@ public class FileListAdapter extends BaseAdapter {
             files = null;
             sortList();
             notifyDataSetChanged();
-
-            Intent intent = new Intent();
-            intent.setAction(FileConst.Action_Open_Folder);
-            intent.putExtra(FileConst.Extra_File_Path, file.getAbsolutePath());
-            mContext.sendBroadcast(intent);
             return true;
         }
         return false;

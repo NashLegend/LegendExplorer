@@ -33,7 +33,6 @@ import android.view.View.OnLongClickListener;
  */
 public class FileItemView extends FrameLayout implements OnClickListener,
         OnCheckedChangeListener, OnLongClickListener {
-
     private ImageView icon;
     private TextView title;
     private CheckBox checkBox;
@@ -186,7 +185,10 @@ public class FileItemView extends FrameLayout implements OnClickListener,
     }
 
     public void openFolder() {
-        adapter.openFolder(fileItem);
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Open_Folder);
+        intent.putExtra(FileConst.Extra_File_Path, fileItem.getAbsolutePath());
+        getContext().sendBroadcast(intent);
     }
 
     public FileListAdapter getAdapter() {

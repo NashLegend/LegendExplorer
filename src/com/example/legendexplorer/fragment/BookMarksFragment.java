@@ -70,6 +70,10 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
         return view;
     }
 
+    public void openFolder(String path) {
+        openFolder(new File(path));
+    }
+
     /**
      * 打开目录
      * 
@@ -78,6 +82,14 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     public void openFolder(File file) {
         if (file.exists() && file.isDirectory()) {
             adapter.openFolder(file);
+            String path = file.getAbsolutePath();
+            if (currentFileItem == null) {
+                currentFileItem = new FileItem(file);
+            }
+            pathText.setText(path.replace(currentFileItem.getAbsolutePath(),
+                    FileConst.Value_Bookmark_Path + currentFileItem.getName()));
+        } else {
+            throw new NullPointerException("openFolder://file.exists() && file.isDirectory()");
         }
     }
 
@@ -120,6 +132,9 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
             } else {
                 openFolder(file.getParentFile());
             }
+        } else {
+            throw new NullPointerException(
+                    "back2ParentLevel://file != null && file.getParentFile() != null");
         }
     }
 
@@ -217,12 +232,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     public boolean doVeryAction(Intent intent) {
         String action = intent.getAction();
         if (FileConst.Action_Open_Folder.equals(action)) {
-            String path = intent.getStringExtra(FileConst.Extra_File_Path);
-            if (currentFileItem == null) {
-                currentFileItem = new FileItem(path);
-            }
-            pathText.setText(path.replace(currentFileItem.getAbsolutePath(),
-                    FileConst.Value_Bookmark_Path + currentFileItem.getName()));
+            openFolder(intent.getStringExtra(FileConst.Extra_File_Path));
         } else if (FileConst.Action_FileItem_Long_Click.equals(action)) {
             change2SelectMode();
         } else if (FileConst.Action_FileItem_Unselect.equals(action)) {

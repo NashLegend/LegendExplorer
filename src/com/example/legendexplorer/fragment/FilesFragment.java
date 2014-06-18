@@ -35,6 +35,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     private ImageButton backButton;
     private CheckBox selectAllButton;
     private boolean inSelectMode = false;
+    private ArrayList<FileListAdapter> fakeBackStack = new ArrayList<FileListAdapter>();
 
     private String initialPath = "/";
 
@@ -77,7 +78,9 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             // 若不存在此目录，则打开根文件夹
             file = Environment.getExternalStorageDirectory();
         }
-        adapter.openFolder(file);
+        if (adapter.openFolder(file)) {
+            pathText.setText(file.getAbsolutePath());
+        }
     }
 
     /**
@@ -198,7 +201,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     public boolean doVeryAction(Intent intent) {
         String action = intent.getAction();
         if (FileConst.Action_Open_Folder.equals(action)) {
-            pathText.setText(intent.getStringExtra(FileConst.Extra_File_Path));
+            openFolder(intent.getStringExtra(FileConst.Extra_File_Path));
         } else if (FileConst.Action_FileItem_Long_Click.equals(action)) {
             change2SelectMode();
         } else if (FileConst.Action_FileItem_Unselect.equals(action)) {
