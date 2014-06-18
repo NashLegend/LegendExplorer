@@ -35,7 +35,6 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     private ImageButton backButton;
     private CheckBox selectAllButton;
     private boolean inSelectMode = false;
-    private ArrayList<FileListAdapter> fakeBackStack = new ArrayList<FileListAdapter>();
 
     private String initialPath = "/";
 
