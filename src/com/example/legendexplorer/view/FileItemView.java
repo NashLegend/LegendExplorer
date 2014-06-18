@@ -53,7 +53,6 @@ public class FileItemView extends FrameLayout implements OnClickListener,
         checkBox = (CheckBox) findViewById(R.id.checkbox_file_item_select);
         setOnClickListener(this);
         setLongClickable(true);
-        setOnLongClickListener(this);
     }
 
     public FileItem getFileItem() {
@@ -68,8 +67,10 @@ public class FileItemView extends FrameLayout implements OnClickListener,
         toggleSelectState();
         if (fileItem.isInSelectMode()) {
             checkBox.setVisibility(View.VISIBLE);
+            setOnLongClickListener(null);
         } else {
             checkBox.setVisibility(View.GONE);
+            setOnLongClickListener(this);
         }
     }
 
@@ -81,14 +82,11 @@ public class FileItemView extends FrameLayout implements OnClickListener,
     }
 
     private void toggleSelectState(boolean manual) {
-        if (!fileItem.isInSelectMode()) {
-            return;
-        }
         if (fileItem.isSelected()) {
             rootFileItemView.setBackgroundColor(Color.CYAN);
         } else {
             rootFileItemView.setBackgroundColor(Color.WHITE);
-            if (manual) {
+            if (manual && fileItem.isInSelectMode()) {
                 Intent intent = new Intent();
                 intent.setAction(FileConst.Action_FileItem_Unselect);
                 getContext().sendBroadcast(intent);
@@ -212,9 +210,6 @@ public class FileItemView extends FrameLayout implements OnClickListener,
         Intent intent = new Intent();
         intent.setAction(FileConst.Action_FileItem_Long_Click);
         getContext().sendBroadcast(intent);
-
-        setOnLongClickListener(null);
-
         return false;
     }
 }
