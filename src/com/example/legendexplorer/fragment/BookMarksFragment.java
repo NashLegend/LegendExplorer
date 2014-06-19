@@ -11,6 +11,7 @@ import com.example.legendexplorer.model.FileItem;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +33,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     private ImageButton backButton;
     private CheckBox selectAllButton;
     private boolean inSelectMode = false;
-    private FileItem currentFileItem = null;
+    private String pathPreffix = "//////////";
     private ArrayList<FileListFragment> fakeBackStack = new ArrayList<FileListFragment>();
 
     public BookMarksFragment() {
@@ -52,7 +53,6 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
         selectAllButton.setVisibility(View.GONE);
         pathText.setKeyListener(null);
         openBookMarks();
-
         return view;
     }
 
@@ -70,6 +70,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
             FileListFragment fragment = new FileListFragment();
             Bundle bundle = new Bundle();
             bundle.putString(FileConst.Extra_File_Path, file.getAbsolutePath());
+            bundle.putString(FileConst.Extra_Path_Preffix, pathPreffix);
             bundle.putInt(FileConst.Extra_Item_Type, FileItem.Item_type_Bookmark);
             fragment.setArguments(bundle);
 
@@ -90,6 +91,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
         FileListFragment fragment = new FileListFragment();
         Bundle bundle = new Bundle();
         bundle.putString(FileConst.Extra_File_Path, FileConst.Value_Bookmark_Path);
+        bundle.putString(FileConst.Extra_Path_Preffix, pathPreffix);
         bundle.putInt(FileConst.Extra_Item_Type, FileItem.Item_type_Bookmark);
         fragment.setArguments(bundle);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -97,21 +99,12 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
         transaction.commit();
         fakeBackStack.add(fragment);
         pathText.setText(fragment.getFilePath());
-        currentFileItem = null;
     }
 
     /**
-     * 读取收藏夹文件
+     * 回退
      */
-    private ArrayList<FileItem> getBookMarks() {
-
-        return null;
-    }
-
-    /**
-     * 返回上级目录
-     */
-    private void back2ParentLevel() {
+    private void backStack() {
         if (fakeBackStack.size() > 1) {
             fakeBackStack.remove(fakeBackStack.size() - 1);
             FileListFragment fragment = fakeBackStack.get(fakeBackStack.size() - 1);
@@ -163,7 +156,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.imagebutton_file_back) {
-            back2ParentLevel();
+            backStack();
         }
     }
 
@@ -207,7 +200,7 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
             return true;
         } else {
             if (fakeBackStack.size() > 1) {
-                back2ParentLevel();
+                backStack();
                 return true;
             }
         }
@@ -218,7 +211,19 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     public boolean doVeryAction(Intent intent) {
         String action = intent.getAction();
         if (FileConst.Action_Open_Folder.equals(action)) {
-            openFolder(intent.getStringExtra(FileConst.Extra_File_Path));
+            int tp = intent.getIntExtra(FileConst.Extra_Item_Type,
+                    FileItem.Item_Type_File_Or_Folder);
+            String path = intent.getStringExtra(FileConst.Extra_File_Path);
+            File file = new File(path);
+            if (file.getParentFile() != null) {
+                if (tp == FileItem.Item_type_Bookmark) {
+                    pathPreffix = new File(path).getParent();
+                    if (pathPreffix.lastIndexOf("/") != pathPreffix.length() - 1) {
+                        pathPreffix += "/";
+                    }
+                }
+            }
+            openFolder(file);
         } else if (FileConst.Action_FileItem_Long_Click.equals(action)) {
             change2SelectMode();
         } else if (FileConst.Action_FileItem_Unselect.equals(action)) {

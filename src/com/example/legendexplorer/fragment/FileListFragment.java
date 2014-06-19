@@ -12,6 +12,8 @@ import com.example.legendexplorer.model.FileItem;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ public class FileListFragment extends Fragment {
     private ListView listView;
     private String filePath;
     private int itemType = FileItem.Item_Type_File_Or_Folder;
+    private String pathPreffix = "/////////////";
 
     public FileListFragment() {
 
@@ -32,6 +35,7 @@ public class FileListFragment extends Fragment {
         super.setArguments(args);
         filePath = args.getString(FileConst.Extra_File_Path);
         itemType = args.getInt(FileConst.Extra_Item_Type, FileItem.Item_Type_File_Or_Folder);
+        pathPreffix = args.getString(FileConst.Extra_Path_Preffix, "/////////////");
     }
 
     @Override
@@ -93,11 +97,13 @@ public class FileListFragment extends Fragment {
             case FileItem.Item_Type_File_Or_Folder:
                 return filePath;
             case FileItem.Item_type_Bookmark:
-                return filePath;
+                if (pathPreffix.equals("") || pathPreffix.equals("/")) {
+                    return FileConst.Value_Bookmark_Path.replace("//", "/") + filePath;
+                }
+                return filePath.replace(pathPreffix, FileConst.Value_Bookmark_Path);
             default:
                 return filePath;
         }
 
     }
-
 }

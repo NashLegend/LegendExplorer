@@ -1,6 +1,7 @@
 
 package com.example.legendexplorer;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import com.example.legendexplorer.adapter.FilePagerAdapter;
@@ -9,6 +10,7 @@ import com.example.legendexplorer.fragment.BaseFragment;
 import com.example.legendexplorer.fragment.BookMarksFragment;
 import com.example.legendexplorer.fragment.ClassifiedFragment;
 import com.example.legendexplorer.fragment.FilesFragment;
+import com.example.legendexplorer.model.FileItem;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -35,7 +37,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         getActionBar().setDisplayShowTitleEnabled(false);
 
         filesFragment = new FilesFragment();
