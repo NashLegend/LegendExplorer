@@ -26,7 +26,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
  * @author NashLegend
  */
 public class FilesFragment extends BaseFragment implements OnClickListener,
-        OnCheckedChangeListener {
+        OnCheckedChangeListener, Explorable {
     private EditText pathText;
     private ImageButton backButton;
     private CheckBox selectAllButton;
@@ -202,6 +202,10 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             selectAllButton.setVisibility(View.VISIBLE);
             inSelectMode = true;
             fakeBackStack.get(fakeBackStack.size() - 1).change2SelectMode();
+
+            Intent intent = new Intent();
+            intent.setAction(FileConst.Action_Switch_2_Select_Mode);
+            getActivity().sendBroadcast(intent);
         }
     }
 
@@ -210,6 +214,10 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             selectAllButton.setVisibility(View.GONE);
             inSelectMode = false;
             fakeBackStack.get(fakeBackStack.size() - 1).exitSelectMode();
+
+            Intent intent = new Intent();
+            intent.setAction(FileConst.Action_Exit_Select_Mode);
+            getActivity().sendBroadcast(intent);
         }
     }
 
@@ -224,7 +232,63 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             selectAllButton.setOnCheckedChangeListener(null);
             selectAllButton.setChecked(false);
             selectAllButton.setOnCheckedChangeListener(this);
+        } else if (FileConst.Action_Add_New_File.equals(action)) {
+
+        } else if (FileConst.Action_Search_File.equals(action)) {
+
+        } else if (FileConst.Action_Change_View_Mode.equals(action)) {
+
+        } else if (FileConst.Action_Refresh_Folder.equals(action)) {
+
+        } else if (FileConst.Action_Copy_File.equals(action)) {
+
+        } else if (FileConst.Action_Cut_File.equals(action)) {
+
+        } else if (FileConst.Action_Delete_File.equals(action)) {
+
         }
         return false;
+    }
+
+    @Override
+    public void toggleViewMode() {
+        // TODO 自动生成的方法存根
+        
+    }
+
+    @Override
+    public void copyFile() {
+        // TODO 自动生成的方法存根
+        
+    }
+
+    @Override
+    public void cutFile() {
+        // TODO 自动生成的方法存根
+        
+    }
+
+    @Override
+    public void deleteFile() {
+        // TODO 自动生成的方法存根
+        
+    }
+
+    @Override
+    public void addNewFile() {
+        // TODO 自动生成的方法存根
+        
+    }
+
+    @Override
+    public void refreshFileList() {
+        // TODO 自动生成的方法存根
+        
+    }
+
+    @Override
+    public void searchFile() {
+        // TODO 自动生成的方法存根
+        
     }
 }

@@ -1,7 +1,6 @@
 
 package com.example.legendexplorer;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import com.example.legendexplorer.adapter.FilePagerAdapter;
@@ -10,7 +9,6 @@ import com.example.legendexplorer.fragment.BaseFragment;
 import com.example.legendexplorer.fragment.BookMarksFragment;
 import com.example.legendexplorer.fragment.ClassifiedFragment;
 import com.example.legendexplorer.fragment.FilesFragment;
-import com.example.legendexplorer.model.FileItem;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -22,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
@@ -32,6 +31,7 @@ public class MainActivity extends Activity {
     private BookMarksFragment bookMarksFragment;
     private ClassifiedFragment classifiedFragment;
     private FileBroadcastReceiver fileBroadcastReceiver;
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +58,86 @@ public class MainActivity extends Activity {
         filter.addAction(FileConst.Action_Open_Folder);
         filter.addAction(FileConst.Action_FileItem_Long_Click);
         filter.addAction(FileConst.Action_FileItem_Unselect);
+        filter.addAction(FileConst.Action_Switch_2_Select_Mode);
+        filter.addAction(FileConst.Action_Exit_Select_Mode);
         fileBroadcastReceiver = new FileBroadcastReceiver();
         registerReceiver(fileBroadcastReceiver, filter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        mMenu = menu;
+        getMenuInflater().inflate(R.menu.filelist, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_new:
+                addNewFile();
+                break;
+            case R.id.action_refresh:
+                refreshFileList();
+                break;
+            case R.id.action_search:
+                searchFile();
+                break;
+            case R.id.action_viewmode:
+                toggleViewMode();
+                break;
+            case R.id.action_copy:
+                copyFile();
+                break;
+            case R.id.action_cut:
+                cutFile();
+                break;
+            case R.id.action_delete:
+                deleteFile();
+                break;
+
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void showFileOperationMenu() {
+        mMenu.clear();
+        getMenuInflater().inflate(R.menu.fileop, mMenu);
+    }
+
+    public void showFileListMenu() {
+        mMenu.clear();
+        getMenuInflater().inflate(R.menu.filelist, mMenu);
+    }
+
+    private void toggleViewMode() {
+
+    }
+
+    private void copyFile() {
+
+    }
+
+    private void cutFile() {
+
+    }
+
+    private void deleteFile() {
+
+    }
+
+    private void addNewFile() {
+
+    }
+
+    private void refreshFileList() {
+
+    }
+
+    private void searchFile() {
+
     }
 
     @Override
@@ -91,13 +163,13 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (FileConst.Action_Open_Folder.equals(action)) {
-
+            if (FileConst.Action_Switch_2_Select_Mode.equals(action)) {
+                showFileOperationMenu();
+            } else if (FileConst.Action_Exit_Select_Mode.equals(action)) {
+                showFileListMenu();
             }
-
             adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
         }
-
     }
 
 }

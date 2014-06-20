@@ -104,6 +104,20 @@ public class FileListFragment extends Fragment {
             default:
                 return filePath;
         }
+    }
+    
+    public void toggleViewMode() {
+        // TODO 自动生成的方法存根
+        
+    }
 
+    public void refreshFileList() {
+        // TODO 自动生成的方法存根
+        
+    }
+
+    public void searchFile() {
+        // TODO 自动生成的方法存根
+        
     }
 }
