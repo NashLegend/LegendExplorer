@@ -43,6 +43,13 @@ public class FileListFragment extends Fragment {
         View view = inflater.inflate(R.layout.layout_file_list, null);
         listView = (ListView) view.findViewById(R.id.fragment_listview_files);
         adapter = new FileListAdapter(getActivity());
+        listView.setAdapter(adapter);
+        listView.setLongClickable(true);
+        loadData();
+        return view;
+    }
+
+    public void loadData() {
         if (filePath != null) {
             if (filePath.equals(FileConst.Value_Bookmark_Path)) {
                 ArrayList<FileItem> fileItems;
@@ -54,10 +61,8 @@ public class FileListFragment extends Fragment {
             } else {
                 adapter.openFolder(new File(filePath));
             }
+            adapter.notifyDataSetChanged();
         }
-        listView.setAdapter(adapter);
-        listView.setLongClickable(true);
-        return view;
     }
 
     /**
@@ -105,19 +110,17 @@ public class FileListFragment extends Fragment {
                 return filePath;
         }
     }
-    
+
     public void toggleViewMode() {
         // TODO 自动生成的方法存根
-        
+
     }
 
     public void refreshFileList() {
-        // TODO 自动生成的方法存根
-        
+        loadData();
     }
 
     public void searchFile() {
-        // TODO 自动生成的方法存根
         
     }
 }

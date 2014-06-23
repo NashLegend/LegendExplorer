@@ -7,12 +7,12 @@ public class FileConst {
     public static final String Action_Open_Folder = "legendexplorer.openfolder";
     public static final String Action_FileItem_Long_Click = "legendexplorer.fileitemlongclick";
     public static final String Action_FileItem_Unselect = "legendexplorer.fileitemunselect";
-    public static final String Action_Refresh_Folder = "legendexplorer.refreshfolder";
-    public static final String Action_Change_View_Mode = "legendexplorer.changeviewmode";
+    public static final String Action_Refresh_FileList = "legendexplorer.refreshfilelist";
+    public static final String Action_Toggle_View_Mode = "legendexplorer.toggleviewmode";
     public static final String Action_Add_New_File = "legendexplorer.addnewfile";
     public static final String Action_Search_File = "legendexplorer.searchfile";
     public static final String Action_Copy_File = "legendexplorer.copyfile";
-    public static final String Action_Cut_File = "legendexplorer.cutfile";
+    public static final String Action_Move_File = "legendexplorer.movefile";
     public static final String Action_Delete_File = "legendexplorer.deletefile";
     public static final String Action_Switch_2_Select_Mode = "legendexplorer.switch2selectmode";
     public static final String Action_Exit_Select_Mode = "legendexplorer.exitselectmode";

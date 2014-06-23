@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
                 copyFile();
                 break;
             case R.id.action_cut:
-                cutFile();
+                moveFile();
                 break;
             case R.id.action_delete:
                 deleteFile();
@@ -113,27 +113,39 @@ public class MainActivity extends Activity {
     }
 
     private void toggleViewMode() {
-
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Toggle_View_Mode);
+        adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
     }
 
     private void copyFile() {
-
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Copy_File);
+        adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
     }
 
-    private void cutFile() {
-
+    private void moveFile() {
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Move_File);
+        adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
     }
 
     private void deleteFile() {
-
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Delete_File);
+        adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
     }
 
     private void addNewFile() {
-
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Add_New_File);
+        adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
     }
 
     private void refreshFileList() {
-
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Refresh_FileList);
+        adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
     }
 
     private void searchFile() {

@@ -6,7 +6,7 @@ public interface Explorable {
 
     public void copyFile();
 
-    public void cutFile();
+    public void moveFile();
 
     public void deleteFile();
 

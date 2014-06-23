@@ -6,8 +6,16 @@ import java.util.ArrayList;
 
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.consts.FileConst;
+import com.example.legendutils.Dialogs.FileDialog;
+import com.example.legendutils.Dialogs.FileDialog.FileDialogListener;
+import com.example.legendutils.Dialogs.Win8ProgressDialog;
+import com.example.legendutils.Tools.FileUtil;
+import com.example.legendutils.Tools.FileUtil.FileOperationListener;
+import com.example.legendutils.Tools.ToastUtil;
 
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -141,12 +149,17 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     /**
      * @return 返回选中的文件列表
      */
-    public ArrayList<File> getSelectedFiles() {
+    public File[] getSelectedFiles() {
+        ArrayList<File> files = new ArrayList<File>();
         if (fakeBackStack.size() > 0) {
-            return fakeBackStack.get(fakeBackStack.size() - 1).getSelectedFiles();
-        } else {
-            return new ArrayList<File>();
+            files = fakeBackStack.get(fakeBackStack.size() - 1).getSelectedFiles();
         }
+        File[] files2 = new File[files.size()];
+        for (int i = 0; i < files2.length; i++) {
+            files2[i] = files.get(i);
+        }
+        return files2;
+
     }
 
     @Override
@@ -233,62 +246,191 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             selectAllButton.setChecked(false);
             selectAllButton.setOnCheckedChangeListener(this);
         } else if (FileConst.Action_Add_New_File.equals(action)) {
-
+            addNewFile();
         } else if (FileConst.Action_Search_File.equals(action)) {
-
-        } else if (FileConst.Action_Change_View_Mode.equals(action)) {
-
-        } else if (FileConst.Action_Refresh_Folder.equals(action)) {
-
+            searchFile();
+        } else if (FileConst.Action_Toggle_View_Mode.equals(action)) {
+            toggleViewMode();
+        } else if (FileConst.Action_Refresh_FileList.equals(action)) {
+            refreshFileList();
         } else if (FileConst.Action_Copy_File.equals(action)) {
-
-        } else if (FileConst.Action_Cut_File.equals(action)) {
-
+            copyFile();
+        } else if (FileConst.Action_Move_File.equals(action)) {
+            moveFile();
         } else if (FileConst.Action_Delete_File.equals(action)) {
-
+            deleteFile();
         }
         return false;
     }
 
     @Override
     public void toggleViewMode() {
-        // TODO 自动生成的方法存根
-        
+        if (fakeBackStack.size() > 0) {
+            fakeBackStack.get(fakeBackStack.size() - 1).toggleViewMode();
+        }
     }
 
     @Override
     public void copyFile() {
-        // TODO 自动生成的方法存根
-        
+        FileDialog dialog = new FileDialog.Builder(getActivity())
+                .setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE).setCancelable(false)
+                .setCanceledOnTouchOutside(false).setTitle("selectFolder")
+                .setFileSelectListener(new FileDialogListener() {
+
+                    @Override
+                    public void onFileSelected(ArrayList<File> files) {
+                        copy2Folder(getSelectedFiles(), files.get(0));
+                    }
+
+                    @Override
+                    public void onFileCanceled() {
+
+                    }
+                }).create(getActivity());
+        dialog.show();
+    }
+
+    private void copy2Folder(File[] files, File destFile) {
+        final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
+                .setCancelable(false).setCanceledOnTouchOutside(false).create();
+        dialog.show();
+        FileUtil.copy2DirectoryAsync(files, destFile, new FileOperationListener() {
+
+            @Override
+            public void onProgress() {
+
+            }
+
+            @Override
+            public void onError() {
+                dialog.dismiss();
+                exitSelectMode();
+                refreshFileList();
+                ToastUtil.showToast(getActivity(), "Copy Error!");
+            }
+
+            @Override
+            public void onComplete() {
+                dialog.dismiss();
+                exitSelectMode();
+                refreshFileList();
+                ToastUtil.showToast(getActivity(), "Copy OK!");
+            }
+        });
     }
 
     @Override
-    public void cutFile() {
-        // TODO 自动生成的方法存根
-        
+    public void moveFile() {
+        FileDialog dialog = new FileDialog.Builder(getActivity())
+                .setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE).setCancelable(false)
+                .setCanceledOnTouchOutside(false).setTitle("selectFolder")
+                .setFileSelectListener(new FileDialogListener() {
+
+                    @Override
+                    public void onFileSelected(ArrayList<File> files) {
+                        move2Folder(getSelectedFiles(), files.get(0));
+                    }
+
+                    @Override
+                    public void onFileCanceled() {
+
+                    }
+                }).create(getActivity());
+        dialog.show();
+    }
+
+    private void move2Folder(File[] files, File destFile) {
+        final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
+                .setCancelable(false).setCanceledOnTouchOutside(false).create();
+        dialog.show();
+        FileUtil.move2DirectoryAsync(files, destFile, new FileOperationListener() {
+
+            @Override
+            public void onProgress() {
+
+            }
+
+            @Override
+            public void onError() {
+                dialog.dismiss();
+                exitSelectMode();
+                refreshFileList();
+                ToastUtil.showToast(getActivity(), "Move Error!");
+            }
+
+            @Override
+            public void onComplete() {
+                dialog.dismiss();
+                exitSelectMode();
+                refreshFileList();
+                ToastUtil.showToast(getActivity(), "Move OK!");
+            }
+        });
     }
 
     @Override
     public void deleteFile() {
-        // TODO 自动生成的方法存根
-        
+        new AlertDialog.Builder(getActivity()).setMessage("Confirm to delete?").setTitle("Message")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteFiles();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create().show();
+    }
+
+    private void deleteFiles() {
+        final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
+                .setCancelable(false).setCanceledOnTouchOutside(false).create();
+        dialog.show();
+        FileUtil.deleteAsync(getSelectedFiles(), new FileOperationListener() {
+
+            @Override
+            public void onProgress() {
+
+            }
+
+            @Override
+            public void onError() {
+                dialog.dismiss();
+                exitSelectMode();
+                refreshFileList();
+                ToastUtil.showToast(getActivity(), "Delete Error!");
+            }
+
+            @Override
+            public void onComplete() {
+                dialog.dismiss();
+                exitSelectMode();
+                refreshFileList();
+                ToastUtil.showToast(getActivity(), "Delete OK!");
+            }
+        });
     }
 
     @Override
     public void addNewFile() {
-        // TODO 自动生成的方法存根
-        
+
     }
 
     @Override
     public void refreshFileList() {
-        // TODO 自动生成的方法存根
-        
+        if (fakeBackStack.size() > 0) {
+            fakeBackStack.get(fakeBackStack.size() - 1).refreshFileList();
+        }
     }
 
     @Override
     public void searchFile() {
-        // TODO 自动生成的方法存根
-        
+        if (fakeBackStack.size() > 0) {
+            fakeBackStack.get(fakeBackStack.size() - 1).searchFile();
+        }
     }
 }

@@ -83,7 +83,9 @@ public class FileListAdapter extends BaseAdapter {
             File[] files = file.listFiles();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
-                    list.add(new FileItem(files[i]));
+                    if (!file.isHidden()) {
+                        list.add(new FileItem(files[i]));
+                    }
                 }
             }
             files = null;
@@ -144,8 +146,10 @@ public class FileListAdapter extends BaseAdapter {
     public ArrayList<File> getSelectedFiles() {
         ArrayList<File> selectedFiles = new ArrayList<File>();
         for (Iterator<FileItem> iterator = list.iterator(); iterator.hasNext();) {
-            File file = (File) iterator.next();// 强制转换为File
-            selectedFiles.add(file);
+            FileItem file = iterator.next();// 强制转换为File
+            if (file.isSelected()) {
+                selectedFiles.add(file);
+            }
         }
         return selectedFiles;
     }
