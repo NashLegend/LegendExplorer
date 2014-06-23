@@ -231,6 +231,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             selectAllButton.setOnCheckedChangeListener(null);
             selectAllButton.setChecked(false);
             selectAllButton.setOnCheckedChangeListener(this);
+        } else if (FileConst.Action_File_Opration_Done.equals(action)) {
+            exitSelectMode();
         } else if (FileConst.Action_Add_New_File.equals(action)) {
             addNewFile();
         } else if (FileConst.Action_Search_File.equals(action)) {
@@ -245,8 +247,6 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             moveFile();
         } else if (FileConst.Action_Delete_File.equals(action)) {
             deleteFile();
-        } else if (FileConst.Action_File_Opration_Done.equals(action)) {
-            exitSelectMode();
         }
         return false;
     }
