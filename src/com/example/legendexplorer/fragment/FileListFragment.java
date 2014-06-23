@@ -9,8 +9,19 @@ import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.db.BookmarkHelper;
 import com.example.legendexplorer.model.FileItem;
+import com.example.legendutils.Dialogs.FileDialog;
+import com.example.legendutils.Dialogs.ListDialog;
+import com.example.legendutils.Dialogs.Win8ProgressDialog;
+import com.example.legendutils.Dialogs.FileDialog.FileDialogListener;
+import com.example.legendutils.Dialogs.ListDialog.OnItemSelectedListener;
+import com.example.legendutils.Tools.FileUtil;
+import com.example.legendutils.Tools.ToastUtil;
+import com.example.legendutils.Tools.FileUtil.FileOperationListener;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -82,8 +93,14 @@ public class FileListFragment extends Fragment {
     /**
      * @return 返回选中的文件列表
      */
-    public ArrayList<File> getSelectedFiles() {
-        return adapter.getSelectedFiles();
+    public File[] getSelectedFiles() {
+        ArrayList<File> files = adapter.getSelectedFiles();
+        File[] files2 = new File[files.size()];
+        for (int i = 0; i < files2.length; i++) {
+            files2[i] = files.get(i);
+        }
+        return files2;
+
     }
 
     public void change2SelectMode() {
@@ -116,11 +133,182 @@ public class FileListFragment extends Fragment {
 
     }
 
+    public void addNewFile() {
+        String[] values = {
+                "File", "Folder"
+        };
+        ListDialog dialog = new ListDialog.Builder(getActivity()).setTitle("choose")
+                .setMultiSelect(false)
+                .setDisplayedValues(values)
+                .setOnItemSelectedListener(new OnItemSelectedListener() {
+
+                    @Override
+                    public void OnItemSelected(int[] items) {
+                        int selected = items[0];
+                        if (selected == 0) {
+                            // File
+                        } else {
+                            // Folder
+                        }
+                    }
+
+                    @Override
+                    public void OnCalcelSelect() {
+                        // TODO 自动生成的方法存根
+
+                    }
+                }).create();
+        dialog.show();
+    }
+
     public void refreshFileList() {
         loadData();
     }
 
     public void searchFile() {
-        
+
+    }
+
+    public void copyFile() {
+        FileDialog dialog = new FileDialog.Builder(getActivity())
+                .setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE).setCancelable(false)
+                .setCanceledOnTouchOutside(false).setTitle("selectFolder")
+                .setFileSelectListener(new FileDialogListener() {
+
+                    @Override
+                    public void onFileSelected(ArrayList<File> files) {
+                        copy2Folder(getSelectedFiles(), files.get(0));
+                    }
+
+                    @Override
+                    public void onFileCanceled() {
+
+                    }
+                }).create(getActivity());
+        dialog.show();
+    }
+
+    private void copy2Folder(File[] files, File destFile) {
+        final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
+                .setCancelable(false).setCanceledOnTouchOutside(false).create();
+        dialog.show();
+        FileUtil.copy2DirectoryAsync(files, destFile, new FileOperationListener() {
+
+            @Override
+            public void onProgress() {
+
+            }
+
+            @Override
+            public void onError() {
+                dialog.dismiss();
+                operationDone();
+                ToastUtil.showToast(getActivity(), "Copy Error!");
+            }
+
+            @Override
+            public void onComplete() {
+                dialog.dismiss();
+                operationDone();
+                ToastUtil.showToast(getActivity(), "Copy OK!");
+            }
+        });
+    }
+
+    public void moveFile() {
+        FileDialog dialog = new FileDialog.Builder(getActivity())
+                .setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE).setCancelable(false)
+                .setCanceledOnTouchOutside(false).setTitle("selectFolder")
+                .setFileSelectListener(new FileDialogListener() {
+
+                    @Override
+                    public void onFileSelected(ArrayList<File> files) {
+                        move2Folder(getSelectedFiles(), files.get(0));
+                    }
+
+                    @Override
+                    public void onFileCanceled() {
+
+                    }
+                }).create(getActivity());
+        dialog.show();
+    }
+
+    private void move2Folder(File[] files, File destFile) {
+        final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
+                .setCancelable(false).setCanceledOnTouchOutside(false).create();
+        dialog.show();
+        FileUtil.move2DirectoryAsync(files, destFile, new FileOperationListener() {
+
+            @Override
+            public void onProgress() {
+
+            }
+
+            @Override
+            public void onError() {
+                dialog.dismiss();
+                operationDone();
+                ToastUtil.showToast(getActivity(), "Move Error!");
+            }
+
+            @Override
+            public void onComplete() {
+                dialog.dismiss();
+                operationDone();
+                ToastUtil.showToast(getActivity(), "Move OK!");
+            }
+        });
+    }
+
+    public void deleteFile() {
+        new AlertDialog.Builder(getActivity()).setMessage("Confirm to delete?").setTitle("Message")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteFiles();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create().show();
+    }
+
+    private void deleteFiles() {
+        final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
+                .setCancelable(false).setCanceledOnTouchOutside(false).create();
+        dialog.show();
+        FileUtil.deleteAsync(getSelectedFiles(), new FileOperationListener() {
+
+            @Override
+            public void onProgress() {
+
+            }
+
+            @Override
+            public void onError() {
+                dialog.dismiss();
+                operationDone();
+                ToastUtil.showToast(getActivity(), "Delete Error!");
+            }
+
+            @Override
+            public void onComplete() {
+                dialog.dismiss();
+                operationDone();
+                ToastUtil.showToast(getActivity(), "Delete OK!");
+            }
+        });
+    }
+    
+    private void operationDone() {
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_File_Opration_Done);
+        getActivity().sendBroadcast(intent);
+        refreshFileList();
     }
 }

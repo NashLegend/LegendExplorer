@@ -144,11 +144,11 @@ public class BookMarksFragment extends BaseFragment implements OnClickListener,
     /**
      * @return 返回选中的文件列表
      */
-    public ArrayList<File> getSelectedFiles() {
+    public File[] getSelectedFiles() {
         if (fakeBackStack.size() > 0) {
             return fakeBackStack.get(fakeBackStack.size() - 1).getSelectedFiles();
         } else {
-            return new ArrayList<File>();
+            return null;
         }
     }
 

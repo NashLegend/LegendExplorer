@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
         filter.addAction(FileConst.Action_FileItem_Unselect);
         filter.addAction(FileConst.Action_Switch_2_Select_Mode);
         filter.addAction(FileConst.Action_Exit_Select_Mode);
+        filter.addAction(FileConst.Action_File_Opration_Done);
         fileBroadcastReceiver = new FileBroadcastReceiver();
         registerReceiver(fileBroadcastReceiver, filter);
     }

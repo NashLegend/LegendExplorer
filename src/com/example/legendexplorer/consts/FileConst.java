@@ -16,7 +16,7 @@ public class FileConst {
     public static final String Action_Delete_File = "legendexplorer.deletefile";
     public static final String Action_Switch_2_Select_Mode = "legendexplorer.switch2selectmode";
     public static final String Action_Exit_Select_Mode = "legendexplorer.exitselectmode";
-
+    public static final String Action_File_Opration_Done = "legendexplorer.fileoperationdone";
     // Extras
     public static final String Extra_File_Path = "filepath";
     public static final String Extra_Item_Type = "itemtype";
