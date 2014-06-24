@@ -155,8 +155,10 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (doBackAction()) {
-            return true;
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (doBackAction()) {
+                return true;
+            }
         }
         return super.onKeyUp(keyCode, event);
     }
