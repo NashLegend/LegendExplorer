@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.ListView;
 
 public class FileListFragment extends Fragment {
@@ -36,6 +37,8 @@ public class FileListFragment extends Fragment {
     private String filePath;
     private int itemType = FileItem.Item_Type_File_Or_Folder;
     private String pathPreffix = "/////////////";
+    private GridView gridView;
+    private View rootView;
 
     public FileListFragment() {
 
@@ -51,13 +54,21 @@ public class FileListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_file_list, null);
-        listView = (ListView) view.findViewById(R.id.fragment_listview_files);
-        adapter = new FileListAdapter(getActivity());
-        listView.setAdapter(adapter);
-        listView.setLongClickable(true);
-        loadData();
-        return view;
+        if (rootView == null) {
+            rootView = inflater.inflate(R.layout.layout_file_list, null);
+            listView = (ListView) rootView.findViewById(R.id.fragment_listview_files);
+            adapter = new FileListAdapter(getActivity());
+            gridView = (GridView) rootView.findViewById(R.id.fragment_gridview_files);
+            gridView.setVisibility(ViewGroup.GONE);
+            listView.setAdapter(adapter);
+            listView.setLongClickable(true);
+            loadData();
+        } else {
+            if (rootView.getParent() != null) {
+                ((ViewGroup) rootView.getParent()).removeView(rootView);
+            }
+        }
+        return rootView;
     }
 
     public void loadData() {
@@ -129,7 +140,27 @@ public class FileListFragment extends Fragment {
     }
 
     public void toggleViewMode() {
-        // TODO 自动生成的方法存根
+        if (gridView.getVisibility() == View.GONE) {
+
+            listView.setVisibility(View.GONE);
+            listView.setAdapter(null);
+
+            adapter.setDisplayModeGrid(true);
+
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(adapter);
+
+        } else {
+
+            gridView.setVisibility(View.GONE);
+            gridView.setAdapter(null);
+
+            adapter.setDisplayModeGrid(false);
+
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(adapter);
+
+        }
 
     }
 
@@ -154,7 +185,6 @@ public class FileListFragment extends Fragment {
 
                     @Override
                     public void OnCalcelSelect() {
-                        // TODO 自动生成的方法存根
 
                     }
                 }).create();
@@ -279,32 +309,39 @@ public class FileListFragment extends Fragment {
     }
 
     private void deleteFiles() {
-        final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
-                .setCancelable(false).setCanceledOnTouchOutside(false).create();
-        dialog.show();
-        FileUtil.deleteAsync(getSelectedFiles(), new FileOperationListener() {
+        // TODO
+        // 删除数据库或者文件
+        if (itemType == FileItem.Item_type_Bookmark) {
+            // 删除数据库
+        } else {
+            final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(getActivity())
+                    .setCancelable(false).setCanceledOnTouchOutside(false).create();
+            dialog.show();
+            FileUtil.deleteAsync(getSelectedFiles(), new FileOperationListener() {
 
-            @Override
-            public void onProgress() {
+                @Override
+                public void onProgress() {
 
-            }
+                }
 
-            @Override
-            public void onError() {
-                dialog.dismiss();
-                operationDone();
-                ToastUtil.showToast(getActivity(), "Delete Error!");
-            }
+                @Override
+                public void onError() {
+                    dialog.dismiss();
+                    operationDone();
+                    ToastUtil.showToast(getActivity(), "Delete Error!");
+                }
 
-            @Override
-            public void onComplete() {
-                dialog.dismiss();
-                operationDone();
-                ToastUtil.showToast(getActivity(), "Delete OK!");
-            }
-        });
+                @Override
+                public void onComplete() {
+                    dialog.dismiss();
+                    operationDone();
+                    ToastUtil.showToast(getActivity(), "Delete OK!");
+                }
+            });
+        }
+
     }
-    
+
     private void operationDone() {
         Intent intent = new Intent();
         intent.setAction(FileConst.Action_File_Opration_Done);

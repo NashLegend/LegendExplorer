@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootFileItemView"
+    android:layout_width="90dp"
+    android:layout_height="120dp"
+    android:descendantFocusability="blocksDescendants" >
+
+    <ImageView
+        android:id="@+id/image_file_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="9dp" />
+
+    <CheckBox
+        android:id="@+id/checkbox_file_item_select"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignBottom="@+id/image_file_icon"
+        android:layout_alignRight="@+id/image_file_icon"
+        android:focusable="false" />
+
+    <TextView
+        android:id="@+id/text_file_title"
+        android:layout_width="72dp"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="9dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="2"
+        android:minWidth="80dp" />
+
+</RelativeLayout>

@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
+import com.example.legendexplorer.view.FileGridItemView;
 import com.example.legendexplorer.view.FileItemView;
 
 import android.annotation.SuppressLint;
@@ -24,6 +25,7 @@ public class FileListAdapter extends BaseAdapter {
     private ArrayList<FileItem> list = new ArrayList<FileItem>();
     private Context mContext;
     private File currentDirectory;
+    private boolean displayModeGrid = false;
 
     public FileListAdapter(Context Context) {
         mContext = Context;
@@ -45,22 +47,46 @@ public class FileListAdapter extends BaseAdapter {
     }
 
     @Override
+    public int getViewTypeCount() {
+        // TODO 自动生成的方法存根
+        return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return displayModeGrid ? 1 : 0;
+    }
+    
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        if (convertView == null) {
-            holder = new ViewHolder();
-            convertView = new FileItemView(mContext);
-            holder.fileItemView = (FileItemView) convertView;
-            convertView.setTag(holder);
+        if (displayModeGrid) {
+            if (convertView == null) {
+                holder = new ViewHolder();
+                convertView = new FileGridItemView(mContext);
+                holder.fileGridItemView = (FileGridItemView) convertView;
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            holder.fileGridItemView.setFileItem(list.get(position), this);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            if (convertView == null) {
+                holder = new ViewHolder();
+                convertView = new FileItemView(mContext);
+                holder.fileItemView = (FileItemView) convertView;
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            holder.fileItemView.setFileItem(list.get(position), this);
         }
-        holder.fileItemView.setFileItem(list.get(position), this);
-        return holder.fileItemView;
+        return convertView;
     }
 
     class ViewHolder {
         FileItemView fileItemView;
+        FileGridItemView fileGridItemView;
     }
 
     public ArrayList<FileItem> getList() {
@@ -83,7 +109,7 @@ public class FileListAdapter extends BaseAdapter {
             File[] files = file.listFiles();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
-                    if (!file.isHidden()) {
+                    if (!files[i].isHidden()) {
                         list.add(new FileItem(files[i]));
                     }
                 }
@@ -175,6 +201,14 @@ public class FileListAdapter extends BaseAdapter {
 
     public File getCurrentDirectory() {
         return currentDirectory;
+    }
+
+    public boolean isDisplayModeGrid() {
+        return displayModeGrid;
+    }
+
+    public void setDisplayModeGrid(boolean displayModeGrid) {
+        this.displayModeGrid = displayModeGrid;
     }
 
 }

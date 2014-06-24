@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="match_parent" >
 
     <LinearLayout
         android:id="@+id/layout_file_header"
@@ -17,7 +16,7 @@
             android:layout_weight="0"
             android:background="#00000000"
             android:src="@drawable/back_button"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <EditText
             android:id="@+id/edittext_file_path"
@@ -37,8 +36,8 @@
     <FrameLayout
         android:id="@+id/content_explorer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:layout_height="match_parent"
+        android:layout_below="@id/layout_file_header" >
     </FrameLayout>
 
-</LinearLayout>
+</RelativeLayout>

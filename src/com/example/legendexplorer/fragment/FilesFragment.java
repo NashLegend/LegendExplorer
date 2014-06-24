@@ -10,6 +10,7 @@ import com.example.legendexplorer.consts.FileConst;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +33,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     private CheckBox selectAllButton;
     private boolean inSelectMode = false;
     private ArrayList<FileListFragment> fakeBackStack = new ArrayList<FileListFragment>();
-
-    private String initialPath = "/";
+    private String initialPath = Environment.getExternalStorageDirectory().getPath();
 
     public FilesFragment() {
 
@@ -43,7 +43,6 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_file_explorer, null);
-        // listView = (ListView) view.findViewById(R.id.listview_files);
         pathText = (EditText) view.findViewById(R.id.edittext_file_path);
         backButton = (ImageButton) view
                 .findViewById(R.id.imagebutton_file_back);
@@ -65,7 +64,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
      * @param file 要打开的文件夹
      */
     public void openFolder(File file) {
-        if (!file.exists() || !file.isDirectory()) {
+        if (file == null || !file.exists() || !file.isDirectory()) {
             // 若不存在此目录，则打开根文件夹
             return;
         }
@@ -99,9 +98,9 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     }
 
     /**
-     * 返回上级目录
+     * 返回一层fragment,不一定是上一级目录
      */
-    private void back2ParentLevel() {
+    private void back2LastStack() {
         if (fakeBackStack.size() > 1) {
             fakeBackStack.remove(fakeBackStack.size() - 1);
             FileListFragment fragment = fakeBackStack.get(fakeBackStack.size() - 1);
@@ -111,6 +110,21 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             pathText.setText(fragment.getFilePath());
         } else {
             // do nothing
+        }
+    }
+
+    /**
+     * 返回上一级目录
+     */
+    private void back2ParentLevel() {
+        // 删还是不删除以前的栈？以后再说。 TODO
+        if (fakeBackStack.size() > 0) {
+            FileListFragment fragment = fakeBackStack.get(fakeBackStack.size() - 1);
+            File file = new File(fragment.getFilePath());
+            File pFile = file.getParentFile();
+            if (pFile != null && pFile.exists() && pFile.isDirectory()) {
+                openFolder(pFile);
+            }
         }
     }
 
@@ -188,7 +202,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             return true;
         } else {
             if (fakeBackStack.size() > 1) {
-                back2ParentLevel();
+                back2LastStack();
                 return true;
             }
         }
