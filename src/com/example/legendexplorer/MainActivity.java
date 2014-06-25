@@ -9,6 +9,7 @@ import com.example.legendexplorer.fragment.BaseFragment;
 import com.example.legendexplorer.fragment.BookMarksFragment;
 import com.example.legendexplorer.fragment.ClassifiedFragment;
 import com.example.legendexplorer.fragment.FilesFragment;
+import com.example.legendexplorer.view.FolderViewPager;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -24,7 +25,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
-    private ViewPager pager;
+    private FolderViewPager pager;
     private FilePagerAdapter adapter;
     private ArrayList<BaseFragment> list;
     private FilesFragment filesFragment;
@@ -38,8 +39,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getActionBar().setDisplayShowTitleEnabled(false);
-
         filesFragment = new FilesFragment();
         bookMarksFragment = new BookMarksFragment();
         classifiedFragment = new ClassifiedFragment();
@@ -49,7 +48,7 @@ public class MainActivity extends Activity {
         list.add(bookMarksFragment);
         list.add(classifiedFragment);
 
-        pager = (ViewPager) findViewById(R.id.pager);
+        pager = (FolderViewPager) findViewById(R.id.pager);
         adapter = new FilePagerAdapter(getFragmentManager());
         adapter.setList(list);
         pager.setAdapter(adapter);
@@ -61,6 +60,8 @@ public class MainActivity extends Activity {
         filter.addAction(FileConst.Action_Switch_2_Select_Mode);
         filter.addAction(FileConst.Action_Exit_Select_Mode);
         filter.addAction(FileConst.Action_File_Opration_Done);
+        filter.addAction(FileConst.Action_Enable_Pager_Scroll);
+        filter.addAction(FileConst.Action_Disable_Pager_Scroll);
         fileBroadcastReceiver = new FileBroadcastReceiver();
         registerReceiver(fileBroadcastReceiver, filter);
     }
@@ -182,6 +183,11 @@ public class MainActivity extends Activity {
                 showFileOperationMenu();
             } else if (FileConst.Action_Exit_Select_Mode.equals(action)) {
                 showFileListMenu();
+            } else if (FileConst.Action_Disable_Pager_Scroll.equals(action)) {
+                pager.setScrollEnabled(false);
+            }
+            else if (FileConst.Action_Enable_Pager_Scroll.equals(action)) {
+                pager.setScrollEnabled(true);
             }
             adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
         }

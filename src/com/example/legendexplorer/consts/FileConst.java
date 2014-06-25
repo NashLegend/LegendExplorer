@@ -17,6 +17,8 @@ public class FileConst {
     public static final String Action_Switch_2_Select_Mode = "legendexplorer.switch2selectmode";
     public static final String Action_Exit_Select_Mode = "legendexplorer.exitselectmode";
     public static final String Action_File_Opration_Done = "legendexplorer.fileoperationdone";
+    public static final String Action_Disable_Pager_Scroll="legendexplorer.disablepagerscroll";
+    public static final String Action_Enable_Pager_Scroll="legendexplorer.enablepagerscroll";
     // Extras
     public static final String Extra_File_Path = "filepath";
     public static final String Extra_Item_Type = "itemtype";
@@ -24,8 +26,12 @@ public class FileConst {
 
     // Keys
     public static final String Key_Is_First_Open = "isfirstopen";
+    public static final String Key_Files_Display_Mode = "filesdisplaymode";
 
     // Values
     public static final String Value_Bookmark_Path = "Bookmark://";
+
+    public static final int Value_Files_Display_List = 0;
+    public static final int Value_Files_Display_Grid = 1;
 
 }

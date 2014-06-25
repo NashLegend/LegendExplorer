@@ -3,9 +3,13 @@ package com.example.legendexplorer.fragment;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.consts.FileConst;
+import com.example.legendexplorer.view.DropDownAncestorList;
+import com.example.legendexplorer.view.DropDownAncestorList.OnAncestorClickListener;
+import com.example.legendutils.Tools.FileUtil;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -32,6 +36,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     private ImageButton backButton;
     private CheckBox selectAllButton;
     private boolean inSelectMode = false;
+    private DropDownAncestorList ancestorList;
     private ArrayList<FileListFragment> fakeBackStack = new ArrayList<FileListFragment>();
     private String initialPath = Environment.getExternalStorageDirectory().getPath();
 
@@ -46,6 +51,20 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
         pathText = (EditText) view.findViewById(R.id.edittext_file_path);
         backButton = (ImageButton) view
                 .findViewById(R.id.imagebutton_file_back);
+        ancestorList = (DropDownAncestorList) view.findViewById(R.id.ancestorList);
+        ancestorList.setOnAncestorClickListener(new OnAncestorClickListener() {
+
+            @Override
+            public void onClick(String path) {
+                openAncestorFolder(new File(path));
+                invokeAncestorList();
+            }
+
+            @Override
+            public void onClickOutside() {
+                invokeAncestorList();
+            }
+        });
         selectAllButton = (CheckBox) view
                 .findViewById(R.id.checkbox_file_all);
 
@@ -53,9 +72,41 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
         selectAllButton.setOnCheckedChangeListener(this);
         selectAllButton.setVisibility(View.GONE);
         pathText.setKeyListener(null);
+        pathText.setOnClickListener(this);
         openFolder();
 
         return view;
+    }
+
+    private void invokeAncestorList() {
+        if (ancestorList.getVisibility() == View.GONE) {
+            String path = pathText.getText().toString();
+            if ("/".equals(path)) {
+                return;
+            } else {
+                File file = new File(path);
+                ancestorList.setupList(file);
+                ancestorList.setVisibility(View.VISIBLE);
+            }
+
+        } else {
+            ancestorList.setVisibility(View.GONE);
+        }
+    }
+
+    private void openAncestorFolder(File file) {
+        // file.isDirectory()为true则说明文件存在
+        if (file != null && file.isDirectory()) {
+            for (int i = fakeBackStack.size() - 1; i >= 0; i--) {
+                FileListFragment subFragment = fakeBackStack.get(i);
+                File file2 = new File(subFragment.getFilePath());
+                if (FileUtil.isAncestorOf(file, file2) || file.equals(file2)) {
+                    fakeBackStack.remove(i);
+                }
+            }
+        }
+
+        openFolder(file);
     }
 
     /**
@@ -64,7 +115,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
      * @param file 要打开的文件夹
      */
     public void openFolder(File file) {
-        if (file == null || !file.exists() || !file.isDirectory()) {
+        // file.isDirectory()不为true则说明文件要么不存在要么是文件
+        if (file == null || !file.isDirectory()) {
             // 若不存在此目录，则打开根文件夹
             return;
         }
@@ -165,8 +217,15 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.imagebutton_file_back) {
-            back2ParentLevel();
+        switch (id) {
+            case R.id.imagebutton_file_back:
+                back2ParentLevel();
+                break;
+            case R.id.edittext_file_path:
+                invokeAncestorList();
+                break;
+            default:
+                break;
         }
     }
 
@@ -197,14 +256,18 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 
     @Override
     public boolean doBackAction() {
+
+        if (ancestorList.getVisibility() == View.VISIBLE) {
+            invokeAncestorList();
+            return true;
+        }
         if (inSelectMode) {
             exitSelectMode();
             return true;
-        } else {
-            if (fakeBackStack.size() > 1) {
-                back2LastStack();
-                return true;
-            }
+        }
+        if (fakeBackStack.size() > 1) {
+            back2LastStack();
+            return true;
         }
 
         return false;
@@ -219,6 +282,10 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             Intent intent = new Intent();
             intent.setAction(FileConst.Action_Switch_2_Select_Mode);
             getActivity().sendBroadcast(intent);
+
+            Intent intent2 = new Intent();
+            intent2.setAction(FileConst.Action_Disable_Pager_Scroll);
+            getActivity().sendBroadcast(intent2);
         }
     }
 

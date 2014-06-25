@@ -40,4 +40,12 @@
         android:layout_below="@id/layout_file_header" >
     </FrameLayout>
 
+    <com.example.legendexplorer.view.DropDownAncestorList
+        android:id="@+id/ancestorList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/layout_file_header"
+        android:visibility="gone" >
+    </com.example.legendexplorer.view.DropDownAncestorList>
+
 </RelativeLayout>

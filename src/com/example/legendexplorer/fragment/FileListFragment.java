@@ -9,6 +9,7 @@ import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.db.BookmarkHelper;
 import com.example.legendexplorer.model.FileItem;
+import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendutils.Dialogs.FileDialog;
 import com.example.legendutils.Dialogs.ListDialog;
 import com.example.legendutils.Dialogs.Win8ProgressDialog;
@@ -59,16 +60,34 @@ public class FileListFragment extends Fragment {
             listView = (ListView) rootView.findViewById(R.id.fragment_listview_files);
             adapter = new FileListAdapter(getActivity());
             gridView = (GridView) rootView.findViewById(R.id.fragment_gridview_files);
-            gridView.setVisibility(ViewGroup.GONE);
-            listView.setAdapter(adapter);
+            gridView.setLongClickable(true);
             listView.setLongClickable(true);
-            loadData();
+            initViews();
         } else {
             if (rootView.getParent() != null) {
                 ((ViewGroup) rootView.getParent()).removeView(rootView);
             }
         }
         return rootView;
+    }
+
+    private void initViews() {
+        int mode = SharePreferencesUtil.readInt(FileConst.Key_Files_Display_Mode,
+                FileConst.Value_Files_Display_List);
+        if (mode == FileConst.Value_Files_Display_List) {
+            gridView.setVisibility(View.GONE);
+            gridView.setAdapter(null);
+            adapter.setDisplayModeGrid(false);
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(adapter);
+        } else {
+            listView.setVisibility(View.GONE);
+            listView.setAdapter(null);
+            adapter.setDisplayModeGrid(true);
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(adapter);
+        }
+        loadData();
     }
 
     public void loadData() {
@@ -150,6 +169,9 @@ public class FileListFragment extends Fragment {
             gridView.setVisibility(View.VISIBLE);
             gridView.setAdapter(adapter);
 
+            SharePreferencesUtil.saveInt(FileConst.Key_Files_Display_Mode,
+                    FileConst.Value_Files_Display_Grid);
+
         } else {
 
             gridView.setVisibility(View.GONE);
@@ -159,6 +181,9 @@ public class FileListFragment extends Fragment {
 
             listView.setVisibility(View.VISIBLE);
             listView.setAdapter(adapter);
+
+            SharePreferencesUtil.saveInt(FileConst.Key_Files_Display_Mode,
+                    FileConst.Value_Files_Display_List);
 
         }
 

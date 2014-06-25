@@ -22,7 +22,9 @@ public class FolderViewPager extends ViewPager {
     }
 
     public void setScrollEnabled(boolean scrollEnabled) {
+        // TODO
         this.scrollEnabled = scrollEnabled;
+        requestDisallowInterceptTouchEvent(!scrollEnabled);
     }
 
 }
