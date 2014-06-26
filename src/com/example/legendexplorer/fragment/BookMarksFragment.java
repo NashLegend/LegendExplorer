@@ -2,7 +2,6 @@
 package com.example.legendexplorer.fragment;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.consts.FileConst;
@@ -17,20 +16,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 /**
  * 书签视图
  * 
  * @author NashLegend
  */
-public class BookMarksFragment extends FilesFragment implements OnClickListener,
-        OnCheckedChangeListener {
+public class BookMarksFragment extends FilesFragment {
     private String pathPreffix = FileConst.Value_File_Path_Never_Existed;
 
     public BookMarksFragment() {
