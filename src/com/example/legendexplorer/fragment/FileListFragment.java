@@ -140,11 +140,18 @@ public class FileListFragment extends Fragment {
     public void exitSelectMode() {
         adapter.exitSelectMode();
     }
-
+    
     /**
      * TODO
      */
     public String getFilePath() {
+        return filePath;
+    }
+
+    /**
+     * TODO
+     */
+    public String getDisplayedFilePath() {
         switch (itemType) {
             case FileItem.Item_Type_File_Or_Folder:
                 return filePath;
@@ -364,7 +371,12 @@ public class FileListFragment extends Fragment {
                 }
             });
         }
+    }
 
+    public void toggleShowHidden() {
+        boolean pre = SharePreferencesUtil.readBoolean(FileConst.Key_Show_Hiddle_Files, false);
+        SharePreferencesUtil.saveBoolean(FileConst.Key_Show_Hiddle_Files, !pre);
+        refreshFileList();
     }
 
     private void operationDone() {

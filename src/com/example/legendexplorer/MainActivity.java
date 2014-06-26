@@ -52,6 +52,7 @@ public class MainActivity extends Activity {
         adapter = new FilePagerAdapter(getFragmentManager());
         adapter.setList(list);
         pager.setAdapter(adapter);
+        pager.setScrollEnabled(true);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(FileConst.Action_Open_Folder);
@@ -88,6 +89,9 @@ public class MainActivity extends Activity {
             case R.id.action_viewmode:
                 toggleViewMode();
                 break;
+            case R.id.action_toggle_hidden:
+                toggleShowHidden();
+                break;
             case R.id.action_copy:
                 copyFile();
                 break;
@@ -105,11 +109,13 @@ public class MainActivity extends Activity {
     }
 
     public void showFileOperationMenu() {
+        pager.setScrollEnabled(false);
         mMenu.clear();
         getMenuInflater().inflate(R.menu.fileop, mMenu);
     }
 
     public void showFileListMenu() {
+        pager.setScrollEnabled(true);
         mMenu.clear();
         getMenuInflater().inflate(R.menu.filelist, mMenu);
     }
@@ -117,6 +123,12 @@ public class MainActivity extends Activity {
     private void toggleViewMode() {
         Intent intent = new Intent();
         intent.setAction(FileConst.Action_Toggle_View_Mode);
+        adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
+    }
+
+    private void toggleShowHidden() {
+        Intent intent = new Intent();
+        intent.setAction(FileConst.Action_Toggle_Show_Hidden);
         adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
     }
 

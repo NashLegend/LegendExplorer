@@ -15,6 +15,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,13 +33,14 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
  */
 public class FilesFragment extends BaseFragment implements OnClickListener,
         OnCheckedChangeListener, Explorable {
-    private EditText pathText;
-    private ImageButton backButton;
-    private CheckBox selectAllButton;
-    private boolean inSelectMode = false;
-    private DropDownAncestorList ancestorList;
-    private ArrayList<FileListFragment> fakeBackStack = new ArrayList<FileListFragment>();
-    private String initialPath = Environment.getExternalStorageDirectory().getPath();
+    protected View view;
+    protected EditText pathText;
+    protected ImageButton backButton;
+    protected CheckBox selectAllButton;
+    protected boolean inSelectMode = false;
+    protected DropDownAncestorList ancestorList;
+    protected ArrayList<FileListFragment> fakeBackStack = new ArrayList<FileListFragment>();
+    protected String initialPath = Environment.getExternalStorageDirectory().getPath();
 
     public FilesFragment() {
 
@@ -47,38 +49,44 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_file_explorer, null);
-        pathText = (EditText) view.findViewById(R.id.edittext_file_path);
-        backButton = (ImageButton) view
-                .findViewById(R.id.imagebutton_file_back);
-        ancestorList = (DropDownAncestorList) view.findViewById(R.id.ancestorList);
-        ancestorList.setOnAncestorClickListener(new OnAncestorClickListener() {
+        if (view == null) {
+            view = inflater.inflate(R.layout.layout_file_explorer, null);
+            pathText = (EditText) view.findViewById(R.id.edittext_file_path);
+            backButton = (ImageButton) view
+                    .findViewById(R.id.imagebutton_file_back);
+            ancestorList = (DropDownAncestorList) view.findViewById(R.id.ancestorList);
+            ancestorList.setOnAncestorClickListener(new OnAncestorClickListener() {
 
-            @Override
-            public void onClick(String path) {
-                openAncestorFolder(new File(path));
-                invokeAncestorList();
+                @Override
+                public void onClick(String path) {
+                    openAncestorFolder(new File(path));
+                    invokeAncestorList();
+                }
+
+                @Override
+                public void onClickOutside() {
+                    invokeAncestorList();
+                }
+            });
+            selectAllButton = (CheckBox) view
+                    .findViewById(R.id.checkbox_file_all);
+
+            backButton.setOnClickListener(this);
+            selectAllButton.setOnCheckedChangeListener(this);
+            selectAllButton.setVisibility(View.GONE);
+            pathText.setKeyListener(null);
+            pathText.setOnClickListener(this);
+            openFolder();
+        } else {
+            if (view.getParent() != null) {
+                ((ViewGroup) view.getParent()).removeView(view);
             }
-
-            @Override
-            public void onClickOutside() {
-                invokeAncestorList();
-            }
-        });
-        selectAllButton = (CheckBox) view
-                .findViewById(R.id.checkbox_file_all);
-
-        backButton.setOnClickListener(this);
-        selectAllButton.setOnCheckedChangeListener(this);
-        selectAllButton.setVisibility(View.GONE);
-        pathText.setKeyListener(null);
-        pathText.setOnClickListener(this);
-        openFolder();
+        }
 
         return view;
     }
 
-    private void invokeAncestorList() {
+    protected void invokeAncestorList() {
         if (ancestorList.getVisibility() == View.GONE) {
             String path = pathText.getText().toString();
             if ("/".equals(path)) {
@@ -87,14 +95,22 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
                 File file = new File(path);
                 ancestorList.setupList(file);
                 ancestorList.setVisibility(View.VISIBLE);
+
+                Intent intent2 = new Intent();
+                intent2.setAction(FileConst.Action_Disable_Pager_Scroll);
+                getActivity().sendBroadcast(intent2);
             }
 
         } else {
             ancestorList.setVisibility(View.GONE);
+
+            Intent intent2 = new Intent();
+            intent2.setAction(FileConst.Action_Enable_Pager_Scroll);
+            getActivity().sendBroadcast(intent2);
         }
     }
 
-    private void openAncestorFolder(File file) {
+    protected void openAncestorFolder(File file) {
         // file.isDirectory()为true则说明文件存在
         if (file != null && file.isDirectory()) {
             for (int i = fakeBackStack.size() - 1; i >= 0; i--) {
@@ -130,7 +146,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
         transaction.replace(R.id.content_explorer, fragment, file.getAbsolutePath());
         transaction.commit();
         fakeBackStack.add(fragment);
-        pathText.setText(fragment.getFilePath());
+        pathText.setText(fragment.getDisplayedFilePath());
     }
 
     /**
@@ -152,14 +168,14 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     /**
      * 返回一层fragment,不一定是上一级目录
      */
-    private void back2LastStack() {
+    protected void backStack() {
         if (fakeBackStack.size() > 1) {
             fakeBackStack.remove(fakeBackStack.size() - 1);
             FileListFragment fragment = fakeBackStack.get(fakeBackStack.size() - 1);
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.content_explorer, fragment, fragment.getFilePath());
+            transaction.replace(R.id.content_explorer, fragment, fragment.getDisplayedFilePath());
             transaction.commit();
-            pathText.setText(fragment.getFilePath());
+            pathText.setText(fragment.getDisplayedFilePath());
         } else {
             // do nothing
         }
@@ -168,11 +184,11 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     /**
      * 返回上一级目录
      */
-    private void back2ParentLevel() {
+    protected void back2ParentLevel() {
         // 删还是不删除以前的栈？以后再说。 TODO
         if (fakeBackStack.size() > 0) {
             FileListFragment fragment = fakeBackStack.get(fakeBackStack.size() - 1);
-            File file = new File(fragment.getFilePath());
+            File file = new File(fragment.getDisplayedFilePath());
             File pFile = file.getParentFile();
             if (pFile != null && pFile.exists() && pFile.isDirectory()) {
                 openFolder(pFile);
@@ -183,7 +199,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     /**
      * 选中当前目录所有文件
      */
-    private void selectAll() {
+    protected void selectAll() {
         if (fakeBackStack.size() > 0) {
             fakeBackStack.get(fakeBackStack.size() - 1).selectAll();
         }
@@ -192,7 +208,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     /**
      * 取消选中当前目录所有文件
      */
-    private void unselectAll() {
+    protected void unselectAll() {
         if (fakeBackStack.size() > 0) {
             fakeBackStack.get(fakeBackStack.size() - 1).unselectAll();
         }
@@ -254,26 +270,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
         return selectAllButton;
     }
 
-    @Override
-    public boolean doBackAction() {
-
-        if (ancestorList.getVisibility() == View.VISIBLE) {
-            invokeAncestorList();
-            return true;
-        }
-        if (inSelectMode) {
-            exitSelectMode();
-            return true;
-        }
-        if (fakeBackStack.size() > 1) {
-            back2LastStack();
-            return true;
-        }
-
-        return false;
-    }
-
-    private void change2SelectMode() {
+    protected void change2SelectMode() {
         if (fakeBackStack.size() > 0) {
             selectAllButton.setVisibility(View.VISIBLE);
             inSelectMode = true;
@@ -282,14 +279,10 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             Intent intent = new Intent();
             intent.setAction(FileConst.Action_Switch_2_Select_Mode);
             getActivity().sendBroadcast(intent);
-
-            Intent intent2 = new Intent();
-            intent2.setAction(FileConst.Action_Disable_Pager_Scroll);
-            getActivity().sendBroadcast(intent2);
         }
     }
 
-    private void exitSelectMode() {
+    protected void exitSelectMode() {
         if (fakeBackStack.size() > 0) {
             selectAllButton.setVisibility(View.GONE);
             inSelectMode = false;
@@ -301,11 +294,32 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
         }
     }
 
+    protected void doOpenFolderAction(Intent intent) {
+        openFolder(intent.getStringExtra(FileConst.Extra_File_Path));
+    }
+
+    @Override
+    public boolean doBackAction() {
+        if (ancestorList.getVisibility() == View.VISIBLE) {
+            invokeAncestorList();
+            return true;
+        }
+        if (inSelectMode) {
+            exitSelectMode();
+            return true;
+        }
+        if (fakeBackStack.size() > 1) {
+            backStack();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean doVeryAction(Intent intent) {
         String action = intent.getAction();
         if (FileConst.Action_Open_Folder.equals(action)) {
-            openFolder(intent.getStringExtra(FileConst.Extra_File_Path));
+            doOpenFolderAction(intent);
         } else if (FileConst.Action_FileItem_Long_Click.equals(action)) {
             change2SelectMode();
         } else if (FileConst.Action_FileItem_Unselect.equals(action)) {
@@ -328,6 +342,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
             moveFile();
         } else if (FileConst.Action_Delete_File.equals(action)) {
             deleteFile();
+        } else if (FileConst.Action_Toggle_Show_Hidden.equals(action)) {
+            toggleShowHidden();
         }
         return false;
     }
@@ -378,6 +394,13 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
     public void searchFile() {
         if (fakeBackStack.size() > 0) {
             fakeBackStack.get(fakeBackStack.size() - 1).searchFile();
+        }
+    }
+
+    @Override
+    public void toggleShowHidden() {
+        if (fakeBackStack.size() > 0) {
+            fakeBackStack.get(fakeBackStack.size() - 1).toggleShowHidden();
         }
     }
 }

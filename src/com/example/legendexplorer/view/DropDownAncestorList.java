@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import com.example.legendexplorer.R;
+import com.example.legendexplorer.consts.FileConst;
 import com.example.legendutils.Tools.DisplayUtil;
 
 import android.content.Context;
@@ -22,10 +23,14 @@ import android.widget.TextView;
 
 public class DropDownAncestorList extends LinearLayout implements OnClickListener {
 
-    private File baseFile = new File("/");
+    private File mFile = new File("/");
     private ArrayList<View> views = new ArrayList<View>();
     private int padStep = DisplayUtil.dip2px(10, getContext());
+    private String prefix = "//////////////";
+    private String replacer = FileConst.Value_Bookmark_Path;
     private OnAncestorClickListener onAncestorClickListener;
+    private boolean hasPreffix = false;
+    private File rootFile;
 
     public DropDownAncestorList(Context context) {
         super(context);
@@ -53,25 +58,52 @@ public class DropDownAncestorList extends LinearLayout implements OnClickListene
         this.onAncestorClickListener = onAncestorClickListener;
     }
 
+    public void setupList(File currentFolder, String prefix, String replacer) {
+        hasPreffix = true;
+        this.prefix = prefix;
+        this.replacer = replacer;
+        this.rootFile = new File(prefix);
+        setupList(currentFolder);
+    }
+
     public void setupList(File file) {
         setOnClickListener(this);
-        if (file != null && !file.equals(baseFile)) {
+        if (file != null && !file.equals(mFile)) {
             clearAllViews();
-            baseFile = file;
+            mFile = file;
             buildViewList();
         }
     }
 
-    private void buildViewList() {
-        File tmpFile = baseFile;
+    private boolean isNotFileRoot(File file) {
+        if (hasPreffix) {
+            return !file.equals(rootFile);
+        } else {
+            return file.getParentFile() != null;
+        }
+    }
 
-        while (tmpFile.getParentFile() != null) {
+    private void buildViewList() {
+
+        File tmpFile = mFile;
+
+        while (isNotFileRoot(tmpFile)) {
             File file = tmpFile.getParentFile();
             View view = LayoutInflater.from(getContext()).inflate(R.layout.view_ancestor_item,
                     null);
+
             view.setTag(file.getAbsolutePath());
-            TextView tv=(TextView) view.findViewById(R.id.text_ancestor_file_title);
-            tv.setText(file.getAbsolutePath());
+            TextView tv = (TextView) view.findViewById(R.id.text_ancestor_file_title);
+            String displatPath = file.getAbsolutePath();
+            if (displatPath.lastIndexOf("/") != displatPath.length() - 1) {
+                displatPath += "/";
+            }
+
+            if (hasPreffix) {
+                displatPath = displatPath.replace(prefix, replacer);
+            }
+
+            tv.setText(displatPath);
             view.setOnClickListener(this);
             views.add(view);
             tmpFile = file;
@@ -100,12 +132,12 @@ public class DropDownAncestorList extends LinearLayout implements OnClickListene
 
     @Override
     public void onClick(View v) {
-        if (v==this) {
+        if (v == this) {
             if (onAncestorClickListener != null) {
                 onAncestorClickListener.onClickOutside();
             }
-        }else {
-            if (v.getTag()!=null) {
+        } else {
+            if (v.getTag() != null) {
                 String path = v.getTag().toString();
                 if (TextUtils.isEmpty(path)) {
                     return;
@@ -119,6 +151,7 @@ public class DropDownAncestorList extends LinearLayout implements OnClickListene
 
     public static interface OnAncestorClickListener {
         void onClick(String path);
+
         void onClickOutside();
     }
 

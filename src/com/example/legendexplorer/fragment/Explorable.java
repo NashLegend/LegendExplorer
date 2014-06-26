@@ -15,4 +15,6 @@ public interface Explorable {
     public void refreshFileList();
 
     public void searchFile();
+
+    public void toggleShowHidden();
 }

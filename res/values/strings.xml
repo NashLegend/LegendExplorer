@@ -9,7 +9,8 @@
     <string name="action_search">search</string>
     <string name="action_new">add</string>
     <string name="action_viewmode">viewmode</string>
-    <string name="action_refresh">refresh</string>
+    <string name="action_toggle_hidden">Toggle Hidden</string>
+    <string name="action_refresh">Refresh</string>
     <string name="cancel">取消</string>
     <string name="ok">确定</string>
     <string name="back">返回</string>

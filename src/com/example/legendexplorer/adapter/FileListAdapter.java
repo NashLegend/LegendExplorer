@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
+import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendexplorer.view.FileGridItemView;
 import com.example.legendexplorer.view.FileItemView;
 
@@ -56,7 +57,7 @@ public class FileListAdapter extends BaseAdapter {
     public int getItemViewType(int position) {
         return displayModeGrid ? 1 : 0;
     }
-    
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
@@ -103,15 +104,22 @@ public class FileListAdapter extends BaseAdapter {
      * @param file
      */
     public boolean openFolder(File file) {
+        boolean showhidden = SharePreferencesUtil.readBoolean(FileConst.Key_Show_Hiddle_Files,
+                false);
         if (file != null && file.exists() && file.isDirectory()) {
             currentDirectory = file;
             list.clear();
             File[] files = file.listFiles();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
-                    if (!files[i].isHidden()) {
+                    if (showhidden) {
                         list.add(new FileItem(files[i]));
+                    } else {
+                        if (!files[i].isHidden()) {
+                            list.add(new FileItem(files[i]));
+                        }
                     }
+
                 }
             }
             files = null;
