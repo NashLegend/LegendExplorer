@@ -270,7 +270,10 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 			if (file != null) {
 				if (currentDirectory.equals(new File(
 						FileConst.Value_File_Path_Never_Existed))) {
-					// TODO Auto-generated method stub
+					BookmarkHelper helper = new BookmarkHelper(mContext);
+					helper.open();
+					tmpList = helper.getBookmarks();
+					helper.close();
 				} else if (file.isDirectory()) {
 					File[] files = file.listFiles();
 					if (files != null) {
