@@ -106,6 +106,7 @@ public class BookMarksFragment extends FilesFragment {
      * 打开收藏夹目录
      */
     public void openBookMarks() {
+    	pathPreffix = FileConst.Value_File_Path_Never_Existed;
         fakeBackStack.clear();
         FileListFragment fragment = new FileListFragment();
         Bundle bundle = new Bundle();
@@ -118,7 +119,6 @@ public class BookMarksFragment extends FilesFragment {
         transaction.commit();
         fakeBackStack.add(fragment);
         pathText.setText(fragment.getDisplayedFilePath());
-        pathPreffix = FileConst.Value_File_Path_Never_Existed;
     }
 
     /**
