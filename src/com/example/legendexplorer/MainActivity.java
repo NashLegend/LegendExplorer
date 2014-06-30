@@ -10,29 +10,21 @@ import com.example.legendexplorer.fragment.BookMarksFragment;
 import com.example.legendexplorer.fragment.ClassifiedFragment;
 import com.example.legendexplorer.fragment.FilesFragment;
 import com.example.legendexplorer.view.FolderViewPager;
-import com.example.legendutils.Tools.LogUtil;
 import com.example.legendutils.Tools.TimerUtil;
 import com.example.legendutils.Tools.ToastUtil;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.SearchView;
-import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -45,7 +37,6 @@ public class MainActivity extends Activity {
 	private FileBroadcastReceiver fileBroadcastReceiver;
 	private Menu mMenu;
 	private SearchView searchView;
-	private long lastTick = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -15,15 +15,12 @@ import com.example.legendexplorer.view.FileItemView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.Filter;
 
 @SuppressLint("DefaultLocale")
 public class FileListAdapter extends BaseAdapter implements Filterable {
@@ -53,7 +50,6 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 
 	@Override
 	public int getViewTypeCount() {
-		// TODO 自动生成的方法存根
 		return 2;
 	}
 
@@ -248,10 +244,11 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 
 	private Filter filter = new Filter() {
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint,
 				FilterResults results) {
-			list = (ArrayList<FileItem>) results.values;
+			setList((ArrayList<FileItem>) results.values);
 			if (results.count > 0) {
 				notifyDataSetChanged();
 			} else {
