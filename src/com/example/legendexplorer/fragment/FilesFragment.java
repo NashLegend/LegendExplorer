@@ -12,18 +12,23 @@ import com.example.legendutils.Tools.FileUtil;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.PopupWindow;
 
 /**
  * 普通视图
@@ -41,6 +46,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 	protected ArrayList<FileListFragment> fakeBackStack = new ArrayList<FileListFragment>();
 	protected String initialPath = Environment.getExternalStorageDirectory()
 			.getPath();
+	protected PopupWindow popupWindow;
 
 	public FilesFragment() {
 
@@ -54,22 +60,6 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			pathText = (EditText) view.findViewById(R.id.edittext_file_path);
 			backButton = (ImageButton) view
 					.findViewById(R.id.imagebutton_file_back);
-			ancestorList = (DropDownAncestorList) view
-					.findViewById(R.id.ancestorList);
-			ancestorList
-					.setOnAncestorClickListener(new OnAncestorClickListener() {
-
-						@Override
-						public void onClick(String path) {
-							openAncestorFolder(new File(path));
-							invokeAncestorList();
-						}
-
-						@Override
-						public void onClickOutside() {
-							invokeAncestorList();
-						}
-					});
 			selectAllButton = (CheckBox) view
 					.findViewById(R.id.checkbox_file_all);
 
@@ -78,6 +68,25 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			selectAllButton.setVisibility(View.GONE);
 			pathText.setKeyListener(null);
 			pathText.setOnClickListener(this);
+
+			ancestorList = new DropDownAncestorList(getActivity());
+			ancestorList
+					.setOnAncestorClickListener(new OnAncestorClickListener() {
+
+						@Override
+						public void onClick(String path) {
+							openAncestorFolder(new File(path));
+							popupWindow.dismiss();
+						}
+					});
+
+			popupWindow = new PopupWindow(ancestorList,
+					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, true);
+			popupWindow.setTouchable(true);
+			popupWindow.setOutsideTouchable(true);
+			popupWindow.setBackgroundDrawable(new BitmapDrawable(
+					getResources(), (Bitmap) null));
+
 			openFolder();
 		} else {
 			if (view.getParent() != null) {
@@ -89,26 +98,14 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 	}
 
 	protected void invokeAncestorList() {
-		if (ancestorList.getVisibility() == View.GONE) {
-			String path = pathText.getText().toString();
-			if ("/".equals(path)) {
-				return;
-			} else {
-				File file = new File(path);
-				ancestorList.setupList(file);
-				ancestorList.setVisibility(View.VISIBLE);
-
-				Intent intent2 = new Intent();
-				intent2.setAction(FileConst.Action_Disable_Pager_Scroll);
-				getActivity().sendBroadcast(intent2);
-			}
-
+		String path = pathText.getText().toString();
+		if ("/".equals(path)) {
+			return;
 		} else {
-			ancestorList.setVisibility(View.GONE);
-			Intent intent2 = new Intent();
-			intent2.setAction(FileConst.Action_Enable_Pager_Scroll);
-			getActivity().sendBroadcast(intent2);
+			File file = new File(path);
+			ancestorList.setupList(file);
 		}
+		popupWindow.showAsDropDown(pathText);
 	}
 
 	protected void openAncestorFolder(File file) {
@@ -324,10 +321,6 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 
 	@Override
 	public boolean doBackAction() {
-		if (ancestorList.getVisibility() == View.VISIBLE) {
-			invokeAncestorList();
-			return true;
-		}
 		if (inSelectMode) {
 			exitSelectMode();
 			return true;

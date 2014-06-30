@@ -74,8 +74,6 @@ public class MainActivity extends Activity {
 		filter.addAction(FileConst.Action_Switch_2_Select_Mode);
 		filter.addAction(FileConst.Action_Exit_Select_Mode);
 		filter.addAction(FileConst.Action_File_Opration_Done);
-		filter.addAction(FileConst.Action_Enable_Pager_Scroll);
-		filter.addAction(FileConst.Action_Disable_Pager_Scroll);
 		filter.addAction(FileConst.Action_Quit_Search);
 		fileBroadcastReceiver = new FileBroadcastReceiver();
 		registerReceiver(fileBroadcastReceiver, filter);
@@ -267,12 +265,6 @@ public class MainActivity extends Activity {
 				return;
 			} else if (FileConst.Action_Exit_Select_Mode.equals(action)) {
 				showFileListMenu();
-				return;
-			} else if (FileConst.Action_Disable_Pager_Scroll.equals(action)) {
-				pager.setScrollEnabled(false);
-				return;
-			} else if (FileConst.Action_Enable_Pager_Scroll.equals(action)) {
-				pager.setScrollEnabled(true);
 				return;
 			} else if (FileConst.Action_Quit_Search.equals(action)) {
 				quitSearchFile();

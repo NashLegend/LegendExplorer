@@ -10,14 +10,18 @@ import com.example.legendexplorer.view.DropDownAncestorList.OnAncestorClickListe
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 
 /**
  * 书签视图
@@ -38,23 +42,6 @@ public class BookMarksFragment extends FilesFragment {
 			view = inflater.inflate(R.layout.layout_file_bookmark, null);
 			pathText = (EditText) view.findViewById(R.id.edittext_file_path);
 
-			ancestorList = (DropDownAncestorList) view
-					.findViewById(R.id.ancestorList);
-			ancestorList
-					.setOnAncestorClickListener(new OnAncestorClickListener() {
-
-						@Override
-						public void onClick(String path) {
-							openAncestorFolder(new File(path));
-							invokeAncestorList();
-						}
-
-						@Override
-						public void onClickOutside() {
-							invokeAncestorList();
-						}
-					});
-
 			backButton = (ImageButton) view
 					.findViewById(R.id.imagebutton_file_back);
 			selectAllButton = (CheckBox) view
@@ -64,6 +51,25 @@ public class BookMarksFragment extends FilesFragment {
 			selectAllButton.setVisibility(View.GONE);
 			pathText.setKeyListener(null);
 			pathText.setOnClickListener(this);
+
+			ancestorList = new DropDownAncestorList(getActivity());
+			ancestorList
+					.setOnAncestorClickListener(new OnAncestorClickListener() {
+
+						@Override
+						public void onClick(String path) {
+							openAncestorFolder(new File(path));
+							popupWindow.dismiss();
+						}
+					});
+
+			popupWindow = new PopupWindow(ancestorList,
+					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, true);
+			popupWindow.setTouchable(true);
+			popupWindow.setOutsideTouchable(true);
+			popupWindow.setBackgroundDrawable(new BitmapDrawable(
+					getResources(), (Bitmap) null));
+
 			openBookMarks();
 		} else {
 			if (view.getParent() != null) {
@@ -168,29 +174,11 @@ public class BookMarksFragment extends FilesFragment {
 
 	@Override
 	protected void invokeAncestorList() {
-		if (ancestorList.getVisibility() == View.GONE) {
-			if (fakeBackStack.size() > 1) {
-				if (fakeBackStack.size() > 0) {
-					String path = fakeBackStack.get(fakeBackStack.size() - 1)
-							.getFilePath();
-					File file = new File(path);
-					ancestorList.setupList(file, pathPreffix,
-							FileConst.Value_Bookmark_Path);
-					ancestorList.setVisibility(View.VISIBLE);
-
-					Intent intent2 = new Intent();
-					intent2.setAction(FileConst.Action_Disable_Pager_Scroll);
-					getActivity().sendBroadcast(intent2);
-				}
-			}
-
-		} else {
-			ancestorList.setVisibility(View.GONE);
-
-			Intent intent2 = new Intent();
-			intent2.setAction(FileConst.Action_Enable_Pager_Scroll);
-			getActivity().sendBroadcast(intent2);
-		}
+		String path = fakeBackStack.get(fakeBackStack.size() - 1).getFilePath();
+		File file = new File(path);
+		ancestorList
+				.setupList(file, pathPreffix, FileConst.Value_Bookmark_Path);
+		popupWindow.showAsDropDown(pathText);
 	}
 
 	@Override
