@@ -42,6 +42,7 @@ public class FileListFragment extends Fragment {
 	private String pathPreffix = "/////////////";
 	private GridView gridView;
 	private View rootView;
+	private String searchQuery = "";
 
 	public FileListFragment() {
 
@@ -64,9 +65,11 @@ public class FileListFragment extends Fragment {
 			rootView = inflater.inflate(R.layout.layout_file_list, null);
 			listView = (ListView) rootView
 					.findViewById(R.id.fragment_listview_files);
+			listView.setTextFilterEnabled(true);
 			adapter = new FileListAdapter(getActivity());
 			gridView = (GridView) rootView
 					.findViewById(R.id.fragment_gridview_files);
+			gridView.setTextFilterEnabled(true);
 			gridView.setLongClickable(true);
 			listView.setLongClickable(true);
 			initViews();
@@ -101,12 +104,8 @@ public class FileListFragment extends Fragment {
 	public void loadData() {
 		if (filePath != null) {
 			if (filePath.equals(FileConst.Value_Bookmark_Path)) {
-				ArrayList<FileItem> fileItems;
-				BookmarkHelper helper = new BookmarkHelper(getActivity());
-				helper.open();
-				fileItems = helper.getBookmarks();
-				helper.close();
-				adapter.setList(fileItems);
+				adapter.openFolder(new File(
+						FileConst.Value_File_Path_Never_Existed));
 			} else {
 				adapter.openFolder(new File(filePath));
 			}
@@ -149,16 +148,10 @@ public class FileListFragment extends Fragment {
 		adapter.exitSelectMode();
 	}
 
-	/**
-	 * TODO
-	 */
 	public String getFilePath() {
 		return filePath;
 	}
 
-	/**
-	 * TODO
-	 */
 	public String getDisplayedFilePath() {
 		switch (itemType) {
 		case FileItem.Item_Type_File_Or_Folder:
@@ -302,8 +295,9 @@ public class FileListFragment extends Fragment {
 		loadData();
 	}
 
-	public void searchFile() {
-
+	public void searchFile(String query) {
+		searchQuery = query;
+		adapter.getFilter().filter(query);
 	}
 
 	public void copyFile() {
@@ -456,6 +450,10 @@ public class FileListFragment extends Fragment {
 						}
 					});
 		}
+	}
+
+	public boolean isInSearchingMode() {
+		return !TextUtils.isEmpty(searchQuery);
 	}
 
 	public void toggleShowHidden() {

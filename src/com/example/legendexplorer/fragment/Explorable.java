@@ -14,7 +14,7 @@ public interface Explorable {
 
     public void refreshFileList();
 
-    public void searchFile();
+    public void searchFile(String query);
 
     public void toggleShowHidden();
 }

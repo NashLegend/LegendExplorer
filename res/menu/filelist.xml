@@ -2,22 +2,23 @@
 
     <item
         android:id="@+id/action_search"
+        android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/file_search"
         android:orderInCategory="1"
-        android:showAsAction="always"
+        android:showAsAction="always|collapseActionView"
         android:title="@string/action_search"/>
-    <item
-        android:id="@+id/action_new"
-        android:icon="@drawable/file_new"
-        android:orderInCategory="2"
-        android:showAsAction="always"
-        android:title="@string/action_new"/>
     <item
         android:id="@+id/action_viewmode"
         android:icon="@drawable/file_viewmode_grid"
-        android:orderInCategory="3"
-        android:showAsAction="always"
+        android:orderInCategory="2"
+        android:showAsAction="ifRoom"
         android:title="@string/action_viewmode"/>
+    <item
+        android:id="@+id/action_new"
+        android:icon="@drawable/file_new"
+        android:orderInCategory="3"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_new"/>
     <item
         android:id="@+id/action_toggle_hidden"
         android:icon="@drawable/file_refresh"
