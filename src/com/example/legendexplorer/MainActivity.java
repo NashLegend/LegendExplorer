@@ -105,6 +105,9 @@ public class MainActivity extends Activity {
 		case R.id.action_delete:
 			deleteFile();
 			break;
+		case R.id.action_zip:
+			zipFile();
+			break;
 
 		default:
 			break;
@@ -156,6 +159,12 @@ public class MainActivity extends Activity {
 	private void deleteFile() {
 		Intent intent = new Intent();
 		intent.setAction(FileConst.Action_Delete_File);
+		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
+	}
+	
+	private void zipFile() {
+		Intent intent = new Intent();
+		intent.setAction(FileConst.Action_Zip_File);
 		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
 	}
 

@@ -369,6 +369,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			deleteFile();
 		} else if (FileConst.Action_Toggle_Show_Hidden.equals(action)) {
 			toggleShowHidden();
+		} else if (FileConst.Action_Zip_File.equals(action)) {
+			zipFile();
 		}
 		return false;
 	}
@@ -426,6 +428,13 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 	public void toggleShowHidden() {
 		if (fakeBackStack.size() > 0) {
 			fakeBackStack.get(fakeBackStack.size() - 1).toggleShowHidden();
+		}
+	}
+
+	@Override
+	public void zipFile() {
+		if (fakeBackStack.size() > 0) {
+			fakeBackStack.get(fakeBackStack.size() - 1).zipFile();
 		}
 	}
 }

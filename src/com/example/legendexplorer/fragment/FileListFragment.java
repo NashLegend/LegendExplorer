@@ -463,6 +463,86 @@ public class FileListFragment extends Fragment {
 		refreshFileList();
 	}
 
+	public void zipFile() {
+		final File[] files = getSelectedFiles();
+		if (files.length > 0) {
+			if (files.length == 1) {
+				File sourceFile = files[0];
+				String path = "";
+				String suffix = FileUtil.getFileSuffix(sourceFile);
+				if (suffix.length() > 0) {
+					path = sourceFile.getAbsolutePath().replaceAll(
+							suffix + "$", "zip");
+				} else {
+					path = sourceFile.getAbsolutePath() + ".zip";
+				}
+				File destFile = new File(path);
+				zipWithDialog(files, destFile);
+			} else {
+				new InputDialog.Builder(getActivity())
+						.setTitle("Input File Name")
+						.setButtonText("Okay", "Nay").setCancelable(true)
+						.setCanceledOnTouchOutside(true)
+						.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface arg0, int arg1) {
+								if (arg1 == DialogInterface.BUTTON_POSITIVE) {
+									InputDialog dialog = (InputDialog) arg0;
+									if (!TextUtils.isEmpty(dialog.InputString)) {
+										String fname = dialog.InputString;
+										if (!fname.endsWith(".zip")) {
+											if (fname.endsWith(".")) {
+												fname += "zip";
+											} else {
+												fname += ".zip";
+											}
+										}
+										File destFile = new File(getFilePath(),
+												fname);
+										zipWithDialog(files, destFile);
+									}
+								}
+							}
+						}).create().show();
+			}
+		} else {
+			// do nothing
+		}
+	}
+
+	private void zipWithDialog(File[] sourceFile, File destFile) {
+
+		final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(
+				getActivity()).setCancelable(false)
+				.setCanceledOnTouchOutside(false).create();
+		dialog.show();
+
+		// TODO
+
+		FileUtil.zipAsync(sourceFile,destFile, new FileOperationListener() {
+
+			@Override
+			public void onProgress() {
+				
+			}
+
+			@Override
+			public void onError() {
+				dialog.dismiss();
+				operationDone();
+				ToastUtil.showToast(getActivity(), "Zip Error!");
+			}
+
+			@Override
+			public void onComplete() {
+				dialog.dismiss();
+				operationDone();
+				ToastUtil.showToast(getActivity(), "Zip OK!");
+			}
+		});
+	}
+
 	private void operationDone() {
 		Intent intent = new Intent();
 		intent.setAction(FileConst.Action_File_Opration_Done);

@@ -17,4 +17,6 @@ public interface Explorable {
     public void searchFile(String query);
 
     public void toggleShowHidden();
+    
+    public void zipFile();
 }
