@@ -260,7 +260,7 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 		protected FilterResults performFiltering(CharSequence constraint) {
 			boolean showhidden = SharePreferencesUtil.readBoolean(
 					FileConst.Key_Show_Hiddle_Files, false);
-			Log.i("filter", "*" + constraint + "*");
+			String mat = constraint.toString().toLowerCase();
 			FilterResults results = new FilterResults();
 			ArrayList<FileItem> tmpList = new ArrayList<FileItem>();
 			File file = currentDirectory;
@@ -276,7 +276,7 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 					if (files != null) {
 						for (int i = 0; i < files.length; i++) {
 							File tmpFile = files[i];
-							if (tmpFile.getName().contains(constraint)) {
+							if (tmpFile.getName().toLowerCase().contains(mat)) {
 								if (showhidden) {
 									tmpList.add(new FileItem(tmpFile));
 								} else {

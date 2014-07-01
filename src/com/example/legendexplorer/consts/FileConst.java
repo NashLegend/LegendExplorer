@@ -20,6 +20,7 @@ public class FileConst {
 	public static final String Action_File_Opration_Done = "legendexplorer.fileoperationdone";
 	public static final String Action_Disable_Pager_Scroll = "legendexplorer.disablepagerscroll";
 	public static final String Action_Enable_Pager_Scroll = "legendexplorer.enablepagerscroll";
+	
 	// Extras
 	public static final String Extra_File_Path = "filepath";
 	public static final String Extra_Item_Type = "itemtype";
