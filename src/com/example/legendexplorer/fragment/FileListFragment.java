@@ -19,6 +19,8 @@ import com.example.legendutils.Dialogs.ListDialog.OnItemSelectedListener;
 import com.example.legendutils.Tools.FileUtil;
 import com.example.legendutils.Tools.ToastUtil;
 import com.example.legendutils.Tools.FileUtil.FileOperationListener;
+import com.example.legendutils.Tools.ZipUtil;
+import com.example.legendutils.Tools.ZipUtil.ZipOperationListener;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -329,12 +331,12 @@ public class FileListFragment extends Fragment {
 				new FileOperationListener() {
 
 					@Override
-					public void onProgress() {
+					public void onProgress(int progress) {
 
 					}
 
 					@Override
-					public void onError() {
+					public void onError(String e) {
 						dialog.dismiss();
 						operationDone();
 						ToastUtil.showToast(getActivity(), "Copy Error!");
@@ -378,12 +380,12 @@ public class FileListFragment extends Fragment {
 				new FileOperationListener() {
 
 					@Override
-					public void onProgress() {
+					public void onProgress(int progress) {
 
 					}
 
 					@Override
-					public void onError() {
+					public void onError(String e) {
 						dialog.dismiss();
 						operationDone();
 						ToastUtil.showToast(getActivity(), "Move Error!");
@@ -431,12 +433,12 @@ public class FileListFragment extends Fragment {
 					new FileOperationListener() {
 
 						@Override
-						public void onProgress() {
+						public void onProgress(int progress) {
 
 						}
 
 						@Override
-						public void onError() {
+						public void onError(String e) {
 							dialog.dismiss();
 							operationDone();
 							ToastUtil.showToast(getActivity(), "Delete Error!");
@@ -518,17 +520,21 @@ public class FileListFragment extends Fragment {
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
 
-		// TODO
-
-		FileUtil.zipAsync(sourceFile,destFile, new FileOperationListener() {
+		ZipUtil.zipAsync(sourceFile, destFile, "", new ZipOperationListener() {
 
 			@Override
-			public void onProgress() {
-				
+			public void onWorking() {
+				// TODO
+
 			}
 
 			@Override
-			public void onError() {
+			public void onProgress(int progress) {
+				// TODO
+			}
+
+			@Override
+			public void onError(String e) {
 				dialog.dismiss();
 				operationDone();
 				ToastUtil.showToast(getActivity(), "Zip Error!");
@@ -539,6 +545,13 @@ public class FileListFragment extends Fragment {
 				dialog.dismiss();
 				operationDone();
 				ToastUtil.showToast(getActivity(), "Zip OK!");
+			}
+
+			@Override
+			public void onCancelled() {
+				dialog.dismiss();
+				operationDone();
+				ToastUtil.showToast(getActivity(), "Zip Cancelled!");
 			}
 		});
 	}
