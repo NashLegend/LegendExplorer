@@ -14,10 +14,10 @@ import android.view.ViewGroup;
  * 
  * @author NashLegend
  */
-public class ClassifiedFragment extends BaseFragment {
+public class CategoriedFragment extends BaseFragment {
 	protected View view;
 
-	public ClassifiedFragment() {
+	public CategoriedFragment() {
 		
 	}
 

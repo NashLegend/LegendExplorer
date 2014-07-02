@@ -7,7 +7,7 @@ import com.example.legendexplorer.adapter.FilePagerAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.fragment.BaseFragment;
 import com.example.legendexplorer.fragment.BookMarksFragment;
-import com.example.legendexplorer.fragment.ClassifiedFragment;
+import com.example.legendexplorer.fragment.CategoriedFragment;
 import com.example.legendexplorer.fragment.FilesFragment;
 import com.example.legendexplorer.view.FolderViewPager;
 import com.example.legendutils.Tools.TimerUtil;
@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 	private ArrayList<BaseFragment> list;
 	private FilesFragment filesFragment;
 	private BookMarksFragment bookMarksFragment;
-	private ClassifiedFragment classifiedFragment;
+	private CategoriedFragment classifiedFragment;
 	private FileBroadcastReceiver fileBroadcastReceiver;
 	private Menu mMenu;
 	private SearchView searchView;
@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
 
 		filesFragment = new FilesFragment();
 		bookMarksFragment = new BookMarksFragment();
-		classifiedFragment = new ClassifiedFragment();
+		classifiedFragment = new CategoriedFragment();
 
 		list = new ArrayList<BaseFragment>();
 		list.add(filesFragment);
