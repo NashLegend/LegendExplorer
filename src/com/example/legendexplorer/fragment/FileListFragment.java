@@ -523,12 +523,6 @@ public class FileListFragment extends Fragment {
 		ZipUtil.zipAsync(sourceFile, destFile, "", new ZipOperationListener() {
 
 			@Override
-			public void onWorking() {
-				// TODO
-
-			}
-
-			@Override
 			public void onProgress(int progress) {
 				// TODO
 			}
