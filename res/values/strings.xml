@@ -15,5 +15,15 @@
     <string name="cancel">取消</string>
     <string name="ok">确定</string>
     <string name="back">返回</string>
+    <string name="category_all">All</string>
+    <string name="category_apk">APKs</string>
+    <string name="category_document">Docs</string>
+    <string name="category_favorite">Favorites</string>
+    <string name="category_music">Music</string>
+    <string name="category_other">Misc</string>
+    <string name="category_picture">Pics</string>
+    <string name="category_theme">Themes</string>
+    <string name="category_video">Videos</string>
+    <string name="category_zip">Zips</string>
 
 </resources>

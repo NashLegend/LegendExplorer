@@ -311,18 +311,21 @@ public class FileListFragment extends Fragment {
 
 					@Override
 					public void onFileSelected(ArrayList<File> files) {
-						copy2Folder(getSelectedFiles(), files.get(0));
+						if (files.size() > 0) {
+							copy2Folder(getSelectedFiles(), files.get(0));
+						}
 					}
 
 					@Override
 					public void onFileCanceled() {
-
+						ToastUtil.showToast(getActivity(), "Copy Cancelled!");
 					}
 				}).create(getActivity());
 		dialog.show();
 	}
 
 	private void copy2Folder(File[] files, File destFile) {
+		Log.i("copy", "cops");
 		final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();

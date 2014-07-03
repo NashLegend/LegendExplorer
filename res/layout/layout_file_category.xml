@@ -3,7 +3,145 @@
     android:id="@+id/content_classified"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000fff"
     android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/category_page"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/category_buttons"
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:id="@+id/category_music"
+                    style="@style/CategoryButtonStyle"
+                    android:background="@drawable/category_button_left" >
+
+                    <ImageView
+                        style="@style/CategoryButtonIconStyle"
+                        android:src="@drawable/format_music" />
+
+                    <TextView
+                        style="@style/CategoryButtonTextStyle"
+                        android:text="@string/category_music" />
+
+                    <TextView
+                        android:id="@+id/category_music_count"
+                        style="@style/CategoryButtonCountTextStyle" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/category_video"
+                    style="@style/CategoryButtonStyle"
+                    android:background="@drawable/category_button_middle" >
+
+                    <ImageView
+                        style="@style/CategoryButtonIconStyle"
+                        android:src="@drawable/format_media" />
+
+                    <TextView
+                        style="@style/CategoryButtonTextStyle"
+                        android:text="@string/category_video" />
+
+                    <TextView
+                        android:id="@+id/category_video_count"
+                        style="@style/CategoryButtonCountTextStyle" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/category_picture"
+                    style="@style/CategoryButtonStyle"
+                    android:background="@drawable/category_button_right" >
+
+                    <ImageView
+                        style="@style/CategoryButtonIconStyle"
+                        android:src="@drawable/format_picture" />
+
+                    <TextView
+                        style="@style/CategoryButtonTextStyle"
+                        android:text="@string/category_picture" />
+
+                    <TextView
+                        android:id="@+id/category_picture_count"
+                        style="@style/CategoryButtonCountTextStyle" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:id="@+id/category_apk"
+                    style="@style/CategoryButtonStyle"
+                    android:background="@drawable/category_button_left" >
+
+                    <ImageView
+                        style="@style/CategoryButtonIconStyle"
+                        android:src="@drawable/format_apk" />
+
+                    <TextView
+                        style="@style/CategoryButtonTextStyle"
+                        android:text="@string/category_apk" />
+
+                    <TextView
+                        android:id="@+id/category_apk_count"
+                        style="@style/CategoryButtonCountTextStyle" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/category_document"
+                    style="@style/CategoryButtonStyle"
+                    android:background="@drawable/category_button_middle" >
+
+                    <ImageView
+                        style="@style/CategoryButtonIconStyle"
+                        android:src="@drawable/format_text" />
+
+                    <TextView
+                        style="@style/CategoryButtonTextStyle"
+                        android:text="@string/category_document" />
+
+                    <TextView
+                        android:id="@+id/category_document_count"
+                        style="@style/CategoryButtonCountTextStyle" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/category_zip"
+                    style="@style/CategoryButtonStyle"
+                    android:background="@drawable/category_button_right" >
+
+                    <ImageView
+                        style="@style/CategoryButtonIconStyle"
+                        android:src="@drawable/format_zip" />
+
+                    <TextView
+                        style="@style/CategoryButtonTextStyle"
+                        android:text="@string/category_zip" />
+
+                    <TextView
+                        android:id="@+id/category_zip_count"
+                        style="@style/CategoryButtonCountTextStyle" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 
 </FrameLayout>
