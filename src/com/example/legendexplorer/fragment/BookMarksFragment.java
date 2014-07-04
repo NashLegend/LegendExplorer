@@ -39,7 +39,8 @@ public class BookMarksFragment extends FilesFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		if (view == null) {
-			view = inflater.inflate(R.layout.layout_file_bookmark, null);
+			view = inflater.inflate(R.layout.layout_file_bookmark, container,
+					false);
 			pathText = (EditText) view.findViewById(R.id.edittext_file_path);
 
 			backButton = (ImageButton) view
@@ -128,7 +129,8 @@ public class BookMarksFragment extends FilesFragment {
 		bundle.putString(FileConst.Extra_File_Path,
 				FileConst.Value_Bookmark_Path);
 		bundle.putString(FileConst.Extra_Path_Preffix, pathPreffix);
-		bundle.putInt(FileConst.Extra_Item_Type, FileConst.Value_Item_Type_Bookmark);
+		bundle.putInt(FileConst.Extra_Item_Type,
+				FileConst.Value_Item_Type_Bookmark);
 		bundle.putInt(FileConst.Extra_Explore_Type,
 				FileConst.Value_Explore_Type_Bookmarks);
 		fragment.setArguments(bundle);

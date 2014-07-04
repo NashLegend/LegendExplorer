@@ -56,7 +56,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		if (view == null) {
-			view = inflater.inflate(R.layout.layout_file_explorer, null);
+			view = inflater.inflate(R.layout.layout_file_explorer, container,
+					false);
 			pathText = (EditText) view.findViewById(R.id.edittext_file_path);
 			backButton = (ImageButton) view
 					.findViewById(R.id.imagebutton_file_back);
