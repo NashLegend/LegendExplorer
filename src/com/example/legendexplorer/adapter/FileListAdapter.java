@@ -15,6 +15,7 @@ import com.example.legendexplorer.view.FileItemView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,6 +141,19 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 			return true;
 		}
 		return false;
+	}
+
+	public void openCursor(Cursor cursor) {
+		currentDirectory = null;
+		list.clear();
+		if (cursor != null && cursor.getCount() > 0) {
+			while (cursor.moveToNext()) {
+				FileItem item = new FileItem(cursor.getString(1));
+				list.add(item);
+			}
+		}
+		sortList();
+		notifyDataSetChanged();
 	}
 
 	/**

@@ -8,6 +8,7 @@ import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.db.BookmarkHelper;
+import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
 import com.example.legendexplorer.model.FileItem;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendutils.Dialogs.FileDialog;
@@ -27,6 +28,7 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,14 +42,15 @@ public class FileListFragment extends Fragment {
 	private FileListAdapter adapter;
 	private ListView listView;
 	private String filePath;
-	private int itemType = FileItem.Item_Type_File_Or_Folder;
+	private int itemType = FileConst.Value_Item_Type_File_Or_Folder;
+	private int exploreType = FileConst.Value_Explore_Type_Files;
 	private String pathPreffix = "/////////////";
 	private GridView gridView;
 	private View rootView;
 	private String searchQuery = "";
+	private Cursor mCursor;
 
 	public FileListFragment() {
-
 	}
 
 	@Override
@@ -55,16 +58,23 @@ public class FileListFragment extends Fragment {
 		super.setArguments(args);
 		filePath = args.getString(FileConst.Extra_File_Path);
 		itemType = args.getInt(FileConst.Extra_Item_Type,
-				FileItem.Item_Type_File_Or_Folder);
+				FileConst.Value_Item_Type_File_Or_Folder);
+		exploreType = args.getInt(FileConst.Extra_Explore_Type,
+				FileConst.Value_Explore_Type_Files);
 		pathPreffix = args.getString(FileConst.Extra_Path_Preffix,
 				"/////////////");
+	}
+
+	public void setCursor(Cursor cursor) {
+		mCursor = cursor;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		if (rootView == null) {
-			rootView = inflater.inflate(R.layout.layout_file_list, null);
+			rootView = inflater.inflate(R.layout.layout_file_list, container,
+					false);
 			listView = (ListView) rootView
 					.findViewById(R.id.fragment_listview_files);
 			listView.setTextFilterEnabled(true);
@@ -104,15 +114,21 @@ public class FileListFragment extends Fragment {
 	}
 
 	public void loadData() {
-		if (filePath != null) {
-			if (filePath.equals(FileConst.Value_Bookmark_Path)) {
-				adapter.openFolder(new File(
-						FileConst.Value_File_Path_Never_Existed));
-			} else {
-				adapter.openFolder(new File(filePath));
+		if (exploreType == FileConst.Value_Explore_Type_Categories) {
+			if (mCursor != null) {
+				adapter.openCursor(mCursor);
 			}
-			adapter.notifyDataSetChanged();
+		} else {
+			if (filePath != null) {
+				if (filePath.equals(FileConst.Value_Bookmark_Path)) {
+					adapter.openFolder(new File(
+							FileConst.Value_File_Path_Never_Existed));
+				} else {
+					adapter.openFolder(new File(filePath));
+				}
+			}
 		}
+		adapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -155,10 +171,10 @@ public class FileListFragment extends Fragment {
 	}
 
 	public String getDisplayedFilePath() {
-		switch (itemType) {
-		case FileItem.Item_Type_File_Or_Folder:
+		switch (exploreType) {
+		case FileConst.Value_Explore_Type_Files:
 			return filePath;
-		case FileItem.Item_type_Bookmark:
+		case FileConst.Value_Explore_Type_Bookmarks:
 			if (pathPreffix.equals("") || pathPreffix.equals("/")) {
 				return FileConst.Value_Bookmark_Path.replace("//", "/")
 						+ filePath;
@@ -425,7 +441,7 @@ public class FileListFragment extends Fragment {
 	private void deleteFiles() {
 		// TODO
 		// 删除数据库或者文件
-		if (itemType == FileItem.Item_type_Bookmark) {
+		if (itemType == FileConst.Value_Item_Type_Bookmark) {
 			// 删除数据库
 		} else {
 			final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(

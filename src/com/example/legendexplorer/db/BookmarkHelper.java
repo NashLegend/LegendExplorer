@@ -3,6 +3,7 @@ package com.example.legendexplorer.db;
 
 import java.util.ArrayList;
 
+import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
 
 import android.content.ContentValues;
@@ -67,7 +68,7 @@ public class BookmarkHelper {
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
                 String filePath = cursor.getString(BookmarkColumn.FILE_PATH_COLUMN);
                 FileItem item = new FileItem(filePath);
-                item.setItemType(FileItem.Item_type_Bookmark);
+                item.setItemType(FileConst.Value_Item_Type_Bookmark);
                 list.add(item);
             }
         }

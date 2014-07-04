@@ -7,8 +7,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.example.legendexplorer.R;
-import com.example.legendutils.Tools.FileUtil;
+import com.example.legendexplorer.consts.FileConst;
 
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +17,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore.Audio;
@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /**
@@ -39,6 +40,8 @@ public class CategoriedFragment extends BaseFragment {
 	protected View view;
 	private static ScannerReceiver receiver;
 	private FileCategoryHelper mFileCagetoryHelper;
+	private FileListFragment listFragment;
+	private FrameLayout frameLayout;
 
 	private static HashMap<Integer, FileCategory> button2Category = new HashMap<Integer, FileCategory>();
 	static {
@@ -65,7 +68,8 @@ public class CategoriedFragment extends BaseFragment {
 
 			view = inflater.inflate(R.layout.layout_file_category, container,
 					false);
-
+			frameLayout = (FrameLayout) view
+					.findViewById(R.id.content_category);
 			mFileCagetoryHelper = new FileCategoryHelper(getActivity());
 			setupClick();
 			updateUI();
@@ -84,25 +88,17 @@ public class CategoriedFragment extends BaseFragment {
 
 	public void refreshData() {
 		mFileCagetoryHelper.refreshCategoryInfo();
-
-		// the other category size should include those files didn't get
-		// scanned.
 		long size = 0;
 		for (FileCategory fc : FileCategoryHelper.sCategories) {
 			FileCategoryHelper.CategoryInfo categoryInfo = mFileCagetoryHelper
 					.getCategoryInfos().get(fc);
-
 			setCategoryCount(fc, categoryInfo.count);
-
-			// other category size should be set separately with calibration
 			if (fc == FileCategory.Other)
 				continue;
 
 			// setCategorySize(fc, categoryInfo.size);
 			// setCategoryBarValue(fc, categoryInfo.size);
 			size += categoryInfo.size;
-			Log.i("cat", fc + "_" + categoryInfo.count + "_"
-					+ categoryInfo.size);
 		}
 
 	}
@@ -138,7 +134,6 @@ public class CategoriedFragment extends BaseFragment {
 		default:
 			break;
 		}
-
 		return 0;
 	}
 
@@ -158,9 +153,6 @@ public class CategoriedFragment extends BaseFragment {
 	// txtId = R.id.category_legend_picture;
 	// resId = R.string.category_picture;
 	// break;
-	// case Theme:
-	// txtId = R.id.category_legend_theme;
-	// resId = R.string.category_theme;
 	// break;
 	// case Doc:
 	// txtId = R.id.category_legend_document;
@@ -193,7 +185,6 @@ public class CategoriedFragment extends BaseFragment {
 		int id = getCategoryCountId(fc);
 		if (id == 0)
 			return;
-
 		setTextView(id, "(" + count + ")");
 	}
 
@@ -218,14 +209,38 @@ public class CategoriedFragment extends BaseFragment {
 		public void onClick(View v) {
 			FileCategory f = button2Category.get(v.getId());
 			if (f != null) {
-				onCategorySelected(f);
+				showCategoryList(f);
 			}
 		}
-
 	};
 
-	private void onCategorySelected(FileCategory f) {
-		// List
+	public void showCategoryList(FileCategory f) {
+		frameLayout.setVisibility(View.VISIBLE);
+		Cursor cursor = mFileCagetoryHelper.query(f);
+		listFragment = new FileListFragment();
+		listFragment.setCursor(cursor);
+		Bundle bundle = new Bundle();
+		bundle.putInt(FileConst.Extra_Explore_Type,
+				FileConst.Value_Explore_Type_Categories);
+		listFragment.setArguments(bundle);
+		FragmentTransaction transaction = getFragmentManager()
+				.beginTransaction();
+		transaction.replace(R.id.content_category, listFragment);
+		transaction.commit();
+	}
+
+	public boolean hideCategoryList() {
+		if (listFragment == null) {
+			return false;
+		} else {
+			FragmentTransaction transaction = getFragmentManager()
+					.beginTransaction();
+			transaction.remove(listFragment);
+			transaction.commit();
+			listFragment = null;
+			frameLayout.setVisibility(View.GONE);
+			return true;
+		}
 	}
 
 	private static final int MSG_FILE_CHANGED_TIMER = 100;
@@ -248,7 +263,6 @@ public class CategoriedFragment extends BaseFragment {
 		}
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
-
 			public void run() {
 				timer = null;
 				Message message = new Message();
@@ -268,7 +282,10 @@ public class CategoriedFragment extends BaseFragment {
 
 	@Override
 	public boolean doBackAction() {
-		// TODO 自动生成的方法存根
+		if (listFragment != null) {
+			hideCategoryList();
+			return true;
+		}
 		return false;
 	}
 
@@ -329,28 +346,61 @@ public class CategoriedFragment extends BaseFragment {
 
 		public FileCategoryHelper(Context context) {
 			mContext = context;
-
 			mCategory = FileCategory.All;
 		}
 
+		public Cursor query(FileCategory fc) {
+			Uri uri = getContentUriByCategory(fc);
+			String selection = buildSelectionByCategory(fc);
+			String sortOrder = null;
+
+			if (uri == null) {
+				return null;
+			}
+
+			String[] columns = new String[] { FileColumns._ID,
+					FileColumns.DATA, FileColumns.SIZE,
+					FileColumns.DATE_MODIFIED };
+
+			return mContext.getContentResolver().query(uri, columns, selection,
+					null, sortOrder);
+		}
+
+		private Uri getContentUriByCategory(FileCategory cat) {
+			Uri uri;
+			String volumeName = "external";
+			switch (cat) {
+			case Doc:
+			case Zip:
+			case Apk:
+				uri = Files.getContentUri(volumeName);
+				break;
+			case Music:
+				uri = Audio.Media.getContentUri(volumeName);
+				break;
+			case Video:
+				uri = Video.Media.getContentUri(volumeName);
+				break;
+			case Picture:
+				uri = Images.Media.getContentUri(volumeName);
+				break;
+			default:
+				uri = null;
+			}
+			return uri;
+		}
+
 		public void refreshCategoryInfo() {
-			// clear
 			for (FileCategory fc : sCategories) {
 				setCategoryInfo(fc, 0, 0);
 			}
-
-			// query database
 			String volumeName = "external";
-
 			Uri uri = Audio.Media.getContentUri(volumeName);
 			refreshMediaCategory(FileCategory.Music, uri);
-
 			uri = Video.Media.getContentUri(volumeName);
 			refreshMediaCategory(FileCategory.Video, uri);
-
 			uri = Images.Media.getContentUri(volumeName);
 			refreshMediaCategory(FileCategory.Picture, uri);
-
 			uri = Files.getContentUri(volumeName);
 			refreshMediaCategory(FileCategory.Theme, uri);
 			refreshMediaCategory(FileCategory.Doc, uri);
@@ -379,8 +429,6 @@ public class CategoriedFragment extends BaseFragment {
 
 			if (c.moveToNext()) {
 				setCategoryInfo(fc, c.getLong(0), c.getLong(1));
-				Log.v(LOG_TAG, "Retrieved " + fc.name() + " info >>> count:"
-						+ c.getLong(0) + " size:" + c.getLong(1));
 				c.close();
 				return true;
 			}

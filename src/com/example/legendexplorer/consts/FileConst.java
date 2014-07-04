@@ -25,6 +25,8 @@ public class FileConst {
 	// Extras
 	public static final String Extra_File_Path = "filepath";
 	public static final String Extra_Item_Type = "itemtype";
+	public static final String Extra_Explore_Type = "exploretype";
+	public static final String Extra_Category_Type = "categorytype";
 	public static final String Extra_Path_Preffix = "pathpreffix";
 
 	// Keys
@@ -38,5 +40,13 @@ public class FileConst {
 	public static final String Value_File_Path_Never_Existed = "/filepathneverexisted/";
 	public static final int Value_Files_Display_List = 0;
 	public static final int Value_Files_Display_Grid = 1;
+
+	public static final int Value_Explore_Type_Files = 0;
+	public static final int Value_Explore_Type_Bookmarks = 1;
+	public static final int Value_Explore_Type_Categories = 2;
+	
+	public static final int Value_Item_Type_File_Or_Folder = 0;
+	public static final int Value_Item_Type_Bookmark = 1;
+	public static final int Value_Item_Type_Category = 2;
 
 }

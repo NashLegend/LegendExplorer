@@ -103,7 +103,9 @@ public class BookMarksFragment extends FilesFragment {
 		bundle.putString(FileConst.Extra_File_Path, file.getAbsolutePath());
 		bundle.putString(FileConst.Extra_Path_Preffix, pathPreffix);
 		bundle.putInt(FileConst.Extra_Item_Type,
-				FileItem.Item_Type_File_Or_Folder);
+				FileConst.Value_Item_Type_File_Or_Folder);
+		bundle.putInt(FileConst.Extra_Explore_Type,
+				FileConst.Value_Explore_Type_Bookmarks);
 		fragment.setArguments(bundle);
 
 		FragmentTransaction transaction = getFragmentManager()
@@ -126,7 +128,9 @@ public class BookMarksFragment extends FilesFragment {
 		bundle.putString(FileConst.Extra_File_Path,
 				FileConst.Value_Bookmark_Path);
 		bundle.putString(FileConst.Extra_Path_Preffix, pathPreffix);
-		bundle.putInt(FileConst.Extra_Item_Type, FileItem.Item_type_Bookmark);
+		bundle.putInt(FileConst.Extra_Item_Type, FileConst.Value_Item_Type_Bookmark);
+		bundle.putInt(FileConst.Extra_Explore_Type,
+				FileConst.Value_Explore_Type_Bookmarks);
 		fragment.setArguments(bundle);
 		FragmentTransaction transaction = getFragmentManager()
 				.beginTransaction();
@@ -184,11 +188,11 @@ public class BookMarksFragment extends FilesFragment {
 	@Override
 	protected void doOpenFolderAction(Intent intent) {
 		int tp = intent.getIntExtra(FileConst.Extra_Item_Type,
-				FileItem.Item_Type_File_Or_Folder);
+				FileConst.Value_Item_Type_File_Or_Folder);
 		String path = intent.getStringExtra(FileConst.Extra_File_Path);
 		File file = new File(path);
 		if (file.getParentFile() != null) {
-			if (tp == FileItem.Item_type_Bookmark) {
+			if (tp == FileConst.Value_Item_Type_Bookmark) {
 				if (pathPreffix == FileConst.Value_File_Path_Never_Existed) {
 					pathPreffix = new File(path).getParent();
 					if (pathPreffix.lastIndexOf("/") != pathPreffix.length() - 1) {
