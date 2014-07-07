@@ -15,8 +15,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore.Audio;
@@ -39,7 +41,6 @@ import android.widget.TextView;
 public class CategoriedFragment extends BaseFragment {
 	protected View view;
 	private static ScannerReceiver receiver;
-	private FileCategoryHelper mFileCagetoryHelper;
 	private FileListFragment listFragment;
 	private FrameLayout frameLayout;
 
@@ -70,7 +71,6 @@ public class CategoriedFragment extends BaseFragment {
 					false);
 			frameLayout = (FrameLayout) view
 					.findViewById(R.id.content_category);
-			mFileCagetoryHelper = new FileCategoryHelper(getActivity());
 			setupClick();
 			updateUI();
 			registerReceiver();
@@ -87,10 +87,10 @@ public class CategoriedFragment extends BaseFragment {
 	}
 
 	public void refreshData() {
-		mFileCagetoryHelper.refreshCategoryInfo();
+		FileCategoryHelper.refreshCategoryInfo(getActivity());
 		long size = 0;
 		for (FileCategory fc : FileCategoryHelper.sCategories) {
-			FileCategoryHelper.CategoryInfo categoryInfo = mFileCagetoryHelper
+			FileCategoryHelper.CategoryInfo categoryInfo = FileCategoryHelper
 					.getCategoryInfos().get(fc);
 			setCategoryCount(fc, categoryInfo.count);
 			if (fc == FileCategory.Other)
@@ -216,7 +216,7 @@ public class CategoriedFragment extends BaseFragment {
 
 	public void showCategoryList(FileCategory f) {
 		frameLayout.setVisibility(View.VISIBLE);
-		Cursor cursor = mFileCagetoryHelper.query(f);
+		Cursor cursor = FileCategoryHelper.query(f, getActivity());
 		listFragment = new FileListFragment();
 		listFragment.setCursor(cursor);
 		Bundle bundle = new Bundle();
@@ -256,8 +256,10 @@ public class CategoriedFragment extends BaseFragment {
 		}
 
 	};
+	private boolean inSelectMode;
 
 	synchronized public void notifyFileChanged() {
+		Log.i("noti", "notifyFileChanged");
 		if (timer != null) {
 			timer.cancel();
 		}
@@ -282,6 +284,11 @@ public class CategoriedFragment extends BaseFragment {
 
 	@Override
 	public boolean doBackAction() {
+		if (inSelectMode) {
+			exitSelectMode();
+			return true;
+		}
+
 		if (listFragment != null) {
 			hideCategoryList();
 			return true;
@@ -291,8 +298,93 @@ public class CategoriedFragment extends BaseFragment {
 
 	@Override
 	public boolean doVeryAction(Intent intent) {
-		// TODO 自动生成的方法存根
+		String action = intent.getAction();
+		if (FileConst.Action_FileItem_Long_Click.equals(action)) {
+			change2SelectMode();
+		} else if (FileConst.Action_FileItem_Unselect.equals(action)) {
+			// selectAllButton.setOnCheckedChangeListener(null);
+			// selectAllButton.setChecked(false);
+			// selectAllButton.setOnCheckedChangeListener(this);
+		} else if (FileConst.Action_File_Operation_Done.equals(action)) {
+			exitSelectMode();
+		} else if (FileConst.Action_Search_File.equals(action)) {
+			String query = intent
+					.getStringExtra(FileConst.Key_Search_File_Query);
+			searchFile(query);
+		} else if (FileConst.Action_Quit_Search.equals(action)) {
+			searchFile("");
+		} else if (FileConst.Action_Toggle_View_Mode.equals(action)) {
+			toggleViewMode();
+		} else if (FileConst.Action_Refresh_FileList.equals(action)) {
+			refreshFileList();
+		} else if (FileConst.Action_Copy_File.equals(action)) {
+			copyFile();
+		} else if (FileConst.Action_Move_File.equals(action)) {
+			moveFile();
+		} else if (FileConst.Action_Delete_File.equals(action)) {
+			deleteFile();
+		}
 		return false;
+	}
+
+	private void deleteFile() {
+		if (listFragment != null) {
+			listFragment.deleteFile();
+		}
+	}
+
+	private void moveFile() {
+		if (listFragment != null) {
+			listFragment.moveFile();
+		}
+	}
+
+	private void copyFile() {
+		if (listFragment != null) {
+			listFragment.copyFile();
+		}
+	}
+
+	private void refreshFileList() {
+		if (listFragment != null) {
+			listFragment.refreshFileList();
+		}
+	}
+
+	private void toggleViewMode() {
+		if (listFragment != null) {
+			listFragment.toggleViewMode();
+		}
+	}
+
+	private void searchFile(String query) {
+		if (listFragment != null) {
+			listFragment.searchFile(query);
+		}
+	}
+
+	private void exitSelectMode() {
+		if (listFragment != null) {
+			// selectAllButton.setVisibility(View.GONE);
+			inSelectMode = false;
+			listFragment.exitSelectMode();
+
+			Intent intent = new Intent();
+			intent.setAction(FileConst.Action_Exit_Select_Mode);
+			getActivity().sendBroadcast(intent);
+		}
+	}
+
+	private void change2SelectMode() {
+		if (listFragment != null) {
+			// selectAllButton.setVisibility(View.VISIBLE);
+			inSelectMode = true;
+			listFragment.change2SelectMode();
+
+			Intent intent = new Intent();
+			intent.setAction(FileConst.Action_Switch_2_Select_Mode);
+			getActivity().sendBroadcast(intent);
+		}
 	}
 
 	public class ScannerReceiver extends BroadcastReceiver {
@@ -323,15 +415,15 @@ public class CategoriedFragment extends BaseFragment {
 
 		private static final String LOG_TAG = "cat";
 
-		public class CategoryInfo {
+		public static class CategoryInfo {
 			public long count;
 
 			public long size;
 		}
 
-		private HashMap<FileCategory, CategoryInfo> mCategoryInfo = new HashMap<FileCategory, CategoryInfo>();
+		private static HashMap<FileCategory, CategoryInfo> mCategoryInfo = new HashMap<FileCategory, CategoryInfo>();
 
-		public HashMap<FileCategory, CategoryInfo> getCategoryInfos() {
+		public static HashMap<FileCategory, CategoryInfo> getCategoryInfos() {
 			return mCategoryInfo;
 		}
 
@@ -340,16 +432,15 @@ public class CategoriedFragment extends BaseFragment {
 				FileCategory.Theme, FileCategory.Doc, FileCategory.Zip,
 				FileCategory.Apk, FileCategory.Other };
 
-		private FileCategory mCategory;
-
-		private Context mContext;
-
 		public FileCategoryHelper(Context context) {
-			mContext = context;
-			mCategory = FileCategory.All;
+
 		}
 
-		public Cursor query(FileCategory fc) {
+		public static void delete(FileCategory fc, String path, Context context) {
+
+		}
+
+		public static Cursor query(FileCategory fc, Context context) {
 			Uri uri = getContentUriByCategory(fc);
 			String selection = buildSelectionByCategory(fc);
 			String sortOrder = null;
@@ -361,12 +452,11 @@ public class CategoriedFragment extends BaseFragment {
 			String[] columns = new String[] { FileColumns._ID,
 					FileColumns.DATA, FileColumns.SIZE,
 					FileColumns.DATE_MODIFIED };
-
-			return mContext.getContentResolver().query(uri, columns, selection,
+			return context.getContentResolver().query(uri, columns, selection,
 					null, sortOrder);
 		}
 
-		private Uri getContentUriByCategory(FileCategory cat) {
+		private static Uri getContentUriByCategory(FileCategory cat) {
 			Uri uri;
 			String volumeName = "external";
 			switch (cat) {
@@ -390,25 +480,26 @@ public class CategoriedFragment extends BaseFragment {
 			return uri;
 		}
 
-		public void refreshCategoryInfo() {
+		public static void refreshCategoryInfo(Context mContext) {
 			for (FileCategory fc : sCategories) {
 				setCategoryInfo(fc, 0, 0);
 			}
 			String volumeName = "external";
 			Uri uri = Audio.Media.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Music, uri);
+			refreshMediaCategory(FileCategory.Music, uri, mContext);
 			uri = Video.Media.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Video, uri);
+			refreshMediaCategory(FileCategory.Video, uri, mContext);
 			uri = Images.Media.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Picture, uri);
+			refreshMediaCategory(FileCategory.Picture, uri, mContext);
 			uri = Files.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Theme, uri);
-			refreshMediaCategory(FileCategory.Doc, uri);
-			refreshMediaCategory(FileCategory.Zip, uri);
-			refreshMediaCategory(FileCategory.Apk, uri);
+			refreshMediaCategory(FileCategory.Theme, uri, mContext);
+			refreshMediaCategory(FileCategory.Doc, uri, mContext);
+			refreshMediaCategory(FileCategory.Zip, uri, mContext);
+			refreshMediaCategory(FileCategory.Apk, uri, mContext);
 		}
 
-		private void setCategoryInfo(FileCategory fc, long count, long size) {
+		private static void setCategoryInfo(FileCategory fc, long count,
+				long size) {
 			CategoryInfo info = mCategoryInfo.get(fc);
 			if (info == null) {
 				info = new CategoryInfo();
@@ -418,7 +509,8 @@ public class CategoriedFragment extends BaseFragment {
 			info.size = size;
 		}
 
-		private boolean refreshMediaCategory(FileCategory fc, Uri uri) {
+		private static boolean refreshMediaCategory(FileCategory fc, Uri uri,
+				Context mContext) {
 			String[] columns = new String[] { "COUNT(*)", "SUM(_size)" };
 			Cursor c = mContext.getContentResolver().query(uri, columns,
 					buildSelectionByCategory(fc), null, null);
@@ -447,7 +539,7 @@ public class CategoriedFragment extends BaseFragment {
 			}
 		};
 
-		private String buildDocSelection() {
+		private static String buildDocSelection() {
 			StringBuilder selection = new StringBuilder();
 			Iterator<String> iter = sDocMimeTypesSet.iterator();
 			while (iter.hasNext()) {
@@ -457,7 +549,7 @@ public class CategoriedFragment extends BaseFragment {
 			return selection.substring(0, selection.lastIndexOf(")") + 1);
 		}
 
-		private String buildSelectionByCategory(FileCategory cat) {
+		private static String buildSelectionByCategory(FileCategory cat) {
 			String selection = null;
 			switch (cat) {
 			case Theme:

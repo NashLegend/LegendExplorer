@@ -147,6 +147,7 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 		currentDirectory = null;
 		list.clear();
 		if (cursor != null && cursor.getCount() > 0) {
+			cursor.moveToPosition(-1);
 			while (cursor.moveToNext()) {
 				FileItem item = new FileItem(cursor.getString(1));
 				list.add(item);

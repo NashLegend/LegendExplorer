@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
 		filter.addAction(FileConst.Action_FileItem_Unselect);
 		filter.addAction(FileConst.Action_Switch_2_Select_Mode);
 		filter.addAction(FileConst.Action_Exit_Select_Mode);
-		filter.addAction(FileConst.Action_File_Opration_Done);
+		filter.addAction(FileConst.Action_File_Operation_Done);
 		filter.addAction(FileConst.Action_Quit_Search);
 		fileBroadcastReceiver = new FileBroadcastReceiver();
 		registerReceiver(fileBroadcastReceiver, filter);

@@ -348,7 +348,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			selectAllButton.setOnCheckedChangeListener(null);
 			selectAllButton.setChecked(false);
 			selectAllButton.setOnCheckedChangeListener(this);
-		} else if (FileConst.Action_File_Opration_Done.equals(action)) {
+		} else if (FileConst.Action_File_Operation_Done.equals(action)) {
 			exitSelectMode();
 		} else if (FileConst.Action_Add_New_File.equals(action)) {
 			addNewFile();

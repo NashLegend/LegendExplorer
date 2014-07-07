@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
-import com.example.legendexplorer.db.BookmarkHelper;
-import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
-import com.example.legendexplorer.model.FileItem;
+import com.example.legendexplorer.fragment.CategoriedFragment.FileCategoryHelper;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendutils.Dialogs.FileDialog;
 import com.example.legendutils.Dialogs.InputDialog;
@@ -29,6 +27,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -346,7 +345,7 @@ public class FileListFragment extends Fragment {
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
-		FileUtil.copy2DirectoryAsync(files, destFile,
+		FileUtil.copy2DirectoryAsync(files, destFile, getActivity(),
 				new FileOperationListener() {
 
 					@Override
@@ -395,7 +394,7 @@ public class FileListFragment extends Fragment {
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
-		FileUtil.move2DirectoryAsync(files, destFile,
+		FileUtil.move2DirectoryAsync(files, destFile, getActivity(),
 				new FileOperationListener() {
 
 					@Override
@@ -448,7 +447,8 @@ public class FileListFragment extends Fragment {
 					getActivity()).setCancelable(false)
 					.setCanceledOnTouchOutside(false).create();
 			dialog.show();
-			FileUtil.deleteAsync(getSelectedFiles(),
+			final File file = getSelectedFiles()[0];
+			FileUtil.deleteAsync(getSelectedFiles(), getActivity(),
 					new FileOperationListener() {
 
 						@Override
@@ -467,6 +467,10 @@ public class FileListFragment extends Fragment {
 						public void onComplete() {
 							dialog.dismiss();
 							operationDone();
+
+							MediaScannerConnection.scanFile(getActivity(),
+									new String[] { file.getAbsolutePath() },
+									null, null);
 							ToastUtil.showToast(getActivity(), "Delete OK!");
 						}
 					});
@@ -571,7 +575,7 @@ public class FileListFragment extends Fragment {
 
 	private void operationDone() {
 		Intent intent = new Intent();
-		intent.setAction(FileConst.Action_File_Opration_Done);
+		intent.setAction(FileConst.Action_File_Operation_Done);
 		getActivity().sendBroadcast(intent);
 		refreshFileList();
 	}

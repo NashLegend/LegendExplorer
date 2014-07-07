@@ -17,7 +17,7 @@ public class FileConst {
 	public static final String Action_Delete_File = "legendexplorer.deletefile";
 	public static final String Action_Exit_Select_Mode = "legendexplorer.exitselectmode";
 	public static final String Action_Toggle_Show_Hidden = "legendexplorer.toggleshowhidden";
-	public static final String Action_File_Opration_Done = "legendexplorer.fileoperationdone";
+	public static final String Action_File_Operation_Done = "legendexplorer.fileoperationdone";
 	public static final String Action_Enable_Pager_Scroll = "legendexplorer.enablepagerscroll";
 	public static final String Action_Switch_2_Select_Mode = "legendexplorer.switch2selectmode";
 	public static final String Action_Disable_Pager_Scroll = "legendexplorer.disablepagerscroll";

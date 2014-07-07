@@ -1,4 +1,3 @@
-
 package com.example.legendexplorer.application;
 
 import com.example.legendexplorer.consts.FileConst;
@@ -7,28 +6,33 @@ import com.example.legendexplorer.utils.SharePreferencesUtil;
 
 import android.app.Application;
 import android.content.Context;
+import android.media.MediaScannerConnection;
+import android.os.Environment;
 
 public class ExplorerApplication extends Application {
 
-    public static Context GlobalContext;
+	public static Context GlobalContext;
 
-    public ExplorerApplication() {
+	public ExplorerApplication() {
 
-    }
+	}
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        GlobalContext = this;
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		GlobalContext = this;
+//		MediaScannerConnection.scanFile(getApplicationContext(),
+//				new String[] { Environment.getExternalStorageDirectory()
+//						.getAbsolutePath() }, null, null);
+		if (SharePreferencesUtil.readBoolean(FileConst.Key_Is_First_Open, true)) {
+			SharePreferencesUtil
+					.saveBoolean(FileConst.Key_Is_First_Open, false);
+			BookmarkHelper helper = new BookmarkHelper(this);
+			helper.initBookmarks();
+		}
+	}
 
-        if (SharePreferencesUtil.readBoolean(FileConst.Key_Is_First_Open, true)) {
-            SharePreferencesUtil.saveBoolean(FileConst.Key_Is_First_Open, false);
-            BookmarkHelper helper = new BookmarkHelper(this);
-            helper.initBookmarks();
-        }
-    }
-
-    public static Context getGlobalContext() {
-        return GlobalContext;
-    }
+	public static Context getGlobalContext() {
+		return GlobalContext;
+	}
 }
