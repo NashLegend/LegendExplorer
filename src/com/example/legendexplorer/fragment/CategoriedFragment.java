@@ -341,6 +341,10 @@ public class CategoriedFragment extends BaseFragment {
 	}
 
 	private void refreshFileList() {
+		MediaScannerConnection.scanFile(getActivity(),
+				new String[] { Environment.getExternalStorageDirectory()
+						.getAbsolutePath() }, null, null);
+		refreshData();
 		if (listFragment != null) {
 			listFragment.refreshFileList();
 		}
