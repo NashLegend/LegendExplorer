@@ -14,11 +14,14 @@ import com.example.legendutils.Tools.TimerUtil;
 import com.example.legendutils.Tools.ToastUtil;
 
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileObserver;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,11 +40,18 @@ public class MainActivity extends Activity {
 	private FileBroadcastReceiver fileBroadcastReceiver;
 	private Menu mMenu;
 	private SearchView searchView;
+	private StorageObserver observer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+//		observer = new StorageObserver(Environment
+//				.getExternalStorageDirectory().getAbsolutePath(),
+//				FileObserver.CREATE | FileObserver.DELETE
+//						| FileObserver.MOVED_FROM | FileObserver.MOVED_TO);
+//		observer.startWatching();
 
 		filesFragment = new FilesFragment();
 		bookMarksFragment = new BookMarksFragment();
@@ -206,6 +216,12 @@ public class MainActivity extends Activity {
 
 	private boolean doBackAction() {
 		return adapter.getItem(pager.getCurrentItem()).doBackAction();
+	}
+	
+	@Override
+	protected void onStop() {
+		Log.i("cat", "StopActi");
+		super.onStop();
 	}
 
 	@Override

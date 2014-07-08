@@ -8,6 +8,7 @@ import android.app.Application;
 import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.os.Environment;
+import android.widget.ImageView;
 
 public class ExplorerApplication extends Application {
 
@@ -21,9 +22,9 @@ public class ExplorerApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		GlobalContext = this;
-//		MediaScannerConnection.scanFile(getApplicationContext(),
-//				new String[] { Environment.getExternalStorageDirectory()
-//						.getAbsolutePath() }, null, null);
+		MediaScannerConnection.scanFile(getApplicationContext(),
+				new String[] { Environment.getExternalStorageDirectory()
+						.getAbsolutePath() }, null, null);
 		if (SharePreferencesUtil.readBoolean(FileConst.Key_Is_First_Open, true)) {
 			SharePreferencesUtil
 					.saveBoolean(FileConst.Key_Is_First_Open, false);

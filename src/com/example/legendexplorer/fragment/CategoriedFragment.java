@@ -55,7 +55,7 @@ public class CategoriedFragment extends BaseFragment {
 	}
 
 	public enum FileCategory {
-		All, Music, Video, Picture, Theme, Doc, Zip, Apk, Custom, Other, Favorite
+		All, Music, Video, Picture, Doc, Zip, Apk, Other
 	}
 
 	public CategoriedFragment() {
@@ -65,20 +65,12 @@ public class CategoriedFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		if (view == null) {
-
-			view = inflater.inflate(R.layout.layout_file_category, container,
-					false);
-			frameLayout = (FrameLayout) view
-					.findViewById(R.id.content_category);
-			setupClick();
-			updateUI();
-			registerReceiver();
-		} else {
-			if (view.getParent() != null) {
-				((ViewGroup) view.getParent()).removeView(view);
-			}
-		}
+		view = inflater
+				.inflate(R.layout.layout_file_category, container, false);
+		frameLayout = (FrameLayout) view.findViewById(R.id.content_category);
+		setupClick();
+		updateUI();
+		registerReceiver();
 		return view;
 	}
 
@@ -271,14 +263,17 @@ public class CategoriedFragment extends BaseFragment {
 				message.what = MSG_FILE_CHANGED_TIMER;
 				handler.sendMessage(message);
 			}
-
 		}, 1000);
 	}
 
 	@Override
-	public void onDestroy() {
-		Log.i("cat", "destroy");
+	public void onStop() {
 		getActivity().unregisterReceiver(receiver);
+		super.onStop();
+	}
+
+	@Override
+	public void onDestroy() {
 		super.onDestroy();
 	}
 
@@ -429,8 +424,8 @@ public class CategoriedFragment extends BaseFragment {
 
 		public static FileCategory[] sCategories = new FileCategory[] {
 				FileCategory.Music, FileCategory.Video, FileCategory.Picture,
-				FileCategory.Theme, FileCategory.Doc, FileCategory.Zip,
-				FileCategory.Apk, FileCategory.Other };
+				FileCategory.Doc, FileCategory.Zip, FileCategory.Apk,
+				FileCategory.Other };
 
 		public FileCategoryHelper(Context context) {
 
@@ -492,7 +487,6 @@ public class CategoriedFragment extends BaseFragment {
 			uri = Images.Media.getContentUri(volumeName);
 			refreshMediaCategory(FileCategory.Picture, uri, mContext);
 			uri = Files.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Theme, uri, mContext);
 			refreshMediaCategory(FileCategory.Doc, uri, mContext);
 			refreshMediaCategory(FileCategory.Zip, uri, mContext);
 			refreshMediaCategory(FileCategory.Apk, uri, mContext);
@@ -529,9 +523,12 @@ public class CategoriedFragment extends BaseFragment {
 		}
 
 		public static HashSet<String> sDocMimeTypesSet = new HashSet<String>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			{
-				add("text/plain");
-				add("text/plain");
 				add("application/pdf");
 				add("application/msword");
 				add("application/vnd.ms-excel");
@@ -542,6 +539,7 @@ public class CategoriedFragment extends BaseFragment {
 		private static String buildDocSelection() {
 			StringBuilder selection = new StringBuilder();
 			Iterator<String> iter = sDocMimeTypesSet.iterator();
+			selection.append(FileColumns.DATA + " LIKE '%.txt' OR ");
 			while (iter.hasNext()) {
 				selection.append("(" + FileColumns.MIME_TYPE + "=='"
 						+ iter.next() + "') OR ");
@@ -552,9 +550,6 @@ public class CategoriedFragment extends BaseFragment {
 		private static String buildSelectionByCategory(FileCategory cat) {
 			String selection = null;
 			switch (cat) {
-			case Theme:
-				selection = FileColumns.DATA + " LIKE '%.mtz'";
-				break;
 			case Doc:
 				selection = buildDocSelection();
 				break;

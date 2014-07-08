@@ -18,6 +18,7 @@ import com.example.legendutils.Tools.SystemUtil;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 	private Context mContext;
 	private File currentDirectory;
 	private boolean displayModeGrid = false;
+	private Cursor mCursor;
 
 	public FileListAdapter(Context Context) {
 		mContext = Context;
@@ -155,12 +157,27 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 
 	public void openCursor(Cursor cursor) {
 		currentDirectory = null;
+		mCursor = cursor;
 		list.clear();
+		ArrayList<File> fileNos = new ArrayList<File>();
 		if (cursor != null && cursor.getCount() > 0) {
 			cursor.moveToPosition(-1);
 			while (cursor.moveToNext()) {
 				FileItem item = new FileItem(cursor.getString(1));
-				list.add(item);
+				if (item.exists()) {
+					list.add(item);
+				} else {
+					fileNos.add(item);
+				}
+			}
+		}
+		if (fileNos.size() > 0) {
+			String[] files = new String[fileNos.size()];
+			for (int i = 0; i < fileNos.size(); i++) {
+				files[i] = fileNos.get(i).getAbsolutePath();
+			}
+			if (mContext != null) {
+				MediaScannerConnection.scanFile(mContext, files, null, null);
 			}
 		}
 		sortList();
@@ -314,6 +331,16 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 						}
 					}
 					files = null;
+				}
+			} else if (mCursor != null) {
+				if (mCursor.getCount() > 0) {
+					mCursor.moveToPosition(-1);
+					while (mCursor.moveToNext()) {
+						FileItem item = new FileItem(mCursor.getString(1));
+						if (item.getName().toLowerCase().contains(mat)) {
+							tmpList.add(item);
+						}
+					}
 				}
 			}
 			sortList(tmpList);
