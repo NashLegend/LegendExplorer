@@ -161,7 +161,7 @@ public class MainActivity extends Activity {
 		intent.setAction(FileConst.Action_Delete_File);
 		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
 	}
-	
+
 	private void zipFile() {
 		Intent intent = new Intent();
 		intent.setAction(FileConst.Action_Zip_File);

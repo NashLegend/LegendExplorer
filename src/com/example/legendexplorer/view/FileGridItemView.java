@@ -1,10 +1,10 @@
-
 package com.example.legendexplorer.view;
 
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
+import com.example.legendutils.Tools.FileUtil;
 
 import android.app.Service;
 import android.content.ActivityNotFoundException;
@@ -32,187 +32,193 @@ import android.view.View.OnLongClickListener;
  * @author NashLegend
  */
 public class FileGridItemView extends FrameLayout implements OnClickListener,
-        OnCheckedChangeListener, OnLongClickListener {
-    private ImageView icon;
-    private TextView title;
-    private CheckBox checkBox;
-    private ViewGroup rootFileItemView;
-    private FileListAdapter adapter;
+		OnCheckedChangeListener, OnLongClickListener {
+	private ImageView icon;
+	private TextView title;
+	private CheckBox checkBox;
+	private ViewGroup rootFileItemView;
+	private FileListAdapter adapter;
 
-    private FileItem fileItem;
+	private FileItem fileItem;
 
-    public FileGridItemView(Context context) {
-        super(context);
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_grid_file_item, this);
-        icon = (ImageView) findViewById(R.id.image_file_icon);
-        title = (TextView) findViewById(R.id.text_file_title);
-        rootFileItemView = (ViewGroup) findViewById(R.id.rootFileItemView);
-        checkBox = (CheckBox) findViewById(R.id.checkbox_file_item_select);
-        setOnClickListener(this);
-        setLongClickable(true);
-    }
+	public FileGridItemView(Context context) {
+		super(context);
+		LayoutInflater inflater = (LayoutInflater) context
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inflater.inflate(R.layout.view_grid_file_item, this);
+		icon = (ImageView) findViewById(R.id.image_file_icon);
+		title = (TextView) findViewById(R.id.text_file_title);
+		rootFileItemView = (ViewGroup) findViewById(R.id.rootFileItemView);
+		checkBox = (CheckBox) findViewById(R.id.checkbox_file_item_select);
+		setOnClickListener(this);
+		setLongClickable(true);
+	}
 
-    public FileItem getFileItem() {
-        return fileItem;
-    }
+	public FileItem getFileItem() {
+		return fileItem;
+	}
 
-    public void setFileItem(FileItem fileItem, FileListAdapter adapter) {
-        this.fileItem = fileItem;
-        this.adapter = adapter;
-        icon.setImageResource(fileItem.getIcon());
-        title.setText(fileItem.getName());
-        toggleSelectState();
-        if (fileItem.isInSelectMode()) {
-            checkBox.setVisibility(View.VISIBLE);
-            setOnLongClickListener(null);
-        } else {
-            checkBox.setVisibility(View.GONE);
-            setOnLongClickListener(this);
-        }
-    }
+	public void setFileItem(FileItem fileItem, FileListAdapter adapter) {
+		this.fileItem = fileItem;
+		this.adapter = adapter;
+		icon.setImageResource(fileItem.getIcon());
+		title.setText(fileItem.getName());
+		toggleSelectState();
+		if (fileItem.isInSelectMode()) {
+			checkBox.setVisibility(View.VISIBLE);
+			setOnLongClickListener(null);
+		} else {
+			checkBox.setVisibility(View.GONE);
+			setOnLongClickListener(this);
+		}
+	}
 
-    /**
-     * 切换选中、未选中状态,fileItem.setSelected(boolean)先发生;
-     */
-    public void toggleSelectState() {
-        toggleSelectState(false);
-    }
+	/**
+	 * 切换选中、未选中状态,fileItem.setSelected(boolean)先发生;
+	 */
+	public void toggleSelectState() {
+		toggleSelectState(false);
+	}
 
-    private void toggleSelectState(boolean manual) {
-        if (fileItem.isSelected()) {
-            rootFileItemView.setBackgroundColor(Color.CYAN);
-        } else {
-            rootFileItemView.setBackgroundColor(Color.WHITE);
-            if (manual && fileItem.isInSelectMode()) {
-                Intent intent = new Intent();
-                intent.setAction(FileConst.Action_FileItem_Unselect);
-                getContext().sendBroadcast(intent);
-            }
-        }
-        checkBox.setOnCheckedChangeListener(null);
-        checkBox.setChecked(fileItem.isSelected());
-        checkBox.setOnCheckedChangeListener(this);
-    }
+	private void toggleSelectState(boolean manual) {
+		if (fileItem.isSelected()) {
+			rootFileItemView
+					.setBackgroundResource(R.drawable.bg_file_item_select);
+		} else {
+			rootFileItemView
+					.setBackgroundResource(R.drawable.bg_file_item_normal);
+			if (manual && fileItem.isInSelectMode()) {
+				Intent intent = new Intent();
+				intent.setAction(FileConst.Action_FileItem_Unselect);
+				getContext().sendBroadcast(intent);
+			}
+		}
+		checkBox.setOnCheckedChangeListener(null);
+		checkBox.setChecked(fileItem.isSelected());
+		checkBox.setOnCheckedChangeListener(this);
+	}
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() != R.id.checkbox_file_item_select) {
-            if (fileItem.isInSelectMode()) {
-                selectOne();
-            } else {
-                if (fileItem.isDirectory()) {
-                    openFolder();
-                } else {
-                    openFile();
-                }
-            }
+	@Override
+	public void onClick(View v) {
+		if (v.getId() != R.id.checkbox_file_item_select) {
+			if (fileItem.isInSelectMode()) {
+				selectOne();
+			} else {
+				if (fileItem.isDirectory()) {
+					openFolder();
+				} else {
+					openFile();
+				}
+			}
 
-        }
-    }
+		}
+	}
 
-    /**
-     * 打开文件
-     */
-    private void openFile() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        Uri data = Uri.fromFile(fileItem);
-        intent.setDataAndType(data, "*/*");
-        switch (fileItem.getFileType()) {
-            case FileItem.FILE_TYPE_APK:
-                intent.setDataAndType(data, "application/vnd.android.package-archive");
-                break;
-            case FileItem.FILE_TYPE_IMAGE:
-                intent.setDataAndType(data, "image/*");
-                break;
-            case FileItem.FILE_TYPE_AUDIO:
-                intent.putExtra("oneshot", 0);
-                intent.putExtra("configchange", 0);
-                intent.setDataAndType(data, "audio/*");
-                break;
-            case FileItem.FILE_TYPE_TXT:
-                intent.setDataAndType(data, "text/plain");
-                break;
-            case FileItem.FILE_TYPE_VIDEO:
-                intent.putExtra("oneshot", 0);
-                intent.putExtra("configchange", 0);
-                intent.setDataAndType(data, "video/*");
-                break;
-            case FileItem.FILE_TYPE_ZIP:
-                intent.setDataAndType(data, "application/zip");
-                break;
-            case FileItem.FILE_TYPE_WORD:
-                intent.setDataAndType(data, "application/msword");
-                break;
-            case FileItem.FILE_TYPE_PPT:
-                intent.setDataAndType(data, "application/vnd.ms-powerpoint");
-                break;
-            case FileItem.FILE_TYPE_EXCEL:
-                intent.setDataAndType(data, "application/vnd.ms-excel");
-                break;
-            case FileItem.FILE_TYPE_HTML:
-                intent.setDataAndType(data, "text/html");
-                break;
-            case FileItem.FILE_TYPE_PDF:
-                intent.setDataAndType(data, "application/pdf");
-                break;
-            case FileItem.FILE_TYPE_TORRENT:
-                intent.setDataAndType(data, "torrent/*");
-                break;
-            case FileItem.FILE_TYPE_CHM:
-                intent.setDataAndType(data, "application/mshelp");
-                break;
+	/**
+	 * 打开文件
+	 */
+	private void openFile() {
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addCategory(Intent.CATEGORY_DEFAULT);
+		Uri data = Uri.fromFile(fileItem);
+		intent.setDataAndType(data, "*/*");
+		switch (fileItem.getFileType()) {
+		case FileItem.FILE_TYPE_APK:
+			intent.setDataAndType(data,
+					"application/vnd.android.package-archive");
+			break;
+		case FileItem.FILE_TYPE_IMAGE:
+			intent.setDataAndType(data, "image/*");
+			break;
+		case FileItem.FILE_TYPE_AUDIO:
+			intent.putExtra("oneshot", 0);
+			intent.putExtra("configchange", 0);
+			intent.setDataAndType(data, "audio/*");
+			break;
+		case FileItem.FILE_TYPE_TXT:
+			intent.setDataAndType(data, "text/plain");
+			break;
+		case FileItem.FILE_TYPE_VIDEO:
+			intent.putExtra("oneshot", 0);
+			intent.putExtra("configchange", 0);
+			intent.setDataAndType(data, "video/*");
+			break;
+		case FileItem.FILE_TYPE_ZIP:
+			intent.setDataAndType(data, "application/zip");
+			break;
+		case FileItem.FILE_TYPE_WORD:
+			intent.setDataAndType(data, "application/msword");
+			break;
+		case FileItem.FILE_TYPE_PPT:
+			intent.setDataAndType(data, "application/vnd.ms-powerpoint");
+			break;
+		case FileItem.FILE_TYPE_EXCEL:
+			intent.setDataAndType(data, "application/vnd.ms-excel");
+			break;
+		case FileItem.FILE_TYPE_HTML:
+			intent.setDataAndType(data, "text/html");
+			break;
+		case FileItem.FILE_TYPE_PDF:
+			intent.setDataAndType(data, "application/pdf");
+			break;
+		case FileItem.FILE_TYPE_TORRENT:
+			intent.setDataAndType(data, "torrent/*");
+			break;
+		case FileItem.FILE_TYPE_CHM:
+			intent.setDataAndType(data, "application/mshelp");
+			break;
 
-            default:
-                break;
-        }
-        try {
-            getContext().startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(getContext(), "Cannot open this file type", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
-    }
+		default:
+			break;
+		}
+		try {
+			getContext().startActivity(intent);
+		} catch (ActivityNotFoundException e) {
+			Toast.makeText(getContext(), "Cannot open this file type",
+					Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
+		}
+	}
 
-    public void selectOne() {
-        if (fileItem.isInSelectMode()) {
-            fileItem.setSelected(!fileItem.isSelected());
-            toggleSelectState(true);
-        }
-    }
+	public void selectOne() {
+		if (fileItem.isInSelectMode()) {
+			fileItem.setSelected(!fileItem.isSelected());
+			toggleSelectState(true);
+		}
+	}
 
-    public void openFolder() {
-        Intent intent = new Intent();
-        intent.setAction(FileConst.Action_Open_Folder);
-        intent.putExtra(FileConst.Extra_File_Path, fileItem.getAbsolutePath());
-        intent.putExtra(FileConst.Extra_Item_Type, fileItem.getItemType());
-        getContext().sendBroadcast(intent);
-    }
+	public void openFolder() {
+		Intent intent = new Intent();
+		intent.setAction(FileConst.Action_Open_Folder);
+		intent.putExtra(FileConst.Extra_File_Path, fileItem.getAbsolutePath());
+		intent.putExtra(FileConst.Extra_Item_Type, fileItem.getItemType());
+		getContext().sendBroadcast(intent);
+	}
 
-    public FileListAdapter getAdapter() {
-        return adapter;
-    }
+	public FileListAdapter getAdapter() {
+		return adapter;
+	}
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        fileItem.setSelected(isChecked);
-        toggleSelectState(true);
-    }
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		fileItem.setSelected(isChecked);
+		toggleSelectState(true);
+	}
 
-    @Override
-    public boolean onLongClick(View v) {
-        Vibrator vibrator = (Vibrator) getContext().getSystemService(
-                Service.VIBRATOR_SERVICE);
-        vibrator.vibrate(20);
+	@Override
+	public boolean onLongClick(View v) {
+		if (FileUtil.isInExternalStorage(fileItem)) {
+			Vibrator vibrator = (Vibrator) getContext().getSystemService(
+					Service.VIBRATOR_SERVICE);
+			vibrator.vibrate(20);
 
-        fileItem.setSelected(true);
+			fileItem.setSelected(true);
 
-        Intent intent = new Intent();
-        intent.setAction(FileConst.Action_FileItem_Long_Click);
-        getContext().sendBroadcast(intent);
-        return false;
-    }
+			Intent intent = new Intent();
+			intent.setAction(FileConst.Action_FileItem_Long_Click);
+			getContext().sendBroadcast(intent);
+		}
+		return false;
+	}
 }
