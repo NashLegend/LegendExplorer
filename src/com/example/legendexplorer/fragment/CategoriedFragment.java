@@ -207,7 +207,7 @@ public class CategoriedFragment extends BaseFragment {
 	};
 
 	public void showCategoryList(FileCategory f) {
-		frameLayout.setVisibility(View.VISIBLE);
+//		frameLayout.setVisibility(View.VISIBLE);
 		Cursor cursor = FileCategoryHelper.query(f, getActivity());
 		listFragment = new FileListFragment();
 		listFragment.setCursor(cursor);
@@ -217,6 +217,7 @@ public class CategoriedFragment extends BaseFragment {
 		listFragment.setArguments(bundle);
 		FragmentTransaction transaction = getFragmentManager()
 				.beginTransaction();
+		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		transaction.replace(R.id.content_category, listFragment);
 		transaction.commit();
 	}
@@ -227,10 +228,12 @@ public class CategoriedFragment extends BaseFragment {
 		} else {
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
+			transaction
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 			transaction.remove(listFragment);
 			transaction.commit();
 			listFragment = null;
-			frameLayout.setVisibility(View.GONE);
+//			frameLayout.setVisibility(View.GONE);
 			return true;
 		}
 	}

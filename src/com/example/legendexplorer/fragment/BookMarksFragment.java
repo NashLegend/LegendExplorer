@@ -81,13 +81,12 @@ public class BookMarksFragment extends FilesFragment {
 		return view;
 	}
 
-	/**
-	 * 打开目录
-	 * 
-	 * @param file
-	 *            要打开的文件夹
+	/*
+	 * @see
+	 * com.example.legendexplorer.fragment.FilesFragment#openFolder(java.io.
+	 * File, int)
 	 */
-	public void openFolder(File file) {
+	public void openFolder(File file, int animation) {
 
 		if (file == null || !file.isDirectory()) {
 			throw new NullPointerException(
@@ -111,11 +110,22 @@ public class BookMarksFragment extends FilesFragment {
 
 		FragmentTransaction transaction = getFragmentManager()
 				.beginTransaction();
+		transaction.setTransition(animation);
 		transaction.replace(R.id.content_bookmark, fragment,
 				file.getAbsolutePath());
 		transaction.commit();
 		fakeBackStack.add(fragment);
 		pathText.setText(fragment.getDisplayedFilePath());
+	}
+
+	/**
+	 * 打开目录
+	 * 
+	 * @param file
+	 *            要打开的文件夹
+	 */
+	public void openFolder(File file) {
+		openFolder(file, FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 	}
 
 	/**
@@ -153,6 +163,8 @@ public class BookMarksFragment extends FilesFragment {
 					.get(fakeBackStack.size() - 1);
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
+			transaction
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 			transaction.replace(R.id.content_bookmark, fragment,
 					fragment.getDisplayedFilePath());
 			transaction.commit();
@@ -164,23 +176,15 @@ public class BookMarksFragment extends FilesFragment {
 
 	@Override
 	protected void back2ParentLevel() {
-		if (fakeBackStack.size() > 0) {
-			FileListFragment fragment = fakeBackStack
-					.get(fakeBackStack.size() - 1);
-			File file = new File(fragment.getFilePath());
-			File pFile = file.getParentFile();
-			if (pFile != null && pFile.isDirectory()
-					&& pFile.equals(new File(pathPreffix))) {
-				openFolder(pFile);
-			} else {
-				Log.i("back", pFile.getAbsolutePath());
-			}
-		}
+		backStack();
 	}
 
 	@Override
 	protected void invokeAncestorList() {
 		String path = fakeBackStack.get(fakeBackStack.size() - 1).getFilePath();
+		if (FileConst.Value_Bookmark_Path.equals(path)) {
+			return;
+		}
 		File file = new File(path);
 		ancestorList
 				.setupList(file, pathPreffix, FileConst.Value_Bookmark_Path);

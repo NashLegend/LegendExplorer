@@ -121,16 +121,14 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			}
 		}
 
-		openFolder(file);
+		openFolder(file, FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 	}
 
 	/**
-	 * 打开目录
-	 * 
 	 * @param file
-	 *            要打开的文件夹
+	 * @param animation
 	 */
-	public void openFolder(File file) {
+	public void openFolder(File file, int animation) {
 		// file.isDirectory()不为true则说明文件要么不存在要么是文件
 		if (file == null || !file.isDirectory()) {
 			// 若不存在此目录，则打开根文件夹
@@ -144,11 +142,22 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 
 		FragmentTransaction transaction = getFragmentManager()
 				.beginTransaction();
+		transaction.setTransition(animation);
 		transaction.replace(R.id.content_explorer, fragment,
 				file.getAbsolutePath());
 		transaction.commit();
 		fakeBackStack.add(fragment);
 		pathText.setText(fragment.getDisplayedFilePath());
+	}
+
+	/**
+	 * 打开目录
+	 * 
+	 * @param file
+	 *            要打开的文件夹
+	 */
+	public void openFolder(File file) {
+		openFolder(file, FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 	}
 
 	/**
@@ -178,6 +187,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 					.get(fakeBackStack.size() - 1);
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
+			transaction
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 			transaction.replace(R.id.content_explorer, fragment,
 					fragment.getDisplayedFilePath());
 			transaction.commit();
@@ -198,7 +209,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			File file = new File(fragment.getDisplayedFilePath());
 			File pFile = file.getParentFile();
 			if (pFile != null && pFile.exists() && pFile.isDirectory()) {
-				openFolder(pFile);
+				openFolder(pFile, FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 			}
 		}
 	}
