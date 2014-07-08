@@ -12,6 +12,8 @@ import com.example.legendexplorer.model.FileItem;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendexplorer.view.FileGridItemView;
 import com.example.legendexplorer.view.FileItemView;
+import com.example.legendutils.Tools.FileUtil;
+import com.example.legendutils.Tools.SystemUtil;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -120,7 +122,15 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 				helper.close();
 				setList(fileItems);
 			} else {
-				File[] files = file.listFiles();
+				File[] files = null;
+				if (file.canRead()) {
+					files = file.listFiles();
+				} else {
+					if (SystemUtil.isRooted()) {
+						files = FileUtil.ListFilesWithRoot(file
+								.getAbsolutePath());
+					}
+				}
 				if (files != null) {
 					for (int i = 0; i < files.length; i++) {
 						if (showhidden) {
