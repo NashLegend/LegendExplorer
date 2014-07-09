@@ -85,9 +85,6 @@ public class CategoriedFragment extends BaseFragment {
 			FileCategoryHelper.CategoryInfo categoryInfo = FileCategoryHelper
 					.getCategoryInfos().get(fc);
 			setCategoryCount(fc, categoryInfo.count);
-			if (fc == FileCategory.Other)
-				continue;
-
 			// setCategorySize(fc, categoryInfo.size);
 			// setCategoryBarValue(fc, categoryInfo.size);
 			size += categoryInfo.size;
@@ -207,10 +204,8 @@ public class CategoriedFragment extends BaseFragment {
 	};
 
 	public void showCategoryList(FileCategory f) {
-//		frameLayout.setVisibility(View.VISIBLE);
-		Cursor cursor = FileCategoryHelper.query(f, getActivity());
 		listFragment = new FileListFragment();
-		listFragment.setCursor(cursor);
+		listFragment.setCategory(f);
 		Bundle bundle = new Bundle();
 		bundle.putInt(FileConst.Extra_Explore_Type,
 				FileConst.Value_Explore_Type_Categories);
@@ -233,7 +228,7 @@ public class CategoriedFragment extends BaseFragment {
 			transaction.remove(listFragment);
 			transaction.commit();
 			listFragment = null;
-//			frameLayout.setVisibility(View.GONE);
+			// frameLayout.setVisibility(View.GONE);
 			return true;
 		}
 	}
@@ -271,7 +266,12 @@ public class CategoriedFragment extends BaseFragment {
 
 	@Override
 	public void onStop() {
-		getActivity().unregisterReceiver(receiver);
+		try {
+			getActivity().unregisterReceiver(receiver);
+		} catch (Exception e) {
+
+		}
+
 		super.onStop();
 	}
 
@@ -314,7 +314,13 @@ public class CategoriedFragment extends BaseFragment {
 		} else if (FileConst.Action_Toggle_View_Mode.equals(action)) {
 			toggleViewMode();
 		} else if (FileConst.Action_Refresh_FileList.equals(action)) {
-			refreshFileList();
+			new Handler().post(new Runnable() {
+
+				@Override
+				public void run() {
+					refreshFileList();
+				}
+			});
 		} else if (FileConst.Action_Copy_File.equals(action)) {
 			copyFile();
 		} else if (FileConst.Action_Move_File.equals(action)) {
@@ -431,8 +437,7 @@ public class CategoriedFragment extends BaseFragment {
 
 		public static FileCategory[] sCategories = new FileCategory[] {
 				FileCategory.Music, FileCategory.Video, FileCategory.Picture,
-				FileCategory.Doc, FileCategory.Zip, FileCategory.Apk,
-				FileCategory.Other };
+				FileCategory.Doc, FileCategory.Zip, FileCategory.Apk };
 
 		public FileCategoryHelper(Context context) {
 

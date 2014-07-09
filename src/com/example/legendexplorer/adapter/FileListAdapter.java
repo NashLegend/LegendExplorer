@@ -8,6 +8,8 @@ import java.util.Iterator;
 
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.db.BookmarkHelper;
+import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
+import com.example.legendexplorer.fragment.CategoriedFragment.FileCategoryHelper;
 import com.example.legendexplorer.model.FileItem;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendexplorer.view.FileGridItemView;
@@ -19,6 +21,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +36,7 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 	private File currentDirectory;
 	private boolean displayModeGrid = false;
 	private Cursor mCursor;
+	private FileCategory fc;
 
 	public FileListAdapter(Context Context) {
 		mContext = Context;
@@ -108,80 +112,122 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 	 * 
 	 * @param file
 	 */
-	public boolean openFolder(File file) {
-		boolean showhidden = SharePreferencesUtil.readBoolean(
-				FileConst.Key_Show_Hiddle_Files, false);
-		currentDirectory = file;
-		if (file != null
-				&& (file.isDirectory() || file.equals(new File(
-						FileConst.Value_File_Path_Never_Existed)))) {
-			list.clear();
-			if (file.equals(new File(FileConst.Value_File_Path_Never_Existed))) {
-				ArrayList<FileItem> fileItems;
-				BookmarkHelper helper = new BookmarkHelper(mContext);
-				helper.open();
-				fileItems = helper.getBookmarks();
-				helper.close();
-				setList(fileItems);
-			} else {
-				File[] files = null;
-				if (file.canRead()) {
-					files = file.listFiles();
-				} else {
-					if (SystemUtil.isRooted()) {
-						files = FileUtil.ListFilesWithRoot(file
-								.getAbsolutePath());
-					}
-				}
-				if (files != null) {
-					for (int i = 0; i < files.length; i++) {
-						if (showhidden) {
-							list.add(new FileItem(files[i]));
-						} else {
-							if (!files[i].isHidden()) {
-								list.add(new FileItem(files[i]));
-							}
-						}
-
-					}
-				}
-				files = null;
-				sortList();
-			}
-
-			notifyDataSetChanged();
-			return true;
-		}
-		return false;
+	public void openFolder(File file) {
+		OpenFolderTask task = new OpenFolderTask();
+		task.execute(file);
 	}
 
-	public void openCursor(Cursor cursor) {
-		currentDirectory = null;
-		mCursor = cursor;
-		list.clear();
-		ArrayList<File> fileNos = new ArrayList<File>();
-		if (cursor != null && cursor.getCount() > 0) {
-			cursor.moveToPosition(-1);
-			while (cursor.moveToNext()) {
-				FileItem item = new FileItem(cursor.getString(1));
-				if (item.exists()) {
-					list.add(item);
+	class OpenFolderTask extends AsyncTask<File, Integer, ArrayList<FileItem>> {
+
+		@Override
+		protected ArrayList<FileItem> doInBackground(File... params) {
+			ArrayList<FileItem> flist = new ArrayList<FileItem>();
+			boolean showhidden = SharePreferencesUtil.readBoolean(
+					FileConst.Key_Show_Hiddle_Files, false);
+			File file = params[0];
+			currentDirectory = file;
+			if (file != null
+					&& (file.isDirectory() || file.equals(new File(
+							FileConst.Value_File_Path_Never_Existed)))) {
+				flist.clear();
+				if (file.equals(new File(
+						FileConst.Value_File_Path_Never_Existed))) {
+					BookmarkHelper helper = new BookmarkHelper(mContext);
+					helper.open();
+					flist = helper.getBookmarks();
+					helper.close();
 				} else {
-					fileNos.add(item);
+					File[] files = null;
+					if (file.canRead()) {
+						files = file.listFiles();
+					} else {
+						if (SystemUtil.isRooted()) {
+							files = FileUtil.ListFilesWithRoot(file
+									.getAbsolutePath());
+						}
+					}
+					if (files != null) {
+						for (int i = 0; i < files.length; i++) {
+							if (showhidden) {
+								flist.add(new FileItem(files[i]));
+							} else {
+								if (!files[i].isHidden()) {
+									flist.add(new FileItem(files[i]));
+								}
+							}
+
+						}
+					}
+					files = null;
+					sortList(flist);
 				}
 			}
+			return flist;
 		}
-		if (fileNos.size() > 0) {
-			String[] files = new String[fileNos.size()];
-			for (int i = 0; i < fileNos.size(); i++) {
-				files[i] = fileNos.get(i).getAbsolutePath();
-			}
-			if (mContext != null) {
-				MediaScannerConnection.scanFile(mContext, files, null, null);
-			}
+
+		@Override
+		protected void onPostExecute(ArrayList<FileItem> result) {
+			setList(result);
+			notifyDataSetChanged();
 		}
-		sortList();
-		notifyDataSetChanged();
+
+	}
+
+	public void openCursor(FileCategory f) {
+		OpenCursorTask task = new OpenCursorTask();
+		this.fc = f;
+		task.execute(fc);
+	}
+
+	public void closeCursor() {
+		if (mCursor != null && !mCursor.isClosed()) {
+			mCursor.close();
+		}
+	}
+
+	class OpenCursorTask extends
+			AsyncTask<FileCategory, Integer, ArrayList<FileItem>> {
+
+		@Override
+		protected ArrayList<FileItem> doInBackground(FileCategory... params) {
+			ArrayList<FileItem> flist = new ArrayList<FileItem>();
+			currentDirectory = null;
+			fc = params[0];
+			Cursor cursor = FileCategoryHelper.query(fc, mContext);
+			mCursor = cursor;
+			flist.clear();
+			ArrayList<File> fileNos = new ArrayList<File>();
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToPosition(-1);
+				while (cursor.moveToNext()) {
+					FileItem item = new FileItem(cursor.getString(1));
+					if (item.exists()) {
+						flist.add(item);
+					} else {
+						fileNos.add(item);
+					}
+				}
+			}
+			if (fileNos.size() > 0) {
+				String[] files = new String[fileNos.size()];
+				for (int i = 0; i < fileNos.size(); i++) {
+					files[i] = fileNos.get(i).getAbsolutePath();
+				}
+				if (mContext != null) {
+					MediaScannerConnection
+							.scanFile(mContext, files, null, null);
+				}
+			}
+			sortList(flist);
+			return flist;
+		}
+
+		@Override
+		protected void onPostExecute(ArrayList<FileItem> result) {
+			setList(result);
+			notifyDataSetChanged();
+		}
+
 	}
 
 	/**

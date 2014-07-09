@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
+import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
 import com.example.legendexplorer.fragment.CategoriedFragment.FileCategoryHelper;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendutils.Dialogs.FileDialog;
@@ -47,7 +48,7 @@ public class FileListFragment extends Fragment {
 	private GridView gridView;
 	private View rootView;
 	private String searchQuery = "";
-	private Cursor mCursor;
+	private FileCategory fc;
 
 	public FileListFragment() {
 	}
@@ -64,8 +65,14 @@ public class FileListFragment extends Fragment {
 				"/////////////");
 	}
 
-	public void setCursor(Cursor cursor) {
-		mCursor = cursor;
+	public void setCategory(FileCategory f) {
+		this.fc = f;
+	}
+
+	@Override
+	public void onDestroy() {
+		adapter.closeCursor();
+		super.onDestroy();
 	}
 
 	@Override
@@ -114,9 +121,7 @@ public class FileListFragment extends Fragment {
 
 	public void loadData() {
 		if (exploreType == FileConst.Value_Explore_Type_Categories) {
-			if (mCursor != null) {
-				adapter.openCursor(mCursor);
-			}
+			adapter.openCursor(this.fc);
 		} else {
 			if (filePath != null) {
 				if (filePath.equals(FileConst.Value_Bookmark_Path)) {
@@ -127,7 +132,6 @@ public class FileListFragment extends Fragment {
 				}
 			}
 		}
-		adapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -345,7 +349,7 @@ public class FileListFragment extends Fragment {
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
-		FileUtil.copy2DirectoryAsync(files, destFile, 
+		FileUtil.copy2DirectoryAsync(files, destFile,
 				new FileOperationListener() {
 
 					@Override

@@ -219,12 +219,6 @@ public class MainActivity extends Activity {
 	}
 	
 	@Override
-	protected void onStop() {
-		Log.i("cat", "StopActi");
-		super.onStop();
-	}
-
-	@Override
 	protected void onDestroy() {
 		unregisterReceiver(fileBroadcastReceiver);
 		super.onDestroy();
