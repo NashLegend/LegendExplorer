@@ -345,7 +345,7 @@ public class FileListFragment extends Fragment {
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
-		FileUtil.copy2DirectoryAsync(files, destFile, getActivity(),
+		FileUtil.copy2DirectoryAsync(files, destFile, 
 				new FileOperationListener() {
 
 					@Override
@@ -394,7 +394,7 @@ public class FileListFragment extends Fragment {
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
-		FileUtil.move2DirectoryAsync(files, destFile, getActivity(),
+		FileUtil.move2DirectoryAsync(files, destFile,
 				new FileOperationListener() {
 
 					@Override
@@ -448,7 +448,7 @@ public class FileListFragment extends Fragment {
 					.setCanceledOnTouchOutside(false).create();
 			dialog.show();
 			final File file = getSelectedFiles()[0];
-			FileUtil.deleteAsync(getSelectedFiles(), getActivity(),
+			FileUtil.deleteAsync(getSelectedFiles(),
 					new FileOperationListener() {
 
 						@Override
