@@ -6,7 +6,6 @@ import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
-import com.example.legendexplorer.view.FileItemView.IconLoadTask;
 import com.example.legendutils.Tools.FileUtil;
 
 import android.app.Service;
@@ -14,12 +13,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Vibrator;
 import android.os.AsyncTask.Status;
-import android.util.Log;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,9 +43,8 @@ public class FileGridItemView extends FrameLayout implements OnClickListener,
 	private CheckBox checkBox;
 	private ViewGroup rootFileItemView;
 	private FileListAdapter adapter;
-	private IconLoadTask task;
-
 	private FileItem fileItem;
+	private IconLoadTask task;
 
 	public FileGridItemView(Context context) {
 		super(context);

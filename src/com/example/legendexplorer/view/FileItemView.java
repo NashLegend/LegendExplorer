@@ -13,12 +13,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -279,6 +277,5 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 			getContext().sendBroadcast(intent);
 		}
 		return false;
-
 	}
 }
