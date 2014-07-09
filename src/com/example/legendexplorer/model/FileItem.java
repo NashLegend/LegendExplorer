@@ -237,7 +237,7 @@ public class FileItem extends File {
 	}
 
 	/**
-	 * 设置fileTyle,同时修改icon,目前没有icon...TODO
+	 * 设置fileTyle,同时修改icon
 	 * 
 	 * @param fileType
 	 */

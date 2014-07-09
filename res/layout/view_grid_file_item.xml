@@ -12,6 +12,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="9dp" />
 
+    <ImageView
+        android:id="@+id/image_file_sym_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="9dp"
+        android:background="@drawable/sym_link"
+        android:visibility="gone" />
+
     <CheckBox
         android:id="@+id/checkbox_file_item_select"
         android:layout_width="32dp"

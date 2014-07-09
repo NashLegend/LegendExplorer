@@ -6,18 +6,30 @@
     android:descendantFocusability="blocksDescendants"
     android:orientation="horizontal" >
 
-    <ImageView
-        android:id="@+id/image_file_icon"
+    <RelativeLayout
         android:layout_width="48dp"
-        android:layout_height="48dp" />
+        android:layout_height="48dp" >
+
+        <ImageView
+            android:id="@+id/image_file_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+
+        <ImageView
+            android:id="@+id/image_file_sym_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/sym_link"
+            android:visibility="gone" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/text_file_title"
         android:layout_width="0dp"
-        android:ellipsize="end"
-        android:maxLines="1"
         android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1" />
 
     <CheckBox
         android:id="@+id/checkbox_file_item_select"

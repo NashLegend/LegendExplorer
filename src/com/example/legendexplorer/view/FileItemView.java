@@ -1,5 +1,7 @@
 package com.example.legendexplorer.view;
 
+import java.io.IOException;
+
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
@@ -35,6 +37,7 @@ import android.view.View.OnLongClickListener;
 public class FileItemView extends FrameLayout implements OnClickListener,
 		OnCheckedChangeListener, OnLongClickListener {
 	private ImageView icon;
+	private ImageView symbolView;
 	private TextView title;
 	private CheckBox checkBox;
 	private ViewGroup rootFileItemView;
@@ -48,6 +51,7 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.view_file_item, this);
 		icon = (ImageView) findViewById(R.id.image_file_icon);
+		symbolView = (ImageView) findViewById(R.id.image_file_sym_icon);
 		title = (TextView) findViewById(R.id.text_file_title);
 		rootFileItemView = (ViewGroup) findViewById(R.id.rootFileItemView);
 		checkBox = (CheckBox) findViewById(R.id.checkbox_file_item_select);
@@ -63,6 +67,15 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 		this.fileItem = fileItem;
 		this.adapter = adapter;
 		icon.setImageResource(fileItem.getIcon());
+		try {
+			if (fileItem.isDirectory() && FileUtil.isSymboliclink(fileItem)) {
+				symbolView.setVisibility(View.VISIBLE);
+			} else {
+				symbolView.setVisibility(View.GONE);
+			}
+		} catch (IOException e) {
+			symbolView.setVisibility(View.GONE);
+		}
 		title.setText(fileItem.getName());
 		toggleSelectState();
 		if (fileItem.isInSelectMode()) {
