@@ -12,8 +12,11 @@ import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.AsyncTask.Status;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,8 +45,8 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 	private CheckBox checkBox;
 	private ViewGroup rootFileItemView;
 	private FileListAdapter adapter;
-
 	private FileItem fileItem;
+	private IconLoadTask task;
 
 	public FileItemView(Context context) {
 		super(context);
@@ -66,16 +69,7 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 	public void setFileItem(FileItem fileItem, FileListAdapter adapter) {
 		this.fileItem = fileItem;
 		this.adapter = adapter;
-		icon.setImageResource(fileItem.getIcon());
-		try {
-			if (fileItem.isDirectory() && FileUtil.isSymboliclink(fileItem)) {
-				symbolView.setVisibility(View.VISIBLE);
-			} else {
-				symbolView.setVisibility(View.GONE);
-			}
-		} catch (IOException e) {
-			symbolView.setVisibility(View.GONE);
-		}
+		showFileIcon();
 		title.setText(fileItem.getName());
 		toggleSelectState();
 		if (fileItem.isInSelectMode()) {
@@ -85,6 +79,57 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 			checkBox.setVisibility(View.GONE);
 			setOnLongClickListener(this);
 		}
+	}
+
+	/**
+	 * 显示文件图标
+	 */
+	private void showFileIcon() {
+		icon.setImageResource(fileItem.getIcon());
+		int tp = fileItem.getFileType();
+		if (tp == FileItem.FILE_TYPE_APK || tp == FileItem.FILE_TYPE_AUDIO
+				|| tp == FileItem.FILE_TYPE_IMAGE
+				|| tp == FileItem.FILE_TYPE_VIDEO) {
+			if (task != null && task.getStatus() == Status.RUNNING) {
+				task.cancel(true);
+			}
+			task = new IconLoadTask();
+			task.execute(fileItem);
+		}
+		try {
+			if (fileItem.isDirectory() && FileUtil.isSymboliclink(fileItem)) {
+				symbolView.setVisibility(View.VISIBLE);
+			} else {
+				symbolView.setVisibility(View.GONE);
+			}
+		} catch (IOException e) {
+			symbolView.setVisibility(View.GONE);
+		}
+	}
+
+	class IconLoadTask extends AsyncTask<FileItem, Integer, Bitmap> {
+
+		FileItem originalFile;
+
+		@Override
+		protected Bitmap doInBackground(FileItem... params) {
+			originalFile = params[0];
+			Bitmap bmp = FileUtil.extractFileThumbnail(fileItem, getContext());
+			return bmp;
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			if (fileItem.equals(this.originalFile)) {
+				if (result != null) {
+					icon.setImageBitmap(result);
+				} else {
+					icon.setImageResource(fileItem.getIcon());
+				}
+			}
+			super.onPostExecute(result);
+		}
+
 	}
 
 	/**

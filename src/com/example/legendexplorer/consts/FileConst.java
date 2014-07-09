@@ -34,6 +34,7 @@ public class FileConst {
 	public static final String Key_Files_Display_Mode = "filesdisplaymode";
 	public static final String Key_Show_Hiddle_Files = "showhiddenfiles";
 	public static final String Key_Search_File_Query = "searchfilequery";
+	public static final String Key_Show_More_On_Icon = "showmoreonicon";
 
 	// Values
 	public static final String Value_Bookmark_Path = "Bookmark://";
@@ -44,7 +45,7 @@ public class FileConst {
 	public static final int Value_Explore_Type_Files = 0;
 	public static final int Value_Explore_Type_Bookmarks = 1;
 	public static final int Value_Explore_Type_Categories = 2;
-	
+
 	public static final int Value_Item_Type_File_Or_Folder = 0;
 	public static final int Value_Item_Type_Bookmark = 1;
 	public static final int Value_Item_Type_Category = 2;

@@ -6,15 +6,20 @@ import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
+import com.example.legendexplorer.view.FileItemView.IconLoadTask;
 import com.example.legendutils.Tools.FileUtil;
 
 import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Vibrator;
+import android.os.AsyncTask.Status;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +46,7 @@ public class FileGridItemView extends FrameLayout implements OnClickListener,
 	private CheckBox checkBox;
 	private ViewGroup rootFileItemView;
 	private FileListAdapter adapter;
+	private IconLoadTask task;
 
 	private FileItem fileItem;
 
@@ -65,16 +71,7 @@ public class FileGridItemView extends FrameLayout implements OnClickListener,
 	public void setFileItem(FileItem fileItem, FileListAdapter adapter) {
 		this.fileItem = fileItem;
 		this.adapter = adapter;
-		icon.setImageResource(fileItem.getIcon());
-		try {
-			if (fileItem.isDirectory() && FileUtil.isSymboliclink(fileItem)) {
-				symbolView.setVisibility(View.VISIBLE);
-			} else {
-				symbolView.setVisibility(View.GONE);
-			}
-		} catch (IOException e) {
-			symbolView.setVisibility(View.GONE);
-		}
+		showFileIcon();
 		title.setText(fileItem.getName());
 		toggleSelectState();
 		if (fileItem.isInSelectMode()) {
@@ -84,6 +81,57 @@ public class FileGridItemView extends FrameLayout implements OnClickListener,
 			checkBox.setVisibility(View.GONE);
 			setOnLongClickListener(this);
 		}
+	}
+
+	/**
+	 * 显示文件图标
+	 */
+	private void showFileIcon() {
+		icon.setImageResource(fileItem.getIcon());
+		int tp = fileItem.getFileType();
+		if (tp == FileItem.FILE_TYPE_APK || tp == FileItem.FILE_TYPE_AUDIO
+				|| tp == FileItem.FILE_TYPE_IMAGE
+				|| tp == FileItem.FILE_TYPE_VIDEO) {
+			if (task != null && task.getStatus() == Status.RUNNING) {
+				task.cancel(true);
+			}
+			task = new IconLoadTask();
+			task.execute(fileItem);
+		}
+		try {
+			if (fileItem.isDirectory() && FileUtil.isSymboliclink(fileItem)) {
+				symbolView.setVisibility(View.VISIBLE);
+			} else {
+				symbolView.setVisibility(View.GONE);
+			}
+		} catch (IOException e) {
+			symbolView.setVisibility(View.GONE);
+		}
+	}
+
+	class IconLoadTask extends AsyncTask<FileItem, Integer, Bitmap> {
+
+		FileItem originalFile;
+
+		@Override
+		protected Bitmap doInBackground(FileItem... params) {
+			originalFile = params[0];
+			Bitmap bmp = FileUtil.extractFileThumbnail(fileItem, getContext());
+			return bmp;
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			if (fileItem.equals(this.originalFile)) {
+				if (result != null) {
+					icon.setImageBitmap(result);
+				} else {
+					icon.setImageResource(fileItem.getIcon());
+				}
+			}
+			super.onPostExecute(result);
+		}
+
 	}
 
 	/**
