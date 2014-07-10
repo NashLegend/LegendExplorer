@@ -6,6 +6,7 @@ import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
+import com.example.legendexplorer.utils.IconContainer;
 import com.example.legendutils.Tools.FileUtil;
 
 import android.app.Service;
@@ -65,9 +66,12 @@ public class FileGridItemView extends FrameLayout implements OnClickListener,
 	}
 
 	public void setFileItem(FileItem fileItem, FileListAdapter adapter) {
+		if (!fileItem.equals(this.fileItem)) {
+			this.fileItem = fileItem;
+			showFileIcon();
+		}
 		this.fileItem = fileItem;
 		this.adapter = adapter;
-		showFileIcon();
 		title.setText(fileItem.getName());
 		toggleSelectState();
 		if (fileItem.isInSelectMode()) {
@@ -91,8 +95,13 @@ public class FileGridItemView extends FrameLayout implements OnClickListener,
 			if (task != null && task.getStatus() == Status.RUNNING) {
 				task.cancel(true);
 			}
-			task = new IconLoadTask();
-			task.execute(fileItem);
+			Bitmap bmp = IconContainer.get(fileItem);
+			if (bmp == null) {
+				task = new IconLoadTask();
+				task.execute(fileItem);
+			} else {
+				icon.setImageBitmap(bmp);
+			}
 		}
 		try {
 			if (fileItem.isDirectory() && FileUtil.isSymboliclink(fileItem)) {
@@ -112,7 +121,11 @@ public class FileGridItemView extends FrameLayout implements OnClickListener,
 		@Override
 		protected Bitmap doInBackground(FileItem... params) {
 			originalFile = params[0];
-			Bitmap bmp = FileUtil.extractFileThumbnail(fileItem, getContext());
+			Bitmap bmp = FileUtil.extractFileThumbnail(originalFile,
+					getContext());
+			if (bmp != null) {
+				IconContainer.put(originalFile, bmp);
+			}
 			return bmp;
 		}
 
