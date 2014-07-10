@@ -492,6 +492,35 @@ public class FileListFragment extends Fragment {
 		refreshFileList();
 	}
 
+	public void renameFile() {
+		final File[] files = getSelectedFiles();
+		String title = "";
+		String input = "";
+		if (files.length > 0) {
+			if (files.length == 1) {
+				title = "Rename file";
+				input = files[0].getName();
+			} else {
+				title = "Rename multi-files";
+			}
+		}
+		new InputDialog.Builder(getActivity()).setTitle(title)
+				.setInputText(input).setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dia, int which) {
+						if (which == DialogInterface.BUTTON_POSITIVE) {
+							InputDialog dialog = (InputDialog) dia;
+							if (!TextUtils.isEmpty(dialog.InputString)) {
+								String fname = dialog.InputString.trim();
+								FileUtil.rename(files, fname);
+							}
+							operationDone();
+						}
+					}
+				}).create().show();
+	}
+
 	public void zipFile() {
 		final File[] files = getSelectedFiles();
 		if (files.length > 0) {

@@ -304,6 +304,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 	protected void exitSelectMode() {
 		if (fakeBackStack.size() > 0) {
 			selectAllButton.setVisibility(View.GONE);
+			selectAllButton.setChecked(false);
 			inSelectMode = false;
 			fakeBackStack.get(fakeBackStack.size() - 1).exitSelectMode();
 
@@ -383,6 +384,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			toggleShowHidden();
 		} else if (FileConst.Action_Zip_File.equals(action)) {
 			zipFile();
+		} else if (FileConst.Action_Rename_File.equals(action)) {
+			renameFile();
 		}
 		return false;
 	}
@@ -447,6 +450,13 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 	public void zipFile() {
 		if (fakeBackStack.size() > 0) {
 			fakeBackStack.get(fakeBackStack.size() - 1).zipFile();
+		}
+	}
+
+	@Override
+	public void renameFile() {
+		if (fakeBackStack.size() > 0) {
+			fakeBackStack.get(fakeBackStack.size() - 1).renameFile();
 		}
 	}
 }

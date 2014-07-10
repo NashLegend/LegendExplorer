@@ -14,6 +14,7 @@ public class FileConst {
 	public static final String Action_Copy_File = "legendexplorer.copyfile";
 	public static final String Action_Move_File = "legendexplorer.movefile";
 	public static final String Action_Zip_File = "legendexplorer.zipfile";
+	public static final String Action_Rename_File = "legendexplorer.renamefile";
 	public static final String Action_Delete_File = "legendexplorer.deletefile";
 	public static final String Action_Exit_Select_Mode = "legendexplorer.exitselectmode";
 	public static final String Action_Toggle_Show_Hidden = "legendexplorer.toggleshowhidden";

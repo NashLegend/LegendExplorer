@@ -326,7 +326,6 @@ public class FileListAdapter extends BaseAdapter implements Filterable {
 
 	@Override
 	public Filter getFilter() {
-		Log.i("filter", "getFilter");
 		return filter;
 	}
 

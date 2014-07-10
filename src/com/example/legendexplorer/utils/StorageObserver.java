@@ -1,4 +1,4 @@
-package com.example.legendexplorer;
+package com.example.legendexplorer.utils;
 
 import java.io.File;
 import java.util.ArrayList;

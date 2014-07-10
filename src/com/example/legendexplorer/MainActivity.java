@@ -9,6 +9,7 @@ import com.example.legendexplorer.fragment.BaseFragment;
 import com.example.legendexplorer.fragment.BookMarksFragment;
 import com.example.legendexplorer.fragment.CategoriedFragment;
 import com.example.legendexplorer.fragment.FilesFragment;
+import com.example.legendexplorer.utils.StorageObserver;
 import com.example.legendexplorer.view.FolderViewPager;
 import com.example.legendutils.Tools.TimerUtil;
 import com.example.legendutils.Tools.ToastUtil;
@@ -47,11 +48,11 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-//		observer = new StorageObserver(Environment
-//				.getExternalStorageDirectory().getAbsolutePath(),
-//				FileObserver.CREATE | FileObserver.DELETE
-//						| FileObserver.MOVED_FROM | FileObserver.MOVED_TO);
-//		observer.startWatching();
+		// observer = new StorageObserver(Environment
+		// .getExternalStorageDirectory().getAbsolutePath(),
+		// FileObserver.CREATE | FileObserver.DELETE
+		// | FileObserver.MOVED_FROM | FileObserver.MOVED_TO);
+		// observer.startWatching();
 
 		filesFragment = new FilesFragment();
 		bookMarksFragment = new BookMarksFragment();
@@ -115,6 +116,9 @@ public class MainActivity extends Activity {
 		case R.id.action_delete:
 			deleteFile();
 			break;
+		case R.id.action_rename:
+			renameFile();
+			break;
 		case R.id.action_zip:
 			zipFile();
 			break;
@@ -172,6 +176,12 @@ public class MainActivity extends Activity {
 		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
 	}
 
+	private void renameFile() {
+		Intent intent = new Intent();
+		intent.setAction(FileConst.Action_Rename_File);
+		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
+	}
+
 	private void zipFile() {
 		Intent intent = new Intent();
 		intent.setAction(FileConst.Action_Zip_File);
@@ -217,7 +227,7 @@ public class MainActivity extends Activity {
 	private boolean doBackAction() {
 		return adapter.getItem(pager.getCurrentItem()).doBackAction();
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		unregisterReceiver(fileBroadcastReceiver);
