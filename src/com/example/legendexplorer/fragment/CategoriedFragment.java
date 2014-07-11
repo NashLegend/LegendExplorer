@@ -1,31 +1,30 @@
 package com.example.legendexplorer.fragment;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.consts.FileConst;
+import com.example.legendexplorer.utils.FileCategoryHelper;
+import com.example.legendutils.Tools.FileUtil;
 
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.media.MediaScannerConnection;
+import android.media.MediaScannerConnection.OnScanCompletedListener;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore.Audio;
-import android.provider.MediaStore.Files;
-import android.provider.MediaStore.Images;
-import android.provider.MediaStore.Video;
-import android.provider.MediaStore.Files.FileColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -189,7 +188,7 @@ public class CategoriedFragment extends BaseFragment {
 		filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
 		filter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
 		filter.addAction(Intent.ACTION_MEDIA_SCANNER_STARTED);
-		filter.addDataScheme("file");
+		// filter.addDataScheme("file");
 		getActivity().registerReceiver(receiver, filter);
 	}
 
@@ -349,10 +348,29 @@ public class CategoriedFragment extends BaseFragment {
 		}
 	}
 
+	/**
+	 * 调用系统扫描方法起不到什么作用，真的。除非发生如下情况： 1.所有app在修改、删除、添加、移动文件时都更新content.
+	 * 2.手动扫描全盘，但是慢
+	 */
 	private void refreshFileList() {
-		MediaScannerConnection.scanFile(getActivity(),
-				new String[] { Environment.getExternalStorageDirectory()
-						.getAbsolutePath() }, null, null);
+		// Intent.ACTION_MEDIA_MOUNTED not allow after API19
+		// getActivity().sendBroadcast(new Intent(
+		// Intent.ACTION_MEDIA_MOUNTED,
+		// Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+		// getActivity().sendBroadcast(new
+		// Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, mediaMountUri));
+		// no use,it won't scan all files
+		// MediaScannerConnection.scanFile(getActivity(),
+		// new String[] { Environment.getExternalStorageDirectory()
+		// .getAbsolutePath() }, null,
+		// new MediaScannerConnection.OnScanCompletedListener() {
+		//
+		// @Override
+		// public void onScanCompleted(String path, Uri uri) {
+		// // TODO Auto-generated method stub
+		// }
+		// });
+
 		refreshData();
 		if (listFragment != null) {
 			listFragment.refreshFileList();
@@ -411,173 +429,84 @@ public class CategoriedFragment extends BaseFragment {
 		}
 	}
 
-	public static class FileCategoryHelper {
+	/**
+	 * 彻底地扫描全盘
+	 * 
+	 * @author NashLegend
+	 *
+	 */
+	class ScanTask extends AsyncTask<String, Integer, Boolean> {
 
-		public static final int COLUMN_ID = 0;
+		ArrayList<String> paths = new ArrayList<String>();
 
-		public static final int COLUMN_PATH = 1;
-
-		public static final int COLUMN_SIZE = 2;
-
-		public static final int COLUMN_DATE = 3;
-
-		private static final String LOG_TAG = "cat";
-
-		public static class CategoryInfo {
-			public long count;
-
-			public long size;
-		}
-
-		private static HashMap<FileCategory, CategoryInfo> mCategoryInfo = new HashMap<FileCategory, CategoryInfo>();
-
-		public static HashMap<FileCategory, CategoryInfo> getCategoryInfos() {
-			return mCategoryInfo;
-		}
-
-		public static FileCategory[] sCategories = new FileCategory[] {
-				FileCategory.Music, FileCategory.Video, FileCategory.Picture,
-				FileCategory.Doc, FileCategory.Zip, FileCategory.Apk };
-
-		public FileCategoryHelper(Context context) {
-
-		}
-
-		public static void delete(FileCategory fc, String path, Context context) {
-
-		}
-
-		public static Cursor query(FileCategory fc, Context context) {
-			Uri uri = getContentUriByCategory(fc);
-			String selection = buildSelectionByCategory(fc);
-			String sortOrder = null;
-
-			if (uri == null) {
-				return null;
+		public void scanFile(File file) {
+			if (file.isDirectory()) {
+				File[] files = file.listFiles();
+				if (files != null) {
+					for (int i = 0; i < files.length; i++) {
+						File file2 = files[i];
+						scanFile(file2);
+					}
+				}
+			} else {
+				String suffix = FileUtil.getFileSuffix(file);
+				if (suffix.length() > 0 && isArrayContains(suffix)) {
+					// TODO
+					paths.add(file.getAbsolutePath());
+				}
 			}
-
-			String[] columns = new String[] { FileColumns._ID,
-					FileColumns.DATA, FileColumns.SIZE,
-					FileColumns.DATE_MODIFIED };
-			return context.getContentResolver().query(uri, columns, selection,
-					null, sortOrder);
 		}
 
-		private static Uri getContentUriByCategory(FileCategory cat) {
-			Uri uri;
-			String volumeName = "external";
-			switch (cat) {
-			case Doc:
-			case Zip:
-			case Apk:
-				uri = Files.getContentUri(volumeName);
-				break;
-			case Music:
-				uri = Audio.Media.getContentUri(volumeName);
-				break;
-			case Video:
-				uri = Video.Media.getContentUri(volumeName);
-				break;
-			case Picture:
-				uri = Images.Media.getContentUri(volumeName);
-				break;
-			default:
-				uri = null;
-			}
-			return uri;
-		}
+		private boolean isArrayContains(String suffix) {
+			// 事实上无需扫描媒体文件，如果后缀是媒体文件但是却没有被MediaScanner扫描到，说明这可能是一个私有的文件
+			// 比如在Android/data/com.xx.xxx/image里面有文件是不会想要被放进媒体库的，所以不使用下列数组
+			// String[] strs = { "mp3", "jpg", "jpeg", "bmp", "gif", "png",
+			// "mp4","avi", "rmvk", "mkv", "wmv", "apk", "txt", "doc", "docx",
+			// "xls", "xlsx", "ppt", "pptx", "pdf", "zip", "rar", "7z" };
 
-		public static void refreshCategoryInfo(Context mContext) {
-			for (FileCategory fc : sCategories) {
-				setCategoryInfo(fc, 0, 0);
-			}
-			String volumeName = "external";
-			Uri uri = Audio.Media.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Music, uri, mContext);
-			uri = Video.Media.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Video, uri, mContext);
-			uri = Images.Media.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Picture, uri, mContext);
-			uri = Files.getContentUri(volumeName);
-			refreshMediaCategory(FileCategory.Doc, uri, mContext);
-			refreshMediaCategory(FileCategory.Zip, uri, mContext);
-			refreshMediaCategory(FileCategory.Apk, uri, mContext);
-		}
+			// 有良心的app在使用doc类型的文件时，也会将其扫描的，没有加入库的可能也是私有的，所以不使用下列数组
+			// String[] strs = { "apk", "txt", "doc", "docx", "xls", "xlsx",
+			// "ppt", "pptx", "pdf", "zip", "rar", "7z" };
 
-		private static void setCategoryInfo(FileCategory fc, long count,
-				long size) {
-			CategoryInfo info = mCategoryInfo.get(fc);
-			if (info == null) {
-				info = new CategoryInfo();
-				mCategoryInfo.put(fc, info);
-			}
-			info.count = count;
-			info.size = size;
-		}
+			// 事实上需要扫描的只有下面几个，但是如果所有app厂商足够细心的话，下面几个也不需要的
+			// 可以分别以mime取得下面的文件，分别为：
+			// application/vnd.android.package-archive、text/plain、application/zip
+			// 当然，不能信任他们
+			String[] strs = { "apk", "txt", "zip" };
 
-		private static boolean refreshMediaCategory(FileCategory fc, Uri uri,
-				Context mContext) {
-			String[] columns = new String[] { "COUNT(*)", "SUM(_size)" };
-			Cursor c = mContext.getContentResolver().query(uri, columns,
-					buildSelectionByCategory(fc), null, null);
-			if (c == null) {
-				Log.e(LOG_TAG, "fail to query uri:" + uri);
+			if (strs == null || suffix == null) {
 				return false;
 			}
-
-			if (c.moveToNext()) {
-				setCategoryInfo(fc, c.getLong(0), c.getLong(1));
-				c.close();
-				return true;
+			for (int i = 0; i < strs.length; i++) {
+				if (suffix.equals(strs[i])) {
+					return true;
+				}
 			}
-
 			return false;
 		}
 
-		public static HashSet<String> sDocMimeTypesSet = new HashSet<String>() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			{
-				add("application/pdf");
-				add("application/msword");
-				add("application/vnd.ms-excel");
-				add("application/vnd.ms-excel");
+		@Override
+		protected Boolean doInBackground(String... params) {
+			scanFile(Environment.getExternalStorageDirectory());
+			String[] pathStrings = new String[paths.size()];
+			for (int i = 0; i < paths.size(); i++) {
+				pathStrings[i] = paths.get(i);
 			}
-		};
 
-		private static String buildDocSelection() {
-			StringBuilder selection = new StringBuilder();
-			Iterator<String> iter = sDocMimeTypesSet.iterator();
-			selection.append(FileColumns.DATA + " LIKE '%.txt' OR ");
-			while (iter.hasNext()) {
-				selection.append("(" + FileColumns.MIME_TYPE + "=='"
-						+ iter.next() + "') OR ");
-			}
-			return selection.substring(0, selection.lastIndexOf(")") + 1);
+			MediaScannerConnection.scanFile(getActivity(), pathStrings, null,
+					new MediaScannerConnection.OnScanCompletedListener() {
+
+						@Override
+						public void onScanCompleted(String path, Uri uri) {
+							Log.i("scan", path);
+						}
+					});
+			return null;
 		}
 
-		private static String buildSelectionByCategory(FileCategory cat) {
-			String selection = null;
-			switch (cat) {
-			case Doc:
-				selection = buildDocSelection();
-				break;
-			case Zip:
-				selection = "(" + FileColumns.MIME_TYPE + " == '"
-						+ "application/zip" + "')";
-				break;
-			case Apk:
-				selection = FileColumns.DATA + " LIKE '%.apk'";
-				break;
-			default:
-				selection = null;
-			}
-			return selection;
+		@Override
+		protected void onPostExecute(Boolean result) {
+			super.onPostExecute(result);
 		}
-
 	}
-
 }

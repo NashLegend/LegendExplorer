@@ -8,7 +8,6 @@ import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
-import com.example.legendexplorer.fragment.CategoriedFragment.FileCategoryHelper;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendutils.Dialogs.FileDialog;
 import com.example.legendutils.Dialogs.InputDialog;
@@ -27,7 +26,6 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -268,6 +266,11 @@ public class FileListFragment extends Fragment {
 								}
 								try {
 									if (file.createNewFile()) {
+										MediaScannerConnection.scanFile(
+												getActivity(),
+												new String[] { file
+														.getAbsolutePath() },
+												null, null);
 										refreshFileList();
 									} else {
 										ToastUtil.showToast(getActivity(),
@@ -349,7 +352,7 @@ public class FileListFragment extends Fragment {
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
-		FileUtil.copy2DirectoryAsync(files, destFile,
+		FileUtil.copy2DirectoryAsync(files, destFile, getActivity(),
 				new FileOperationListener() {
 
 					@Override
@@ -398,7 +401,7 @@ public class FileListFragment extends Fragment {
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
-		FileUtil.move2DirectoryAsync(files, destFile,
+		FileUtil.move2DirectoryAsync(files, destFile, getActivity(),
 				new FileOperationListener() {
 
 					@Override
@@ -452,7 +455,7 @@ public class FileListFragment extends Fragment {
 					.setCanceledOnTouchOutside(false).create();
 			dialog.show();
 			final File file = getSelectedFiles()[0];
-			FileUtil.deleteAsync(getSelectedFiles(),
+			FileUtil.deleteAsync(getSelectedFiles(), getActivity(),
 					new FileOperationListener() {
 
 						@Override
@@ -513,7 +516,7 @@ public class FileListFragment extends Fragment {
 							InputDialog dialog = (InputDialog) dia;
 							if (!TextUtils.isEmpty(dialog.InputString)) {
 								String fname = dialog.InputString.trim();
-								FileUtil.rename(files, fname);
+								FileUtil.rename(files, fname, getActivity());
 							}
 							operationDone();
 						}

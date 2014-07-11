@@ -9,7 +9,7 @@ import java.util.Iterator;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.db.BookmarkHelper;
 import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
-import com.example.legendexplorer.fragment.CategoriedFragment.FileCategoryHelper;
+import com.example.legendexplorer.utils.FileCategoryHelper;
 import com.example.legendexplorer.model.FileItem;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendexplorer.view.FileGridItemView;
