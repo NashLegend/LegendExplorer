@@ -8,6 +8,7 @@
     <string name="action_delete">delete</string>
     <string name="action_zip">zip</string>
     <string name="action_rename">rename</string>
+    <string name="action_property">property</string>
     <string name="action_search">search</string>
     <string name="action_new">add</string>
     <string name="action_viewmode">viewmode</string>

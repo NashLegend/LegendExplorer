@@ -23,13 +23,13 @@
         android:id="@+id/action_toggle_hidden"
         android:icon="@drawable/file_refresh"
         android:orderInCategory="4"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/action_toggle_hidden"/>
     <item
         android:id="@+id/action_refresh"
         android:icon="@drawable/file_refresh"
         android:orderInCategory="5"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/action_refresh"/>
 
 </menu>

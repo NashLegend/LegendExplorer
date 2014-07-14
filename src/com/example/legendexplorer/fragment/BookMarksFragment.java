@@ -2,6 +2,7 @@ package com.example.legendexplorer.fragment;
 
 import java.io.File;
 
+import com.example.legendexplorer.MainActivity;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.model.FileItem;
@@ -81,6 +82,59 @@ public class BookMarksFragment extends FilesFragment {
 		return view;
 	}
 
+	@Override
+	protected void change2SelectMode() {
+		if (fakeBackStack.size() > 0) {
+			selectAllButton.setVisibility(View.VISIBLE);
+			inSelectMode = true;
+			fakeBackStack.get(fakeBackStack.size() - 1).change2SelectMode();
+
+			Intent intent = new Intent();
+			int mask = 0;
+			if (fakeBackStack.size() > 0) {
+				FileListFragment fragment = fakeBackStack.get(fakeBackStack
+						.size() - 1);
+				if (fragment.getFilePath()
+						.equals(FileConst.Value_Bookmark_Path)) {
+					mask = MainActivity.ZipFileItemFlag
+							| MainActivity.RenameFileItemFlag
+							| MainActivity.CutFileItemFlag;
+				} else {
+					mask = 0;
+				}
+			}
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
+			getActivity().sendBroadcast(intent);
+		}
+	}
+
+	@Override
+	protected void exitSelectMode() {
+		if (fakeBackStack.size() > 0) {
+			selectAllButton.setVisibility(View.GONE);
+			selectAllButton.setChecked(false);
+			inSelectMode = false;
+			fakeBackStack.get(fakeBackStack.size() - 1).exitSelectMode();
+
+			Intent intent = new Intent();
+			int mask = 0;
+			if (fakeBackStack.size() > 0) {
+				FileListFragment fragment = fakeBackStack.get(fakeBackStack
+						.size() - 1);
+				if (fragment.getFilePath()
+						.equals(FileConst.Value_Bookmark_Path)) {
+					mask = MainActivity.AddFileItemFlag;
+				} else {
+					mask = 0;
+				}
+			}
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+			getActivity().sendBroadcast(intent);
+		}
+	}
+
 	/*
 	 * @see
 	 * com.example.legendexplorer.fragment.FilesFragment#openFolder(java.io.
@@ -116,6 +170,12 @@ public class BookMarksFragment extends FilesFragment {
 		transaction.commit();
 		fakeBackStack.add(fragment);
 		pathText.setText(fragment.getDisplayedFilePath());
+
+		Intent intent = new Intent();
+		int mask = 0;
+		intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+		intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+		getActivity().sendBroadcast(intent);
 	}
 
 	/**
@@ -151,6 +211,12 @@ public class BookMarksFragment extends FilesFragment {
 		transaction.commit();
 		fakeBackStack.add(fragment);
 		pathText.setText(fragment.getDisplayedFilePath());
+
+		Intent intent = new Intent();
+		int mask = MainActivity.AddFileItemFlag;
+		intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+		intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+		getActivity().sendBroadcast(intent);
 	}
 
 	/**
@@ -169,6 +235,18 @@ public class BookMarksFragment extends FilesFragment {
 					fragment.getDisplayedFilePath());
 			transaction.commit();
 			pathText.setText(fragment.getDisplayedFilePath());
+
+			Intent intent = new Intent();
+			int mask = 0;
+			if (fragment.getFilePath().equals(FileConst.Value_Bookmark_Path)) {
+				mask = MainActivity.AddFileItemFlag;
+			} else {
+				mask = 0;
+			}
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+			getActivity().sendBroadcast(intent);
+
 		} else {
 			// do nothing
 		}
@@ -208,6 +286,28 @@ public class BookMarksFragment extends FilesFragment {
 			}
 		}
 		openFolder(file);
+	}
+
+	@Override
+	public void setUserVisibleHint(boolean isVisibleToUser) {
+		super.setUserVisibleHint(isVisibleToUser);
+		if (isVisibleToUser) {
+			Intent intent = new Intent();
+			int mask = MainActivity.AddFileItemFlag;
+			if (fakeBackStack.size() > 0) {
+				FileListFragment fragment = fakeBackStack.get(fakeBackStack
+						.size() - 1);
+				if (fragment.getFilePath()
+						.equals(FileConst.Value_Bookmark_Path)) {
+					mask = MainActivity.AddFileItemFlag;
+				} else {
+					mask = 0;
+				}
+			}
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+			getActivity().sendBroadcast(intent);
+		}
 	}
 
 }

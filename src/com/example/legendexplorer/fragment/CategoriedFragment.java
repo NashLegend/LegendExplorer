@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.example.legendexplorer.MainActivity;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.utils.FileCategoryHelper;
@@ -37,7 +38,7 @@ import android.widget.TextView;
  * 
  * @author NashLegend
  */
-public class CategoriedFragment extends BaseFragment {
+public class CategoriedFragment extends BaseFragment implements Explorable{
 	protected View view;
 	private static ScannerReceiver receiver;
 	private FileListFragment listFragment;
@@ -188,7 +189,7 @@ public class CategoriedFragment extends BaseFragment {
 		filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
 		filter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
 		filter.addAction(Intent.ACTION_MEDIA_SCANNER_STARTED);
-		// filter.addDataScheme("file");
+		filter.addDataScheme("file");
 		getActivity().registerReceiver(receiver, filter);
 	}
 
@@ -214,6 +215,16 @@ public class CategoriedFragment extends BaseFragment {
 		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		transaction.replace(R.id.content_category, listFragment);
 		transaction.commit();
+
+		Intent intent = new Intent();
+		int mask = 0;
+		mask = MainActivity.RefreshListItemFlag
+				| MainActivity.ToggleHiddleItemFlag
+				| MainActivity.AddFileItemFlag;
+		intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+		intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+		getActivity().sendBroadcast(intent);
+
 	}
 
 	public boolean hideCategoryList() {
@@ -228,6 +239,14 @@ public class CategoriedFragment extends BaseFragment {
 			transaction.commit();
 			listFragment = null;
 			// frameLayout.setVisibility(View.GONE);
+			Intent intent = new Intent();
+			int mask = MainActivity.SearchFileItemFlag
+					| MainActivity.ToggleViewItemFlag
+					| MainActivity.AddFileItemFlag
+					| MainActivity.ToggleHiddleItemFlag;
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+			getActivity().sendBroadcast(intent);
 			return true;
 		}
 	}
@@ -326,23 +345,51 @@ public class CategoriedFragment extends BaseFragment {
 			moveFile();
 		} else if (FileConst.Action_Delete_File.equals(action)) {
 			deleteFile();
+		} else if (FileConst.Action_Rename_File.equals(action)) {
+
+		} else if (FileConst.Action_Zip_File.equals(action)) {
+
+		} else if (FileConst.Action_Property_File.equals(action)) {
+
 		}
 		return false;
 	}
 
-	private void deleteFile() {
+	@Override
+	public void setUserVisibleHint(boolean isVisibleToUser) {
+		super.setUserVisibleHint(isVisibleToUser);
+		if (isVisibleToUser) {
+			Intent intent = new Intent();
+			int mask = 0;
+			if (listFragment == null) {
+				mask = MainActivity.SearchFileItemFlag
+						| MainActivity.ToggleViewItemFlag
+						| MainActivity.AddFileItemFlag
+						| MainActivity.ToggleHiddleItemFlag;
+			} else {
+				mask = MainActivity.RefreshListItemFlag
+						| MainActivity.ToggleHiddleItemFlag
+						| MainActivity.AddFileItemFlag;
+			}
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+			getActivity().sendBroadcast(intent);
+		}
+	}
+
+	public void deleteFile() {
 		if (listFragment != null) {
 			listFragment.deleteFile();
 		}
 	}
 
-	private void moveFile() {
+	public void moveFile() {
 		if (listFragment != null) {
 			listFragment.moveFile();
 		}
 	}
 
-	private void copyFile() {
+	public void copyFile() {
 		if (listFragment != null) {
 			listFragment.copyFile();
 		}
@@ -352,7 +399,7 @@ public class CategoriedFragment extends BaseFragment {
 	 * 调用系统扫描方法起不到什么作用，真的。除非发生如下情况： 1.所有app在修改、删除、添加、移动文件时都更新content.
 	 * 2.手动扫描全盘，但是慢
 	 */
-	private void refreshFileList() {
+	public void refreshFileList() {
 		// Intent.ACTION_MEDIA_MOUNTED not allow after API19
 		// getActivity().sendBroadcast(new Intent(
 		// Intent.ACTION_MEDIA_MOUNTED,
@@ -367,7 +414,7 @@ public class CategoriedFragment extends BaseFragment {
 		//
 		// @Override
 		// public void onScanCompleted(String path, Uri uri) {
-		// // TODO Auto-generated method stub
+		// 
 		// }
 		// });
 
@@ -377,13 +424,13 @@ public class CategoriedFragment extends BaseFragment {
 		}
 	}
 
-	private void toggleViewMode() {
+	public void toggleViewMode() {
 		if (listFragment != null) {
 			listFragment.toggleViewMode();
 		}
 	}
 
-	private void searchFile(String query) {
+	public void searchFile(String query) {
 		if (listFragment != null) {
 			listFragment.searchFile(query);
 		}
@@ -396,7 +443,12 @@ public class CategoriedFragment extends BaseFragment {
 			listFragment.exitSelectMode();
 
 			Intent intent = new Intent();
-			intent.setAction(FileConst.Action_Exit_Select_Mode);
+			int mask = 0;
+			mask = MainActivity.RefreshListItemFlag
+					| MainActivity.ToggleHiddleItemFlag
+					| MainActivity.AddFileItemFlag;
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
 			getActivity().sendBroadcast(intent);
 		}
 	}
@@ -408,7 +460,12 @@ public class CategoriedFragment extends BaseFragment {
 			listFragment.change2SelectMode();
 
 			Intent intent = new Intent();
-			intent.setAction(FileConst.Action_Switch_2_Select_Mode);
+			int mask = 0;
+			mask = MainActivity.RefreshListItemFlag
+					| MainActivity.ToggleHiddleItemFlag
+					| MainActivity.AddFileItemFlag;
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
 			getActivity().sendBroadcast(intent);
 		}
 	}
@@ -451,7 +508,6 @@ public class CategoriedFragment extends BaseFragment {
 			} else {
 				String suffix = FileUtil.getFileSuffix(file);
 				if (suffix.length() > 0 && isArrayContains(suffix)) {
-					// TODO
 					paths.add(file.getAbsolutePath());
 				}
 			}
@@ -508,5 +564,26 @@ public class CategoriedFragment extends BaseFragment {
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
 		}
+	}
+
+	@Override
+	public void toggleShowHidden() {
+		//do nothing
+	}
+
+	@Override
+	public void renameFile() {
+		//TODO
+	}
+
+	@Override
+	public void zipFile() {
+		// TODO 
+		
+	}
+
+	@Override
+	public void addNewFile() {
+		//do nothing
 	}
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.example.legendexplorer.MainActivity;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.view.DropDownAncestorList;
@@ -296,7 +297,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			fakeBackStack.get(fakeBackStack.size() - 1).change2SelectMode();
 
 			Intent intent = new Intent();
-			intent.setAction(FileConst.Action_Switch_2_Select_Mode);
+			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
 			getActivity().sendBroadcast(intent);
 		}
 	}
@@ -309,7 +310,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			fakeBackStack.get(fakeBackStack.size() - 1).exitSelectMode();
 
 			Intent intent = new Intent();
-			intent.setAction(FileConst.Action_Exit_Select_Mode);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
 			getActivity().sendBroadcast(intent);
 		}
 	}
@@ -388,6 +389,18 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			renameFile();
 		}
 		return false;
+	}
+
+	@Override
+	public void setUserVisibleHint(boolean isVisibleToUser) {
+		super.setUserVisibleHint(isVisibleToUser);
+		if (isVisibleToUser) {
+			Intent intent = new Intent();
+			int mask = 0;
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
+			getActivity().sendBroadcast(intent);
+		}
 	}
 
 	@Override

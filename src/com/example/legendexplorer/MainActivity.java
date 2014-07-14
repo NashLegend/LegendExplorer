@@ -41,18 +41,26 @@ public class MainActivity extends Activity {
 	private FileBroadcastReceiver fileBroadcastReceiver;
 	private Menu mMenu;
 	private SearchView searchView;
-	private StorageObserver observer;
+
+	public static final int SearchFileItemFlag = 1;
+	public static final int ToggleViewItemFlag = 2;
+	public static final int AddFileItemFlag = 4;
+	public static final int ToggleHiddleItemFlag = 8;
+	public static final int RefreshListItemFlag = 16;
+	public static final int AllFileListMask = 31;
+
+	public static final int CopyFileItemFlag = 1;
+	public static final int CutFileItemFlag = 2;
+	public static final int DeleteFileItemFlag = 4;
+	public static final int RenameFileItemFlag = 8;
+	public static final int ZipFileItemFlag = 16;
+	public static final int PropertyItemFlag = 32;
+	public static final int AllOperationMask = 63;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		// observer = new StorageObserver(Environment
-		// .getExternalStorageDirectory().getAbsolutePath(),
-		// FileObserver.CREATE | FileObserver.DELETE
-		// | FileObserver.MOVED_FROM | FileObserver.MOVED_TO);
-		// observer.startWatching();
 
 		filesFragment = new FilesFragment();
 		bookMarksFragment = new BookMarksFragment();
@@ -73,8 +81,8 @@ public class MainActivity extends Activity {
 		filter.addAction(FileConst.Action_Open_Folder);
 		filter.addAction(FileConst.Action_FileItem_Long_Click);
 		filter.addAction(FileConst.Action_FileItem_Unselect);
-		filter.addAction(FileConst.Action_Switch_2_Select_Mode);
-		filter.addAction(FileConst.Action_Exit_Select_Mode);
+		filter.addAction(FileConst.Action_Set_File_Operation_ActionBar);
+		filter.addAction(FileConst.Action_Set_File_View_ActionBar);
 		filter.addAction(FileConst.Action_File_Operation_Done);
 		filter.addAction(FileConst.Action_Quit_Search);
 		fileBroadcastReceiver = new FileBroadcastReceiver();
@@ -122,6 +130,9 @@ public class MainActivity extends Activity {
 		case R.id.action_zip:
 			zipFile();
 			break;
+		case R.id.action_property:
+			propertyFile();
+			break;
 
 		default:
 			break;
@@ -129,21 +140,107 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void showFileOperationMenu() {
+	public void showFileOperationMenu(int exclu) {
+		if (mMenu == null) {
+			return;
+		}
 		searchView.setOnQueryTextListener(null);
 		pager.setScrollEnabled(false);
-		mMenu.clear();
-		getMenuInflater().inflate(R.menu.fileop, mMenu);
+		if (mMenu.findItem(R.id.action_copy) == null) {
+			mMenu.clear();
+			getMenuInflater().inflate(R.menu.fileop, mMenu);
+		}
+		if (exclu >= PropertyItemFlag) {
+			System.out.println(PropertyItemFlag);
+			mMenu.findItem(R.id.action_property).setVisible(false);
+			exclu = exclu ^ PropertyItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_property).setVisible(true);
+		}
+		if (exclu >= ZipFileItemFlag) {
+			System.out.println(ZipFileItemFlag);
+			mMenu.findItem(R.id.action_zip).setVisible(false);
+			exclu = exclu ^ ZipFileItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_zip).setVisible(true);
+		}
+		if (exclu >= RenameFileItemFlag) {
+			System.out.println(RenameFileItemFlag);
+			mMenu.findItem(R.id.action_rename).setVisible(false);
+			exclu = exclu ^ RenameFileItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_rename).setVisible(true);
+		}
+		if (exclu >= DeleteFileItemFlag) {
+			System.out.println(DeleteFileItemFlag);
+			mMenu.findItem(R.id.action_delete).setVisible(false);
+			exclu = exclu ^ DeleteFileItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_delete).setVisible(true);
+		}
+		if (exclu >= CutFileItemFlag) {
+			System.out.println(CutFileItemFlag);
+			mMenu.findItem(R.id.action_cut).setVisible(false);
+			exclu = exclu ^ CutFileItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_cut).setVisible(true);
+		}
+		if (exclu >= CopyFileItemFlag) {
+			System.out.println(CopyFileItemFlag);
+			mMenu.findItem(R.id.action_copy).setVisible(false);
+		} else {
+			mMenu.findItem(R.id.action_copy).setVisible(true);
+		}
 	}
 
-	public void showFileListMenu() {
+	public void showFileListMenu(int exclu) {
+		if (mMenu == null) {
+			return;
+		}
 		pager.setScrollEnabled(true);
-		mMenu.clear();
-		getMenuInflater().inflate(R.menu.filelist, mMenu);
-		MenuItem searchItem = mMenu.findItem(R.id.action_search);
-		searchItem.setOnActionExpandListener(onActionExpandListener);
-		searchView = (SearchView) searchItem.getActionView();
-		searchView.setOnQueryTextListener(onQueryTextListener);
+		if (mMenu.findItem(R.id.action_search) == null) {
+			mMenu.clear();
+			getMenuInflater().inflate(R.menu.filelist, mMenu);
+		}
+
+		if (exclu >= RefreshListItemFlag) {
+			System.out.println(RefreshListItemFlag);
+			mMenu.findItem(R.id.action_refresh).setVisible(false);
+			exclu = exclu ^ RefreshListItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_refresh).setVisible(true);
+		}
+		if (exclu >= ToggleHiddleItemFlag) {
+			System.out.println(ToggleHiddleItemFlag);
+			mMenu.findItem(R.id.action_toggle_hidden).setVisible(false);
+			exclu = exclu ^ ToggleHiddleItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_toggle_hidden).setVisible(true);
+		}
+		if (exclu >= AddFileItemFlag) {
+			System.out.println(AddFileItemFlag);
+			mMenu.findItem(R.id.action_new).setVisible(false);
+			exclu = exclu ^ AddFileItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_new).setVisible(true);
+		}
+		if (exclu >= ToggleViewItemFlag) {
+			System.out.println(ToggleViewItemFlag);
+			mMenu.findItem(R.id.action_viewmode).setVisible(false);
+			exclu = exclu ^ ToggleViewItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_viewmode).setVisible(true);
+		}
+		if (exclu >= SearchFileItemFlag) {
+			System.out.println(SearchFileItemFlag);
+			mMenu.findItem(R.id.action_search).setVisible(false);
+		} else {
+			MenuItem searchItem = mMenu.findItem(R.id.action_search);
+			searchItem.setVisible(true);
+			searchView = (SearchView) searchItem.getActionView();
+			searchItem.setOnActionExpandListener(onActionExpandListener);
+			searchView.setOnQueryTextListener(onQueryTextListener);
+		}
 	}
 
 	private void toggleViewMode() {
@@ -185,6 +282,12 @@ public class MainActivity extends Activity {
 	private void zipFile() {
 		Intent intent = new Intent();
 		intent.setAction(FileConst.Action_Zip_File);
+		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
+	}
+
+	private void propertyFile() {
+		Intent intent = new Intent();
+		intent.setAction(FileConst.Action_Property_File);
 		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
 	}
 
@@ -280,11 +383,12 @@ public class MainActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-			if (FileConst.Action_Switch_2_Select_Mode.equals(action)) {
-				showFileOperationMenu();
+			int mask = intent.getIntExtra(FileConst.Extra_Menu_Mask, 0);
+			if (FileConst.Action_Set_File_Operation_ActionBar.equals(action)) {
+				showFileOperationMenu(mask);
 				return;
-			} else if (FileConst.Action_Exit_Select_Mode.equals(action)) {
-				showFileListMenu();
+			} else if (FileConst.Action_Set_File_View_ActionBar.equals(action)) {
+				showFileListMenu(mask);
 				return;
 			} else if (FileConst.Action_Quit_Search.equals(action)) {
 				quitSearchFile();

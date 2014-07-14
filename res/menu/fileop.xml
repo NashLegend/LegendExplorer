@@ -21,17 +21,17 @@
     <item
         android:id="@+id/action_rename"
         android:orderInCategory="4"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/action_rename"/>
     <item
         android:id="@+id/action_zip"
         android:orderInCategory="5"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/action_zip"/>
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_property"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:showAsAction="ifRoom"
+        android:title="@string/action_property"/>
 
 </menu>
