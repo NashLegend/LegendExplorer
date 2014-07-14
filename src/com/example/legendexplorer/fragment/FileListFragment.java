@@ -217,6 +217,10 @@ public class FileListFragment extends Fragment {
 
 	}
 
+	public void propertyFile() {
+
+	}
+
 	public void addNewFile() {
 		if (filePath.equals(FileConst.Value_Bookmark_Path)) {
 			// add new book mark
@@ -327,7 +331,7 @@ public class FileListFragment extends Fragment {
 	public void copyFile() {
 		FileDialog dialog = new FileDialog.Builder(getActivity())
 				.setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE)
-				.setCancelable(false).setCanceledOnTouchOutside(false)
+				.setCancelable(true).setCanceledOnTouchOutside(false)
 				.setTitle("selectFolder")
 				.setFileSelectListener(new FileDialogListener() {
 

@@ -27,5 +27,12 @@
     <string name="category_theme">Themes</string>
     <string name="category_video">Videos</string>
     <string name="category_zip">Zips</string>
+    <!-- Grid_Left -->
+    <string name="filename">FileName</string>
+    <string name="filetype">FileType</string>
+    <string name="filepath">FilePath</string>
+    <string name="filevolume">FileVolume</string>
+    <string name="fileinvolving">Involving</string>
+    <string name="modifiedTime">CreateTime</string>
 
 </resources>

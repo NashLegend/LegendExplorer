@@ -20,4 +20,6 @@ public interface Explorable {
 	public void renameFile();
 
 	public void zipFile();
+
+	public void propertyFile();
 }

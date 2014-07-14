@@ -151,42 +151,36 @@ public class MainActivity extends Activity {
 			getMenuInflater().inflate(R.menu.fileop, mMenu);
 		}
 		if (exclu >= PropertyItemFlag) {
-			System.out.println(PropertyItemFlag);
 			mMenu.findItem(R.id.action_property).setVisible(false);
 			exclu = exclu ^ PropertyItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_property).setVisible(true);
 		}
 		if (exclu >= ZipFileItemFlag) {
-			System.out.println(ZipFileItemFlag);
 			mMenu.findItem(R.id.action_zip).setVisible(false);
 			exclu = exclu ^ ZipFileItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_zip).setVisible(true);
 		}
 		if (exclu >= RenameFileItemFlag) {
-			System.out.println(RenameFileItemFlag);
 			mMenu.findItem(R.id.action_rename).setVisible(false);
 			exclu = exclu ^ RenameFileItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_rename).setVisible(true);
 		}
 		if (exclu >= DeleteFileItemFlag) {
-			System.out.println(DeleteFileItemFlag);
 			mMenu.findItem(R.id.action_delete).setVisible(false);
 			exclu = exclu ^ DeleteFileItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_delete).setVisible(true);
 		}
 		if (exclu >= CutFileItemFlag) {
-			System.out.println(CutFileItemFlag);
 			mMenu.findItem(R.id.action_cut).setVisible(false);
 			exclu = exclu ^ CutFileItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_cut).setVisible(true);
 		}
 		if (exclu >= CopyFileItemFlag) {
-			System.out.println(CopyFileItemFlag);
 			mMenu.findItem(R.id.action_copy).setVisible(false);
 		} else {
 			mMenu.findItem(R.id.action_copy).setVisible(true);
@@ -204,35 +198,30 @@ public class MainActivity extends Activity {
 		}
 
 		if (exclu >= RefreshListItemFlag) {
-			System.out.println(RefreshListItemFlag);
 			mMenu.findItem(R.id.action_refresh).setVisible(false);
 			exclu = exclu ^ RefreshListItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_refresh).setVisible(true);
 		}
 		if (exclu >= ToggleHiddleItemFlag) {
-			System.out.println(ToggleHiddleItemFlag);
 			mMenu.findItem(R.id.action_toggle_hidden).setVisible(false);
 			exclu = exclu ^ ToggleHiddleItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_toggle_hidden).setVisible(true);
 		}
 		if (exclu >= AddFileItemFlag) {
-			System.out.println(AddFileItemFlag);
 			mMenu.findItem(R.id.action_new).setVisible(false);
 			exclu = exclu ^ AddFileItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_new).setVisible(true);
 		}
 		if (exclu >= ToggleViewItemFlag) {
-			System.out.println(ToggleViewItemFlag);
 			mMenu.findItem(R.id.action_viewmode).setVisible(false);
 			exclu = exclu ^ ToggleViewItemFlag;
 		} else {
 			mMenu.findItem(R.id.action_viewmode).setVisible(true);
 		}
 		if (exclu >= SearchFileItemFlag) {
-			System.out.println(SearchFileItemFlag);
 			mMenu.findItem(R.id.action_search).setVisible(false);
 		} else {
 			MenuItem searchItem = mMenu.findItem(R.id.action_search);

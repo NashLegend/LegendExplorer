@@ -38,7 +38,7 @@ import android.widget.TextView;
  * 
  * @author NashLegend
  */
-public class CategoriedFragment extends BaseFragment implements Explorable{
+public class CategoriedFragment extends BaseFragment implements Explorable {
 	protected View view;
 	private static ScannerReceiver receiver;
 	private FileListFragment listFragment;
@@ -346,11 +346,11 @@ public class CategoriedFragment extends BaseFragment implements Explorable{
 		} else if (FileConst.Action_Delete_File.equals(action)) {
 			deleteFile();
 		} else if (FileConst.Action_Rename_File.equals(action)) {
-
+			renameFile();
 		} else if (FileConst.Action_Zip_File.equals(action)) {
-
+			zipFile();
 		} else if (FileConst.Action_Property_File.equals(action)) {
-
+			propertyFile();
 		}
 		return false;
 	}
@@ -414,7 +414,7 @@ public class CategoriedFragment extends BaseFragment implements Explorable{
 		//
 		// @Override
 		// public void onScanCompleted(String path, Uri uri) {
-		// 
+		//
 		// }
 		// });
 
@@ -568,22 +568,31 @@ public class CategoriedFragment extends BaseFragment implements Explorable{
 
 	@Override
 	public void toggleShowHidden() {
-		//do nothing
+		// do nothing
 	}
 
 	@Override
 	public void renameFile() {
-		//TODO
+		// TODO
 	}
 
 	@Override
 	public void zipFile() {
-		// TODO 
-		
+		// do nothing
 	}
 
 	@Override
 	public void addNewFile() {
-		//do nothing
+		// do nothing
+		if (listFragment != null) {
+			listFragment.addNewFile();
+		}
+	}
+
+	@Override
+	public void propertyFile() {
+		if (listFragment != null) {
+			listFragment.propertyFile();
+		}
 	}
 }

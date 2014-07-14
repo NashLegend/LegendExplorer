@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/layout_filename"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp" >
+
+        <TextView
+            android:layout_width="@dimen/grid_left_width"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/filename" />
+
+        <TextView
+            android:id="@+id/text_filename"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- Type -->
+
+    <LinearLayout
+        android:id="@+id/layout_filetype"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingTop="8dp" >
+
+        <TextView
+            android:layout_width="@dimen/grid_left_width"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/filetype" />
+
+        <TextView
+            android:id="@+id/text_filetype"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- path -->
+
+    <LinearLayout
+        android:id="@+id/layout_filepath"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp" >
+
+        <TextView
+            android:layout_width="@dimen/grid_left_width"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/filepath" />
+
+        <TextView
+            android:id="@+id/text_filepath"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- volume -->
+
+    <LinearLayout
+        android:id="@+id/layout_filevolume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp" >
+
+        <TextView
+            android:layout_width="@dimen/grid_left_width"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/filevolume" />
+
+        <TextView
+            android:id="@+id/text_filevolume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- Num -->
+
+    <LinearLayout
+        android:id="@+id/layout_filenumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp" >
+
+        <TextView
+            android:layout_width="@dimen/grid_left_width"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/fileinvolving" />
+
+        <TextView
+            android:id="@+id/text_fileinvolving"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- 时间 -->
+
+    <LinearLayout
+        android:id="@+id/layout_modifiedtime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingTop="8dp" >
+
+        <TextView
+            android:layout_width="@dimen/grid_left_width"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/modifiedTime" />
+
+        <TextView
+            android:id="@+id/text_modified_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>

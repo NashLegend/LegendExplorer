@@ -472,4 +472,11 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			fakeBackStack.get(fakeBackStack.size() - 1).renameFile();
 		}
 	}
+
+	@Override
+	public void propertyFile() {
+		if (fakeBackStack.size() > 0) {
+			fakeBackStack.get(fakeBackStack.size() - 1).propertyFile();
+		}
+	}
 }
