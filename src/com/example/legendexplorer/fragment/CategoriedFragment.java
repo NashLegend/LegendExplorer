@@ -3,7 +3,6 @@ package com.example.legendexplorer.fragment;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,24 +12,27 @@ import com.example.legendexplorer.consts.FileConst;
 import com.example.legendexplorer.utils.FileCategoryHelper;
 import com.example.legendutils.Tools.FileUtil;
 
+import android.annotation.SuppressLint;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaScannerConnection;
-import android.media.MediaScannerConnection.OnScanCompletedListener;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StatFs;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -42,7 +44,10 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 	protected View view;
 	private static ScannerReceiver receiver;
 	private FileListFragment listFragment;
-	private FrameLayout frameLayout;
+	private View usedView;
+	private View totalView;
+	private TextView usageText;
+	private RelativeLayout spaceLayout;
 
 	private static HashMap<Integer, FileCategory> button2Category = new HashMap<Integer, FileCategory>();
 	static {
@@ -65,12 +70,22 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		view = inflater
-				.inflate(R.layout.layout_file_category, container, false);
-		frameLayout = (FrameLayout) view.findViewById(R.id.content_category);
-		setupClick();
-		updateUI();
-		registerReceiver();
+		if (view == null) {
+			view = inflater.inflate(R.layout.layout_file_category, container,
+					false);
+			spaceLayout = (RelativeLayout) view.findViewById(R.id.spaceLayout);
+			usedView = view.findViewById(R.id.view_used);
+			totalView = view.findViewById(R.id.view_total);
+			usageText = (TextView) view.findViewById(R.id.text_usage);
+			setupClick();
+			updateUI();
+			registerReceiver();
+		} else {
+			if (view.getParent() != null) {
+				((ViewGroup) view.getParent()).removeView(view);
+			}
+		}
+
 		return view;
 	}
 
@@ -79,15 +94,65 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 	}
 
 	public void refreshData() {
+		spaceLayout.getViewTreeObserver().addOnGlobalLayoutListener(
+				new OnGlobalLayoutListener() {
+
+					@SuppressWarnings("deprecation")
+					@SuppressLint("NewApi")
+					@Override
+					public void onGlobalLayout() {
+						if (Build.VERSION.SDK_INT > 15) {
+							spaceLayout.getViewTreeObserver()
+									.removeOnGlobalLayoutListener(this);
+						} else {
+							spaceLayout.getViewTreeObserver()
+									.removeGlobalOnLayoutListener(this);
+						}
+						if (Environment.getExternalStorageState().equals(
+								Environment.MEDIA_MOUNTED)) {
+							try {
+								StatFs statfs = new StatFs(Environment
+										.getExternalStorageDirectory()
+										.getAbsolutePath());
+
+								// 获取SDCard上BLOCK总数
+								long nTotalBlocks = statfs.getBlockCount();
+
+								// 获取SDCard上每个block的SIZE
+								long nBlocSize = statfs.getBlockSize();
+
+								// 获取可供程序使用的Block的数量
+								long nAvailaBlock = statfs.getAvailableBlocks();
+
+								// 计算SDCard 总容量大小MB
+								long total = nTotalBlocks * nBlocSize;
+
+								// 计算 SDCard 剩余大小MB
+								long free = nAvailaBlock * nBlocSize;
+
+								// 计算 SDCard 剩余大小MB
+								long used = total - free;
+
+								ViewGroup.LayoutParams params = usedView
+										.getLayoutParams();
+								params.width = (int) (totalView.getWidth()
+										* used / total);
+								usedView.setLayoutParams(params);
+
+								usageText.setText(FileUtil.convertStorage(used)
+										+ "/" + FileUtil.convertStorage(total));
+							} catch (IllegalArgumentException e) {
+
+							}
+						}
+					}
+				});
 		FileCategoryHelper.refreshCategoryInfo(getActivity());
-		long size = 0;
 		for (FileCategory fc : FileCategoryHelper.sCategories) {
 			FileCategoryHelper.CategoryInfo categoryInfo = FileCategoryHelper
 					.getCategoryInfos().get(fc);
 			setCategoryCount(fc, categoryInfo.count);
 			// setCategorySize(fc, categoryInfo.size);
-			// setCategoryBarValue(fc, categoryInfo.size);
-			size += categoryInfo.size;
 		}
 
 	}

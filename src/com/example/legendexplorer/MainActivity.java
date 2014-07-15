@@ -330,11 +330,13 @@ public class MainActivity extends Activity {
 
 		@Override
 		public boolean onMenuItemActionExpand(MenuItem item) {
+			pager.setScrollEnabled(false);
 			return true;
 		}
 
 		@Override
 		public boolean onMenuItemActionCollapse(MenuItem item) {
+			pager.setScrollEnabled(true);
 			searchFile("");
 			return true;
 		}
