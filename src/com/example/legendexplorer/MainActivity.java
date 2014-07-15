@@ -55,7 +55,9 @@ public class MainActivity extends Activity {
 	public static final int RenameFileItemFlag = 8;
 	public static final int ZipFileItemFlag = 16;
 	public static final int PropertyItemFlag = 32;
-	public static final int AllOperationMask = 63;
+	public static final int UnzipFileItemFlag = 64;
+	public static final int FavorItemFlag = 128;
+	public static final int AllOperationMask = 255;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class MainActivity extends Activity {
 		filter.addAction(FileConst.Action_Open_Folder);
 		filter.addAction(FileConst.Action_FileItem_Long_Click);
 		filter.addAction(FileConst.Action_FileItem_Unselect);
+		filter.addAction(FileConst.Action_FileItem_Select);
 		filter.addAction(FileConst.Action_Set_File_Operation_ActionBar);
 		filter.addAction(FileConst.Action_Set_File_View_ActionBar);
 		filter.addAction(FileConst.Action_File_Operation_Done);
@@ -133,6 +136,12 @@ public class MainActivity extends Activity {
 		case R.id.action_property:
 			propertyFile();
 			break;
+		case R.id.action_favor:
+			favorFile();
+			break;
+		case R.id.action_unzip:
+			unzipFile();
+			break;
 
 		default:
 			break;
@@ -149,6 +158,18 @@ public class MainActivity extends Activity {
 		if (mMenu.findItem(R.id.action_copy) == null) {
 			mMenu.clear();
 			getMenuInflater().inflate(R.menu.fileop, mMenu);
+		}
+		if (exclu >= FavorItemFlag) {
+			mMenu.findItem(R.id.action_favor).setVisible(false);
+			exclu = exclu ^ FavorItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_favor).setVisible(true);
+		}
+		if (exclu >= UnzipFileItemFlag) {
+			mMenu.findItem(R.id.action_unzip).setVisible(false);
+			exclu = exclu ^ UnzipFileItemFlag;
+		} else {
+			mMenu.findItem(R.id.action_unzip).setVisible(true);
 		}
 		if (exclu >= PropertyItemFlag) {
 			mMenu.findItem(R.id.action_property).setVisible(false);
@@ -296,6 +317,18 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent();
 		intent.setAction(FileConst.Action_Search_File);
 		intent.putExtra(FileConst.Key_Search_File_Query, query);
+		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
+	}
+
+	private void unzipFile() {
+		Intent intent = new Intent();
+		intent.setAction(FileConst.Action_Unzip_File);
+		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
+	}
+
+	private void favorFile() {
+		Intent intent = new Intent();
+		intent.setAction(FileConst.Action_Favor_File);
 		adapter.getItem(pager.getCurrentItem()).doVeryAction(intent);
 	}
 

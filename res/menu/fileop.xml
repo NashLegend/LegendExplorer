@@ -29,6 +29,16 @@
         android:showAsAction="ifRoom"
         android:title="@string/action_zip"/>
     <item
+        android:id="@+id/action_unzip"
+        android:orderInCategory="6"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_unzip"/>
+    <item
+        android:id="@+id/action_favor"
+        android:orderInCategory="7"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_favor"/>
+    <item
         android:id="@+id/action_property"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"

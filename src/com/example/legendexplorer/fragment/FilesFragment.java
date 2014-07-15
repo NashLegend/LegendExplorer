@@ -32,7 +32,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.PopupWindow;
 
 /**
- * 普通视图
+ * 普通视图,事实上if (fakeBackStack.size() > 0) 都是不需要的
  * 
  * @author NashLegend
  */
@@ -358,9 +358,9 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 		} else if (FileConst.Action_FileItem_Long_Click.equals(action)) {
 			change2SelectMode();
 		} else if (FileConst.Action_FileItem_Unselect.equals(action)) {
-			selectAllButton.setOnCheckedChangeListener(null);
-			selectAllButton.setChecked(false);
-			selectAllButton.setOnCheckedChangeListener(this);
+			getItemUnselect();
+		} else if (FileConst.Action_FileItem_Select.equals(action)) {
+			getItemSelect();
 		} else if (FileConst.Action_File_Operation_Done.equals(action)) {
 			exitSelectMode();
 		} else if (FileConst.Action_Add_New_File.equals(action)) {
@@ -391,6 +391,23 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			propertyFile();
 		}
 		return false;
+	}
+
+	public void getItemSelect() {
+		if (fakeBackStack.size() > 0) {
+			fakeBackStack.get(fakeBackStack.size() - 1).getItemSelect();
+		}
+	}
+
+	public void getItemUnselect() {
+
+		selectAllButton.setOnCheckedChangeListener(null);
+		selectAllButton.setChecked(false);
+		selectAllButton.setOnCheckedChangeListener(this);
+
+		if (fakeBackStack.size() > 0) {
+			fakeBackStack.get(fakeBackStack.size() - 1).getItemUnselect();
+		}
 	}
 
 	@Override

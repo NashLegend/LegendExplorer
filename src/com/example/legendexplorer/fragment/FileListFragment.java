@@ -336,6 +336,9 @@ public class FileListFragment extends Fragment {
 	}
 
 	public void copyFile() {
+		if (adapter.getSelectedFiles().size() == 0) {
+			return;
+		}
 		FileDialog dialog = new FileDialog.Builder(getActivity())
 				.setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE)
 				.setCancelable(true).setCanceledOnTouchOutside(false)
@@ -388,6 +391,9 @@ public class FileListFragment extends Fragment {
 	}
 
 	public void moveFile() {
+		if (adapter.getSelectedFiles().size() == 0) {
+			return;
+		}
 		FileDialog dialog = new FileDialog.Builder(getActivity())
 				.setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE)
 				.setCancelable(false).setCanceledOnTouchOutside(false)
@@ -437,6 +443,9 @@ public class FileListFragment extends Fragment {
 	}
 
 	public void deleteFile() {
+		if (adapter.getSelectedFiles().size() == 0) {
+			return;
+		}
 		new AlertDialog.Builder(getActivity()).setMessage("Confirm to delete?")
 				.setTitle("Message")
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -456,7 +465,6 @@ public class FileListFragment extends Fragment {
 	}
 
 	private void deleteFiles() {
-		// TODO
 		// 删除数据库或者文件
 		if (itemType == FileConst.Value_Item_Type_Bookmark) {
 			// 删除数据库
@@ -517,22 +525,25 @@ public class FileListFragment extends Fragment {
 			} else {
 				title = "Rename multi-files";
 			}
-		}
-		new InputDialog.Builder(getActivity()).setTitle(title)
-				.setInputText(input).setOnClickListener(new OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dia, int which) {
-						if (which == DialogInterface.BUTTON_POSITIVE) {
-							InputDialog dialog = (InputDialog) dia;
-							if (!TextUtils.isEmpty(dialog.InputString)) {
-								String fname = dialog.InputString.trim();
-								FileUtil.rename(files, fname, getActivity());
+			new InputDialog.Builder(getActivity()).setTitle(title)
+					.setInputText(input)
+					.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dia, int which) {
+							if (which == DialogInterface.BUTTON_POSITIVE) {
+								InputDialog dialog = (InputDialog) dia;
+								if (!TextUtils.isEmpty(dialog.InputString)) {
+									String fname = dialog.InputString.trim();
+									FileUtil.rename(files, fname, getActivity());
+								}
+								operationDone();
 							}
-							operationDone();
 						}
-					}
-				}).create().show();
+					}).create().show();
+		}
+
 	}
 
 	public void zipFile() {
@@ -618,6 +629,80 @@ public class FileListFragment extends Fragment {
 				ToastUtil.showToast(getActivity(), "Zip Cancelled!");
 			}
 		});
+	}
+
+	public void unzipFile() {
+		final File[] files = getSelectedFiles();
+		if (files.length == 1) {
+			File sourceFile = files[0];
+			if ("zip".equals(FileUtil.getFileSuffix(sourceFile))) {
+
+			}
+		}
+	}
+
+	private void unzipWithDialog(File[] sourceFile, File destFile) {
+
+		final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(
+				getActivity()).setCancelable(false)
+				.setCanceledOnTouchOutside(false).create();
+		dialog.show();
+
+		ZipUtil.zipAsync(sourceFile, destFile, "", new ZipOperationListener() {
+
+			@Override
+			public void onProgress(int progress) {
+				// TODO
+			}
+
+			@Override
+			public void onError(String e) {
+				dialog.dismiss();
+				operationDone();
+				ToastUtil.showToast(getActivity(), "Zip Error!");
+			}
+
+			@Override
+			public void onComplete() {
+				dialog.dismiss();
+				operationDone();
+				ToastUtil.showToast(getActivity(), "Zip OK!");
+			}
+
+			@Override
+			public void onCancelled() {
+				dialog.dismiss();
+				operationDone();
+				ToastUtil.showToast(getActivity(), "Zip Cancelled!");
+			}
+		});
+	}
+
+	public void getItemSelect() {
+		ArrayList<File> files = adapter.getSelectedFiles();
+		if (files.size() == 1) {
+			File file = files.get(0);
+			if ("zip".equals(FileUtil.getFileSuffix(file))) {
+				// unzip TODO
+				return;
+			}
+		}
+		// zip TODO
+	}
+
+	public void getItemUnselect() {
+		ArrayList<File> files = adapter.getSelectedFiles();
+		if (files.size() > 0) {
+			if (files.size() == 1) {
+				File file = files.get(0);
+				if ("zip".equals(FileUtil.getFileSuffix(file))) {
+					// unzip TODO
+				}
+			}
+		} else {
+			// TODO donot show ActionBarMenu
+		}
+
 	}
 
 	private void operationDone() {

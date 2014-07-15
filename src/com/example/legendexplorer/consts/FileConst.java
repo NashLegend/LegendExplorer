@@ -5,6 +5,7 @@ public class FileConst {
 	// Actions
 	public static final String Action_FileItem_Long_Click = "legendexplorer.fileitemlongclick";
 	public static final String Action_FileItem_Unselect = "legendexplorer.fileitemunselect";
+	public static final String Action_FileItem_Select = "legendexplorer.fileitemselect";
 	public static final String Action_Refresh_FileList = "legendexplorer.refreshfilelist";
 	public static final String Action_Toggle_View_Mode = "legendexplorer.toggleviewmode";
 	public static final String Action_Property_File = "legendexplorer.propertyfile";
@@ -15,6 +16,8 @@ public class FileConst {
 	public static final String Action_Copy_File = "legendexplorer.copyfile";
 	public static final String Action_Move_File = "legendexplorer.movefile";
 	public static final String Action_Zip_File = "legendexplorer.zipfile";
+	public static final String Action_Unzip_File = "legendexplorer.unzipfile";
+	public static final String Action_Favor_File = "legendexplorer.favorfile";
 	public static final String Action_Rename_File = "legendexplorer.renamefile";
 	public static final String Action_Delete_File = "legendexplorer.deletefile";
 	public static final String Action_Toggle_Show_Hidden = "legendexplorer.toggleshowhidden";
