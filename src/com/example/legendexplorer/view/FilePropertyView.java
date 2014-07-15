@@ -1,14 +1,18 @@
 package com.example.legendexplorer.view;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.example.legendexplorer.R;
 import com.example.legendutils.Tools.FileUtil;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +59,7 @@ public class FilePropertyView extends FrameLayout {
 		fileTimelayout = findViewById(R.id.layout_modifiedtime);
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	public void setFiles(File[] fs, boolean allInOneFolder) {
 		files = fs;
 		if (files == null || files.length == 0) {
@@ -65,18 +70,23 @@ public class FilePropertyView extends FrameLayout {
 		if (files.length == 1) {
 			File file = files[0];
 			fileNameTextView.setText(file.getName());
-			fileTypeTextView.setText(FileUtil.getFileSuffix(file));
 			filePathTextView.setText(file.getParent());
 			if (file.isDirectory()) {
-				fileVolumeTextView.setText("Calculating");
-				fileNumberTextView.setText("Calculating");
+				fileVolumeTextView.setText("Calculating...");
+				fileNumberTextView.setText("Calculating...");
+				fileTypeTextView.setText("Folder");
 				needTask = true;
 			} else {
+				fileTypeTextView.setText(FileUtil.getFileSuffix(file));
 				fileVolumeTextView.setText(FileUtil.convertStorage(file
 						.length()));
 				fileNumberlayout.setVisibility(View.GONE);
 			}
-			fileTimeTextView.setText(file.lastModified() + "");
+			Date modiDate = new Date(file.lastModified());
+			SimpleDateFormat format = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
+			String dateString = format.format(modiDate);
+			fileTimeTextView.setText(dateString + "");
 		} else {
 			fileNamelayout.setVisibility(View.GONE);
 			fileTypelayout.setVisibility(View.GONE);
@@ -86,8 +96,8 @@ public class FilePropertyView extends FrameLayout {
 			} else {
 				filePathTextView.setText("N/A");
 			}
-			fileVolumeTextView.setText("Calculating");
-			fileNumberTextView.setText("Calculating");
+			fileVolumeTextView.setText("Calculating...");
+			fileNumberTextView.setText("Calculating...");
 			needTask = true;
 		}
 		if (needTask) {

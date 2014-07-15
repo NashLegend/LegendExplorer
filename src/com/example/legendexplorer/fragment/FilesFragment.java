@@ -387,6 +387,8 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			zipFile();
 		} else if (FileConst.Action_Rename_File.equals(action)) {
 			renameFile();
+		} else if (FileConst.Action_Property_File.equals(action)) {
+			propertyFile();
 		}
 		return false;
 	}

@@ -2,15 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="8dp" >
 
     <LinearLayout
         android:id="@+id/layout_filename"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp" >
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp" >
 
         <TextView
             android:layout_width="@dimen/grid_left_width"
@@ -32,7 +33,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingBottom="4dp"
-        android:paddingTop="8dp" >
+        android:paddingTop="4dp" >
 
         <TextView
             android:layout_width="@dimen/grid_left_width"

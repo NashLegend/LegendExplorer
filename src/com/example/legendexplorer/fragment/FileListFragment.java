@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
+import com.example.legendexplorer.dialog.FilePropertyDialog;
 import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendutils.Dialogs.FileDialog;
@@ -218,7 +219,13 @@ public class FileListFragment extends Fragment {
 	}
 
 	public void propertyFile() {
-
+		File[] files = getSelectedFiles();
+		boolean in = exploreType != FileConst.Value_Explore_Type_Categories
+				&& !FileConst.Value_Bookmark_Path.equals(filePath);
+		if (files.length > 0) {
+			new FilePropertyDialog.Builder(getActivity()).setAllInOneFolder(in)
+					.setFiles(files).setTitle("Property").create().show();
+		}
 	}
 
 	public void addNewFile() {
