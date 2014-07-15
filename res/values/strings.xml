@@ -34,5 +34,7 @@
     <string name="filevolume">FileVolume</string>
     <string name="fileinvolving">Involving</string>
     <string name="modifiedTime">CreateTime</string>
+    <string name="title_activity_picker">FilePicker</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
