@@ -96,9 +96,11 @@ public class BookMarksFragment extends FilesFragment {
 						.size() - 1);
 				if (fragment.getFilePath()
 						.equals(FileConst.Value_Bookmark_Path)) {
-					mask = MainActivity.ZipFileItemFlag
-							| MainActivity.RenameFileItemFlag
-							| MainActivity.CutFileItemFlag;
+					mask = MainActivity.FlagFavorItem
+							| MainActivity.FlagUnzipFileItem
+							| MainActivity.FlagZipFileItem
+							| MainActivity.FlagRenameFileItem
+							| MainActivity.FlagCutFileItem;
 				} else {
 					mask = 0;
 				}
@@ -119,12 +121,13 @@ public class BookMarksFragment extends FilesFragment {
 
 			Intent intent = new Intent();
 			int mask = 0;
+			// 事实上fakeBackStack.size==1的时候就足以判断了
 			if (fakeBackStack.size() > 0) {
 				FileListFragment fragment = fakeBackStack.get(fakeBackStack
 						.size() - 1);
 				if (fragment.getFilePath()
 						.equals(FileConst.Value_Bookmark_Path)) {
-					mask = MainActivity.AddFileItemFlag;
+					mask = MainActivity.FlagAddFileItem;
 				} else {
 					mask = 0;
 				}
@@ -213,7 +216,7 @@ public class BookMarksFragment extends FilesFragment {
 		pathText.setText(fragment.getDisplayedFilePath());
 
 		Intent intent = new Intent();
-		int mask = MainActivity.AddFileItemFlag;
+		int mask = MainActivity.FlagAddFileItem;
 		intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 		intent.setAction(FileConst.Action_Set_File_View_ActionBar);
 		getActivity().sendBroadcast(intent);
@@ -239,7 +242,7 @@ public class BookMarksFragment extends FilesFragment {
 			Intent intent = new Intent();
 			int mask = 0;
 			if (fragment.getFilePath().equals(FileConst.Value_Bookmark_Path)) {
-				mask = MainActivity.AddFileItemFlag;
+				mask = MainActivity.FlagAddFileItem;
 			} else {
 				mask = 0;
 			}
@@ -293,13 +296,13 @@ public class BookMarksFragment extends FilesFragment {
 		super.setUserVisibleHint(isVisibleToUser);
 		if (isVisibleToUser) {
 			Intent intent = new Intent();
-			int mask = MainActivity.AddFileItemFlag;
+			int mask = MainActivity.FlagAddFileItem;
 			if (fakeBackStack.size() > 0) {
 				FileListFragment fragment = fakeBackStack.get(fakeBackStack
 						.size() - 1);
 				if (fragment.getFilePath()
 						.equals(FileConst.Value_Bookmark_Path)) {
-					mask = MainActivity.AddFileItemFlag;
+					mask = MainActivity.FlagAddFileItem;
 				} else {
 					mask = 0;
 				}

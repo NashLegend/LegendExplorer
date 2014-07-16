@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.example.legendexplorer.MainActivity;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
+import com.example.legendexplorer.db.BookmarkHelper;
 import com.example.legendexplorer.dialog.FilePropertyDialog;
 import com.example.legendexplorer.fragment.CategoriedFragment.FileCategory;
+import com.example.legendexplorer.model.FileItem;
 import com.example.legendexplorer.utils.SharePreferencesUtil;
 import com.example.legendutils.Dialogs.FileDialog;
 import com.example.legendutils.Dialogs.InputDialog;
@@ -138,6 +141,7 @@ public class FileListFragment extends Fragment {
 	 */
 	public void selectAll() {
 		adapter.selectAll();
+		getItemSelect();
 	}
 
 	/**
@@ -145,6 +149,7 @@ public class FileListFragment extends Fragment {
 	 */
 	public void unselectAll() {
 		adapter.unselectAll();
+		getItemUnselect();
 	}
 
 	/**
@@ -468,6 +473,14 @@ public class FileListFragment extends Fragment {
 		// 删除数据库或者文件
 		if (itemType == FileConst.Value_Item_Type_Bookmark) {
 			// 删除数据库
+			File file = adapter.getSelectedFiles().get(0);
+			BookmarkHelper helper = new BookmarkHelper(getActivity());
+			helper.open();
+			boolean isok = helper.deleteBookmark(adapter.getSelectedFiles());
+			helper.close();
+			operationDone();
+			ToastUtil.showToast(getActivity(), isok ? "Delete OK!"
+					: "Delete Error!");
 		} else {
 			final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(
 					getActivity()).setCancelable(false)
@@ -634,75 +647,195 @@ public class FileListFragment extends Fragment {
 	public void unzipFile() {
 		final File[] files = getSelectedFiles();
 		if (files.length == 1) {
-			File sourceFile = files[0];
+			final File sourceFile = files[0];
 			if ("zip".equals(FileUtil.getFileSuffix(sourceFile))) {
+				try {
+					if (ZipUtil.isZipfileValid(sourceFile)) {
 
+					} else {
+						ToastUtil.showToast(getActivity(),
+								"Not a valid zip file!");
+					}
+				} catch (IOException e1) {
+					ToastUtil.showToast(getActivity(),
+							"Maybe not a valid zip file!");
+				}
+				FileDialog dialog = new FileDialog.Builder(getActivity())
+						.setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE)
+						.setCancelable(true).setCanceledOnTouchOutside(false)
+						.setTitle("selectFolder")
+						.setFileSelectListener(new FileDialogListener() {
+
+							@Override
+							public void onFileSelected(final ArrayList<File> fs) {
+								if (fs.size() > 0) {
+									final File file = fs.get(0);
+									try {
+										if (ZipUtil
+												.isZipfileEncrypted(sourceFile)) {
+											new InputDialog.Builder(
+													getActivity())
+													.setTitle("Input Password")
+													.setButtonText("Okay",
+															"Nay")
+													.setCancelable(true)
+													.setCanceledOnTouchOutside(
+															false)
+													.setOnClickListener(
+															new OnClickListener() {
+
+																@Override
+																public void onClick(
+																		DialogInterface arg0,
+																		int arg1) {
+																	if (arg1 == DialogInterface.BUTTON_POSITIVE) {
+																		InputDialog dialog = (InputDialog) arg0;
+																		unzipWithDialog(
+																				sourceFile,
+																				file.getAbsolutePath(),
+																				dialog.InputString);
+																	} else {
+																		ToastUtil
+																				.showToast(
+																						getActivity(),
+																						"Unzip cancelled!");
+																	}
+																}
+															}).create().show();
+										} else {
+											unzipWithDialog(sourceFile,
+													file.getAbsolutePath(), "");
+										}
+									} catch (IOException e) {
+										ToastUtil.showToast(getActivity(),
+												"Something error Happened");
+									}
+
+								}
+							}
+
+							@Override
+							public void onFileCanceled() {
+								ToastUtil.showToast(getActivity(),
+										"Unzip Cancelled!");
+							}
+						}).create(getActivity());
+				dialog.show();
 			}
 		}
 	}
 
-	private void unzipWithDialog(File[] sourceFile, File destFile) {
+	private void unzipWithDialog(File sourceFile, String destFile, String pwd) {
 
 		final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
 		dialog.show();
 
-		ZipUtil.zipAsync(sourceFile, destFile, "", new ZipOperationListener() {
+		ZipUtil.unZipAsync(sourceFile, destFile, pwd,
+				new ZipOperationListener() {
 
-			@Override
-			public void onProgress(int progress) {
-				// TODO
-			}
+					@Override
+					public void onProgress(int progress) {
+						// TODO
+					}
 
-			@Override
-			public void onError(String e) {
-				dialog.dismiss();
+					@Override
+					public void onError(String e) {
+						dialog.dismiss();
+						operationDone();
+						ToastUtil.showToast(getActivity(), "Unzip Error!");
+					}
+
+					@Override
+					public void onComplete() {
+						dialog.dismiss();
+						operationDone();
+						ToastUtil.showToast(getActivity(), "Unzip OK!");
+					}
+
+					@Override
+					public void onCancelled() {
+						dialog.dismiss();
+						operationDone();
+						ToastUtil.showToast(getActivity(), "Unzip Cancelled!");
+					}
+				});
+	}
+
+	public void favorFile() {
+		// TODO
+		final File[] files = getSelectedFiles();
+		if (files.length == 1) {
+			File sourceFile = files[0];
+			if (sourceFile.isDirectory()) {
+				FileItem item = new FileItem(sourceFile);
+				BookmarkHelper helper = new BookmarkHelper(getActivity());
+				helper.open();
+				boolean isok = helper.insert(item);
+				helper.close();
+
 				operationDone();
-				ToastUtil.showToast(getActivity(), "Zip Error!");
+				ToastUtil.showToast(getActivity(), isok ? "Favor OK!"
+						: "Favor Error!");
+			} else {
+				ToastUtil
+						.showToast(getActivity(), "Only Folder Can Be Favored");
 			}
-
-			@Override
-			public void onComplete() {
-				dialog.dismiss();
-				operationDone();
-				ToastUtil.showToast(getActivity(), "Zip OK!");
-			}
-
-			@Override
-			public void onCancelled() {
-				dialog.dismiss();
-				operationDone();
-				ToastUtil.showToast(getActivity(), "Zip Cancelled!");
-			}
-		});
+		}
 	}
 
 	public void getItemSelect() {
 		ArrayList<File> files = adapter.getSelectedFiles();
-		if (files.size() == 1) {
-			File file = files.get(0);
-			if ("zip".equals(FileUtil.getFileSuffix(file))) {
-				// unzip TODO
-				return;
+		if (isNormalList()) {
+			int mask = MainActivity.MaskNormalListNormal;
+			if (files.size() == 1) {
+				File file = files.get(0);
+				if (file.isDirectory()) {
+					mask = MainActivity.MaskNormalListFavor;
+				} else if ("zip".equals(FileUtil.getFileSuffix(file))) {
+					mask = MainActivity.MaskNormalListUnzip;
+				}
 			}
+
+			Log.i("mask", mask + "");
+
+			Intent intent = new Intent();
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
+			getActivity().sendBroadcast(intent);
 		}
-		// zip TODO
+		Log.i("mask", "masksss");
+
 	}
 
 	public void getItemUnselect() {
 		ArrayList<File> files = adapter.getSelectedFiles();
-		if (files.size() > 0) {
-			if (files.size() == 1) {
-				File file = files.get(0);
-				if ("zip".equals(FileUtil.getFileSuffix(file))) {
-					// unzip TODO
+		if (isNormalList()) {
+			int mask = MainActivity.MaskNormalListNormal;
+			if (files.size() > 0) {
+				if (files.size() == 1) {
+					File file = files.get(0);
+					if (file.isDirectory()) {
+						mask = MainActivity.MaskNormalListFavor;
+					} else if ("zip".equals(FileUtil.getFileSuffix(file))) {
+						mask = MainActivity.MaskNormalListUnzip;
+					}
 				}
+			} else {
+				// TODO donot show ActionBarMenu
 			}
-		} else {
-			// TODO donot show ActionBarMenu
+			Intent intent = new Intent();
+			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
+			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
+			getActivity().sendBroadcast(intent);
 		}
 
+	}
+
+	public boolean isNormalList() {
+		return exploreType != FileConst.Value_Explore_Type_Categories
+				&& !FileConst.Value_Bookmark_Path.equals(filePath);
 	}
 
 	private void operationDone() {
@@ -711,4 +844,5 @@ public class FileListFragment extends Fragment {
 		getActivity().sendBroadcast(intent);
 		refreshFileList();
 	}
+
 }

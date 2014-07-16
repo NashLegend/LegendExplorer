@@ -155,6 +155,11 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 		if (fileItem.isSelected()) {
 			rootFileItemView
 					.setBackgroundResource(R.drawable.bg_file_item_select);
+			if (manual && fileItem.isInSelectMode()) {
+				Intent intent = new Intent();
+				intent.setAction(FileConst.Action_FileItem_Select);
+				getContext().sendBroadcast(intent);
+			}
 		} else {
 			rootFileItemView
 					.setBackgroundResource(R.drawable.bg_file_item_normal);

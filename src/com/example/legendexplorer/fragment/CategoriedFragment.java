@@ -283,9 +283,9 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 
 		Intent intent = new Intent();
 		int mask = 0;
-		mask = MainActivity.RefreshListItemFlag
-				| MainActivity.ToggleHiddleItemFlag
-				| MainActivity.AddFileItemFlag;
+		mask = MainActivity.FlagRefreshListItem
+				| MainActivity.FlagToggleHiddleItem
+				| MainActivity.FlagAddFileItem;
 		intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 		intent.setAction(FileConst.Action_Set_File_View_ActionBar);
 		getActivity().sendBroadcast(intent);
@@ -305,10 +305,10 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 			listFragment = null;
 			// frameLayout.setVisibility(View.GONE);
 			Intent intent = new Intent();
-			int mask = MainActivity.SearchFileItemFlag
-					| MainActivity.ToggleViewItemFlag
-					| MainActivity.AddFileItemFlag
-					| MainActivity.ToggleHiddleItemFlag;
+			int mask = MainActivity.FlagSearchFileItem
+					| MainActivity.FlagToggleViewItem
+					| MainActivity.FlagAddFileItem
+					| MainActivity.FlagToggleHiddleItem;
 			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
 			getActivity().sendBroadcast(intent);
@@ -427,14 +427,14 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 			Intent intent = new Intent();
 			int mask = 0;
 			if (listFragment == null) {
-				mask = MainActivity.SearchFileItemFlag
-						| MainActivity.ToggleViewItemFlag
-						| MainActivity.AddFileItemFlag
-						| MainActivity.ToggleHiddleItemFlag;
+				mask = MainActivity.FlagSearchFileItem
+						| MainActivity.FlagToggleViewItem
+						| MainActivity.FlagAddFileItem
+						| MainActivity.FlagToggleHiddleItem;
 			} else {
-				mask = MainActivity.RefreshListItemFlag
-						| MainActivity.ToggleHiddleItemFlag
-						| MainActivity.AddFileItemFlag;
+				mask = MainActivity.FlagRefreshListItem
+						| MainActivity.FlagToggleHiddleItem
+						| MainActivity.FlagAddFileItem;
 			}
 			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
@@ -509,9 +509,9 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 
 			Intent intent = new Intent();
 			int mask = 0;
-			mask = MainActivity.RefreshListItemFlag
-					| MainActivity.ToggleHiddleItemFlag
-					| MainActivity.AddFileItemFlag;
+			mask = MainActivity.FlagRefreshListItem
+					| MainActivity.FlagToggleHiddleItem
+					| MainActivity.FlagAddFileItem;
 			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 			intent.setAction(FileConst.Action_Set_File_View_ActionBar);
 			getActivity().sendBroadcast(intent);
@@ -526,9 +526,10 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 
 			Intent intent = new Intent();
 			int mask = 0;
-			mask = MainActivity.RefreshListItemFlag
-					| MainActivity.ToggleHiddleItemFlag
-					| MainActivity.AddFileItemFlag;
+			mask = MainActivity.FlagFavorItem | MainActivity.FlagUnzipFileItem
+					| MainActivity.FlagRefreshListItem
+					| MainActivity.FlagToggleHiddleItem
+					| MainActivity.FlagAddFileItem;
 			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
 			getActivity().sendBroadcast(intent);

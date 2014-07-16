@@ -357,6 +357,7 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			doOpenFolderAction(intent);
 		} else if (FileConst.Action_FileItem_Long_Click.equals(action)) {
 			change2SelectMode();
+			getItemSelect();
 		} else if (FileConst.Action_FileItem_Unselect.equals(action)) {
 			getItemUnselect();
 		} else if (FileConst.Action_FileItem_Select.equals(action)) {
@@ -389,6 +390,10 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 			renameFile();
 		} else if (FileConst.Action_Property_File.equals(action)) {
 			propertyFile();
+		} else if (FileConst.Action_Unzip_File.equals(action)) {
+			unzipFile();
+		} else if (FileConst.Action_Favor_File.equals(action)) {
+			favorFile();
 		}
 		return false;
 	}
@@ -496,6 +501,18 @@ public class FilesFragment extends BaseFragment implements OnClickListener,
 	public void propertyFile() {
 		if (fakeBackStack.size() > 0) {
 			fakeBackStack.get(fakeBackStack.size() - 1).propertyFile();
+		}
+	}
+
+	public void unzipFile() {
+		if (fakeBackStack.size() > 0) {
+			fakeBackStack.get(fakeBackStack.size() - 1).unzipFile();
+		}
+	}
+
+	public void favorFile() {
+		if (fakeBackStack.size() > 0) {
+			fakeBackStack.get(fakeBackStack.size() - 1).favorFile();
 		}
 	}
 }

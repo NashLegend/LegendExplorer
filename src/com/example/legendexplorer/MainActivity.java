@@ -42,22 +42,28 @@ public class MainActivity extends Activity {
 	private Menu mMenu;
 	private SearchView searchView;
 
-	public static final int SearchFileItemFlag = 1;
-	public static final int ToggleViewItemFlag = 2;
-	public static final int AddFileItemFlag = 4;
-	public static final int ToggleHiddleItemFlag = 8;
-	public static final int RefreshListItemFlag = 16;
-	public static final int AllFileListMask = 31;
+	public static final int FlagSearchFileItem = 1;
+	public static final int FlagToggleViewItem = 2;
+	public static final int FlagAddFileItem = 4;
+	public static final int FlagToggleHiddleItem = 8;
+	public static final int FlagRefreshListItem = 16;
+	public static final int MaskAllFileList = 31;
 
-	public static final int CopyFileItemFlag = 1;
-	public static final int CutFileItemFlag = 2;
-	public static final int DeleteFileItemFlag = 4;
-	public static final int RenameFileItemFlag = 8;
-	public static final int ZipFileItemFlag = 16;
+	public static final int FlagCopyFileItem = 1;
+	public static final int FlagCutFileItem = 2;
+	public static final int FlagDeleteFileItem = 4;
+	public static final int FlagRenameFileItem = 8;
+	public static final int FlagZipFileItem = 16;
 	public static final int PropertyItemFlag = 32;
-	public static final int UnzipFileItemFlag = 64;
-	public static final int FavorItemFlag = 128;
-	public static final int AllOperationMask = 255;
+	public static final int FlagUnzipFileItem = 64;
+	public static final int FlagFavorItem = 128;
+	public static final int MaskAllOperation = 255;
+
+	public static final int MaskNormalListUnzip = FlagFavorItem
+			| FlagZipFileItem;
+	public static final int MaskNormalListFavor = FlagUnzipFileItem;
+	public static final int MaskNormalListNormal = FlagFavorItem
+			| FlagUnzipFileItem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -159,15 +165,15 @@ public class MainActivity extends Activity {
 			mMenu.clear();
 			getMenuInflater().inflate(R.menu.fileop, mMenu);
 		}
-		if (exclu >= FavorItemFlag) {
+		if (exclu >= FlagFavorItem) {
 			mMenu.findItem(R.id.action_favor).setVisible(false);
-			exclu = exclu ^ FavorItemFlag;
+			exclu = exclu ^ FlagFavorItem;
 		} else {
 			mMenu.findItem(R.id.action_favor).setVisible(true);
 		}
-		if (exclu >= UnzipFileItemFlag) {
+		if (exclu >= FlagUnzipFileItem) {
 			mMenu.findItem(R.id.action_unzip).setVisible(false);
-			exclu = exclu ^ UnzipFileItemFlag;
+			exclu = exclu ^ FlagUnzipFileItem;
 		} else {
 			mMenu.findItem(R.id.action_unzip).setVisible(true);
 		}
@@ -177,31 +183,31 @@ public class MainActivity extends Activity {
 		} else {
 			mMenu.findItem(R.id.action_property).setVisible(true);
 		}
-		if (exclu >= ZipFileItemFlag) {
+		if (exclu >= FlagZipFileItem) {
 			mMenu.findItem(R.id.action_zip).setVisible(false);
-			exclu = exclu ^ ZipFileItemFlag;
+			exclu = exclu ^ FlagZipFileItem;
 		} else {
 			mMenu.findItem(R.id.action_zip).setVisible(true);
 		}
-		if (exclu >= RenameFileItemFlag) {
+		if (exclu >= FlagRenameFileItem) {
 			mMenu.findItem(R.id.action_rename).setVisible(false);
-			exclu = exclu ^ RenameFileItemFlag;
+			exclu = exclu ^ FlagRenameFileItem;
 		} else {
 			mMenu.findItem(R.id.action_rename).setVisible(true);
 		}
-		if (exclu >= DeleteFileItemFlag) {
+		if (exclu >= FlagDeleteFileItem) {
 			mMenu.findItem(R.id.action_delete).setVisible(false);
-			exclu = exclu ^ DeleteFileItemFlag;
+			exclu = exclu ^ FlagDeleteFileItem;
 		} else {
 			mMenu.findItem(R.id.action_delete).setVisible(true);
 		}
-		if (exclu >= CutFileItemFlag) {
+		if (exclu >= FlagCutFileItem) {
 			mMenu.findItem(R.id.action_cut).setVisible(false);
-			exclu = exclu ^ CutFileItemFlag;
+			exclu = exclu ^ FlagCutFileItem;
 		} else {
 			mMenu.findItem(R.id.action_cut).setVisible(true);
 		}
-		if (exclu >= CopyFileItemFlag) {
+		if (exclu >= FlagCopyFileItem) {
 			mMenu.findItem(R.id.action_copy).setVisible(false);
 		} else {
 			mMenu.findItem(R.id.action_copy).setVisible(true);
@@ -218,31 +224,31 @@ public class MainActivity extends Activity {
 			getMenuInflater().inflate(R.menu.filelist, mMenu);
 		}
 
-		if (exclu >= RefreshListItemFlag) {
+		if (exclu >= FlagRefreshListItem) {
 			mMenu.findItem(R.id.action_refresh).setVisible(false);
-			exclu = exclu ^ RefreshListItemFlag;
+			exclu = exclu ^ FlagRefreshListItem;
 		} else {
 			mMenu.findItem(R.id.action_refresh).setVisible(true);
 		}
-		if (exclu >= ToggleHiddleItemFlag) {
+		if (exclu >= FlagToggleHiddleItem) {
 			mMenu.findItem(R.id.action_toggle_hidden).setVisible(false);
-			exclu = exclu ^ ToggleHiddleItemFlag;
+			exclu = exclu ^ FlagToggleHiddleItem;
 		} else {
 			mMenu.findItem(R.id.action_toggle_hidden).setVisible(true);
 		}
-		if (exclu >= AddFileItemFlag) {
+		if (exclu >= FlagAddFileItem) {
 			mMenu.findItem(R.id.action_new).setVisible(false);
-			exclu = exclu ^ AddFileItemFlag;
+			exclu = exclu ^ FlagAddFileItem;
 		} else {
 			mMenu.findItem(R.id.action_new).setVisible(true);
 		}
-		if (exclu >= ToggleViewItemFlag) {
+		if (exclu >= FlagToggleViewItem) {
 			mMenu.findItem(R.id.action_viewmode).setVisible(false);
-			exclu = exclu ^ ToggleViewItemFlag;
+			exclu = exclu ^ FlagToggleViewItem;
 		} else {
 			mMenu.findItem(R.id.action_viewmode).setVisible(true);
 		}
-		if (exclu >= SearchFileItemFlag) {
+		if (exclu >= FlagSearchFileItem) {
 			mMenu.findItem(R.id.action_search).setVisible(false);
 		} else {
 			MenuItem searchItem = mMenu.findItem(R.id.action_search);
