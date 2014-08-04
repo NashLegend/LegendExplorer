@@ -221,7 +221,7 @@ public class FileItem extends File {
 		if (offset > 0 && offset < fileName.length() - 1) {
 			suffix = fileName.substring(offset + 1);
 		}
-		return suffix;
+		return suffix.toLowerCase();
 	}
 
 	public boolean isSelected() {
