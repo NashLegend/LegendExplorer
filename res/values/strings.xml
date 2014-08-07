@@ -38,5 +38,8 @@
     <string name="modifiedTime">CreateTime</string>
     <string name="title_activity_picker">FilePicker</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_image_browse">ImageBrowseActivity</string>
+    <string name="title_activity_audio">AudioActivity</string>
 
 </resources>

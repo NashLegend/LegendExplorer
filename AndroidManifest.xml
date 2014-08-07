@@ -44,6 +44,18 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".SearchActivity"
+            android:label="@string/title_activity_search" >
+        </activity>
+        <activity
+            android:name=".ImageBrowseActivity"
+            android:label="@string/title_activity_image_browse" >
+        </activity>
+        <activity
+            android:name=".AudioActivity"
+            android:label="@string/title_activity_audio" >
+        </activity>
     </application>
 
 </manifest>
