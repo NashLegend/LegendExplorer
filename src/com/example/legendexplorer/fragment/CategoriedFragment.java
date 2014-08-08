@@ -252,8 +252,6 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
 		filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-		filter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
-		filter.addAction(Intent.ACTION_MEDIA_SCANNER_STARTED);
 		filter.addDataScheme("file");
 		getActivity().registerReceiver(receiver, filter);
 	}
@@ -349,17 +347,16 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 
 	@Override
 	public void onStop() {
-		try {
-			getActivity().unregisterReceiver(receiver);
-		} catch (Exception e) {
-
-		}
-
 		super.onStop();
 	}
 
 	@Override
 	public void onDestroy() {
+		try {
+			getActivity().unregisterReceiver(receiver);
+		} catch (Exception e) {
+
+		}
 		super.onDestroy();
 	}
 
@@ -541,13 +538,9 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-			Log.i("cat", action);
-			if (action.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)
-					|| action.equals(Intent.ACTION_MEDIA_MOUNTED)
+			if (action.equals(Intent.ACTION_MEDIA_MOUNTED)
 					|| action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
 				notifyFileChanged();
-			} else if (action.equals(Intent.ACTION_MEDIA_SCANNER_STARTED)) {
-
 			}
 		}
 	}
