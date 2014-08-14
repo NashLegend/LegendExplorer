@@ -524,9 +524,8 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 			Intent intent = new Intent();
 			int mask = 0;
 			mask = MainActivity.FlagFavorItem | MainActivity.FlagUnzipFileItem
-					| MainActivity.FlagRefreshListItem
-					| MainActivity.FlagToggleHiddleItem
-					| MainActivity.FlagAddFileItem;
+					| MainActivity.FlagZipFileItem
+					| MainActivity.FlagRenameFileItem;
 			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
 			getActivity().sendBroadcast(intent);
