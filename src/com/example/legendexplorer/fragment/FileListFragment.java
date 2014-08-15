@@ -798,15 +798,11 @@ public class FileListFragment extends Fragment {
 				}
 			}
 
-			Log.i("mask", mask + "");
-
 			Intent intent = new Intent();
 			intent.putExtra(FileConst.Extra_Menu_Mask, mask);
 			intent.setAction(FileConst.Action_Set_File_Operation_ActionBar);
 			getActivity().sendBroadcast(intent);
 		}
-		Log.i("mask", "masksss");
-
 	}
 
 	public void getItemUnselect() {

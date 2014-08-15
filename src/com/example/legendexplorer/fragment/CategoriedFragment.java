@@ -330,7 +330,6 @@ public class CategoriedFragment extends BaseFragment implements Explorable {
 	private boolean inSelectMode;
 
 	synchronized public void notifyFileChanged() {
-		Log.i("noti", "notifyFileChanged");
 		if (timer != null) {
 			timer.cancel();
 		}
