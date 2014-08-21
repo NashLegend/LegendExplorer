@@ -48,10 +48,9 @@ public class TheImage extends ImageView {
 
     public void load(File file, int w, int h) {
         setBackgroundColor(Color.WHITE);
-        Bitmap bitmap;
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
         options.inJustDecodeBounds = false;
         float hei = options.outHeight;
         float wid = options.outWidth;
@@ -77,9 +76,7 @@ public class TheImage extends ImageView {
 
             @Override
             protected Bitmap doInBackground(String... params) {
-                String path = params[0];
-                Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-                return bitmap;
+                return BitmapFactory.decodeFile(params[0], options);
             }
 
             @Override
@@ -87,10 +84,8 @@ public class TheImage extends ImageView {
                 setImageBitmap(result);
             }
         }
-
         LoadBMPTask task = new LoadBMPTask();
         task.execute(file.getAbsolutePath());
-
     }
 
 }
