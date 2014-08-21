@@ -2,6 +2,7 @@ package com.example.legendexplorer.view;
 
 import java.io.IOException;
 
+import com.example.legendexplorer.ImageBrowseActivity;
 import com.example.legendexplorer.R;
 import com.example.legendexplorer.adapter.FileListAdapter;
 import com.example.legendexplorer.consts.FileConst;
@@ -206,7 +207,11 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 			break;
 		case FileItem.FILE_TYPE_IMAGE:
 			intent.setDataAndType(data, "image/*");
-			break;
+			Intent intentImage=new Intent();
+			intentImage.putExtra(FileConst.Extra_File_Path, fileItem.getAbsolutePath());
+			intentImage.setClass(getContext(), ImageBrowseActivity.class);
+			getContext().startActivity(intentImage);
+			return;
 		case FileItem.FILE_TYPE_AUDIO:
 			intent.putExtra("oneshot", 0);
 			intent.putExtra("configchange", 0);
