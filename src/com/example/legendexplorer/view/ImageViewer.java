@@ -7,25 +7,16 @@ import java.util.ArrayList;
 import com.example.legendutils.Tools.FileUtil;
 
 import android.animation.Animator;
-import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
-import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 public class ImageViewer extends RelativeLayout {
@@ -104,12 +95,11 @@ public class ImageViewer extends RelativeLayout {
         }
     }
 
+    @SuppressLint("Recycle")
     public void setupImages() {
-
         if (velocityTracker == null) {
             velocityTracker = VelocityTracker.obtain();
         }
-
         maxVelocityValue = maxVelovityInDP
                 * getContext().getResources().getDisplayMetrics().density;
         minValidVelocityValue = minValidVelocityInDP
@@ -168,11 +158,10 @@ public class ImageViewer extends RelativeLayout {
             leftPoint = new Point((getWidth() - leftImage.initWidth) / 2 - getWidth(),
                     (getHeight() - leftImage.initHeight) / 2);
         }
-
     }
 
     public boolean isImageFile(File file) {
-        return FileUtil.getFileType(file)==FileUtil.FILE_TYPE_IMAGE;
+        return FileUtil.getFileType(file) == FileUtil.FILE_TYPE_IMAGE;
     }
 
     public float distance(PointF pointF, PointF pointF2) {
@@ -187,26 +176,30 @@ public class ImageViewer extends RelativeLayout {
             case MotionEvent.ACTION_DOWN:
                 scrolling = false;
                 flag = false;
-                downPoint = new PointF(ev.getX(0), ev.getY(0));
-                startPoint = new PointF(ev.getX(0), ev.getY(0));
-                lastPoint = new PointF(ev.getX(0), ev.getY(0));
+                downPoint = new PointF(ev.getX(), ev.getY());
+                startPoint = new PointF(ev.getX(), ev.getY());
+                lastPoint = new PointF(ev.getX(), ev.getY());
                 break;
             case MotionEvent.ACTION_MOVE:
-                pointF = new PointF(ev.getX(0), ev.getY(0));
-                if (scrolling) {
-                    flag = true;
-                } else {
-                    if (distance(pointF, downPoint) > scrollDis) {
+                pointF = new PointF(ev.getX(), ev.getY());
+                if (middleImage.TouchMode == TheImage.MODE_NORMAL) {
+                    if (scrolling) {
                         flag = true;
-                        scrolling = true;
                     } else {
-                        flag = false;
+                        if (Math.abs(ev.getY() - downPoint.x) > scrollDis) {
+                            flag = true;
+                            scrolling = true;
+                        } else {
+                            flag = false;
+                        }
                     }
+                } else {
+                    flag = false;
                 }
+
                 lastPoint = pointF;
                 break;
             case MotionEvent.ACTION_CANCEL:
-                // TODO
                 break;
             case MotionEvent.ACTION_UP:
                 flag = scrolling;
@@ -228,7 +221,7 @@ public class ImageViewer extends RelativeLayout {
 
                 break;
             case MotionEvent.ACTION_MOVE:
-                pointF = new PointF(ev.getX(0), ev.getY(0));
+                pointF = new PointF(ev.getX(), ev.getY());
                 if (scrolling) {
                     scrollImageBy(pointF.x - startPoint.x, pointF.y - startPoint.y);
                 } else {
@@ -241,7 +234,6 @@ public class ImageViewer extends RelativeLayout {
                 lastPoint = pointF;
                 break;
             case MotionEvent.ACTION_CANCEL:
-                // TODO
                 break;
             case MotionEvent.ACTION_UP:
                 if (scrolling) {
@@ -249,7 +241,6 @@ public class ImageViewer extends RelativeLayout {
                 }
                 final VelocityTracker tmpTracker = velocityTracker;
                 tmpTracker.computeCurrentVelocity(1, maxVelocityValue);
-                // tmpTracker.recycle();
                 onDragEnd(tmpTracker.getXVelocity(), tmpTracker.getYVelocity());
                 break;
 
@@ -370,7 +361,7 @@ public class ImageViewer extends RelativeLayout {
 
     public void scrollBack(int dura) {
         if (animatorSet != null && animatorSet.isRunning()) {
-              animatorSet.cancel();
+            animatorSet.cancel();
         }
         animatorSet = new AnimatorSet();
         ArrayList<Animator> animators = new ArrayList<Animator>();
@@ -424,7 +415,6 @@ public class ImageViewer extends RelativeLayout {
     }
 
     public void scrollThreeBodyBy(float x, float y) {
-        // TODO 如果是动画过程中动画停止，按住滑动，这里得到的结果将是错的
         if (x > 0) {
             // 右侧，rightImage不动
             if (leftImage == null) {
