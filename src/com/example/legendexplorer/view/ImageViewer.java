@@ -82,16 +82,18 @@ public class ImageViewer extends RelativeLayout {
         if (isImageFile(FirstImage)) {
             File parentFile = FirstImage.getParentFile();
             File[] listFiles = parentFile.listFiles();
-            for (int i = 0; i < parentFile.listFiles().length; i++) {
-                File file = listFiles[i];
-                if (isImageFile(file)) {
-                    files.add(file);
-                    if (file.equals(FirstImage)) {
-                        imageIndex = files.size() - 1;
+            if (listFiles != null) {
+                for (int i = 0; i < parentFile.listFiles().length; i++) {
+                    File file = listFiles[i];
+                    if (isImageFile(file)) {
+                        files.add(file);
+                        if (file.equals(FirstImage)) {
+                            imageIndex = files.size() - 1;
+                        }
                     }
                 }
+                setupImages();
             }
-            setupImages();
         }
     }
 
@@ -170,6 +172,9 @@ public class ImageViewer extends RelativeLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (files.size() == 0) {
+            return true;
+        }
         boolean flag = false;
         PointF pointF;
         switch (ev.getAction()) {
@@ -214,6 +219,9 @@ public class ImageViewer extends RelativeLayout {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (files.size() == 0) {
+            return true;
+        }
         velocityTracker.addMovement(ev);
         PointF pointF;
         switch (ev.getAction()) {
