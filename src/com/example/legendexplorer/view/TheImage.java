@@ -142,6 +142,7 @@ public class TheImage extends ImageView {
                 } else {
                     TouchMode = MODE_DRAG;
                 }
+                lastPoint=null;
                 break;
             default:
                 break;
