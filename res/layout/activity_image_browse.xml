@@ -5,10 +5,9 @@
     android:background="@android:color/black"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <com.example.legendexplorer.view.ImageViewer
+    <android.support.v4.view.ViewPager
         android:id="@+id/fullscreen_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true" />
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
