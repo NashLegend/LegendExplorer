@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -64,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.legendexplorer.R.styleable;
+import com.example.legendexplorer.application.ExplorerApplication;
 
 /**
  * Displays an image subsampled as necessary to avoid loading too much image
@@ -320,6 +322,42 @@ public class ZoomImageView extends View {
         requestLayout();
     }
 
+    String file;
+    SourceType type;
+
+    public File getImageFile() {
+        File tmpFile = null;
+        switch (type) {
+            case AssetSource:
+
+                break;
+            case UrlSource:
+                try {
+                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                        // 使用SD卡
+                        tmpFile = new File(ExplorerApplication.getGlobalContext()
+                                .getExternalCacheDir(),
+                                URLEncoder.encode(file, "UTF-8"));
+                    } else {
+                        // 安装目录
+                        tmpFile = new File(ExplorerApplication.getGlobalContext().getCacheDir(),
+                                URLEncoder.encode(file, "UTF-8"));
+                    }
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case FileSource:
+                tmpFile = new File(file);
+                break;
+
+            default:
+                break;
+        }
+        return tmpFile;
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -329,7 +367,7 @@ public class ZoomImageView extends View {
     public static interface ImageLoadListener {
         public void onInitOK();
 
-        public void onInitError();
+        public void onInitError(ErrorType errorType);
     }
 
     @Override
@@ -358,6 +396,8 @@ public class ZoomImageView extends View {
     }
 
     public final void setImageUrl(String url) {
+        file = url;
+        type = SourceType.UrlSource;
         reset(true);
         task = new BitmapInitTask(this, getContext(), url, SourceType.UrlSource);
         task.execute();
@@ -370,6 +410,8 @@ public class ZoomImageView extends View {
      * @param extFile URI of the file to display.
      */
     public final void setImageFile(String extFile) {
+        type = SourceType.FileSource;
+        file = extFile;
         reset(true);
         task = new BitmapInitTask(this, getContext(), extFile, SourceType.FileSource);
         task.execute();
@@ -387,6 +429,8 @@ public class ZoomImageView extends View {
      * @param state State to be restored. Nullable.
      */
     public final void setImageFile(String extFile, ImageViewState state) {
+        type = SourceType.FileSource;
+        file = extFile;
         reset(true);
         restoreState(state);
         task = new BitmapInitTask(this, getContext(), extFile, SourceType.FileSource);
@@ -413,6 +457,7 @@ public class ZoomImageView extends View {
      * @param state State to be restored. Nullable.
      */
     public final void setImageAsset(String assetName, ImageViewState state) {
+        type = SourceType.AssetSource;
         reset(true);
         restoreState(state);
         task = new BitmapInitTask(this, getContext(), assetName, SourceType.AssetSource);
@@ -587,6 +632,7 @@ public class ZoomImageView extends View {
         }
         // Detect flings, taps and double taps
         if (detector == null || detector.onTouchEvent(event)) {
+            isPanning = false;
             return true;
         }
 
@@ -643,7 +689,7 @@ public class ZoomImageView extends View {
                             consumed = true;
 
                             scale = Math.min(maxScale, (vDistEnd / vDistStart) * scaleStart);
-                            
+
                             if (scale <= minScale()) {
                                 // Minimum scale reached so don't pan. Adjust
                                 // start settings so any expand will zoom in.
@@ -1180,9 +1226,9 @@ public class ZoomImageView extends View {
         invalidate();
     }
 
-    private void onInitError() {
+    private void onInitError(ErrorType errorType) {
         if (listener != null) {
-            listener.onInitError();
+            listener.onInitError(errorType);
         }
     }
 
@@ -1197,6 +1243,10 @@ public class ZoomImageView extends View {
         AssetSource, FileSource, UrlSource
     }
 
+    public static enum ErrorType {
+        NoError, DecodeError, DownloadError, UrlError, UnknownError
+    }
+
     /**
      * Async task used to get image details without blocking the UI thread.
      */
@@ -1207,6 +1257,7 @@ public class ZoomImageView extends View {
         private final boolean sourceIsAsset;
         private SourceType sourceType;
         private BitmapRegionDecoder decoder;
+        private ErrorType typeError = ErrorType.NoError;
 
         public BitmapInitTask(ZoomImageView view, Context context, String source,
                 SourceType sourceType) {
@@ -1221,45 +1272,45 @@ public class ZoomImageView extends View {
             }
         }
 
-        private String downloadImage(String urlString) {
-            try {
-                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                        + "/XinhuaNews/BigImage/", URLEncoder.encode(urlString, "UTF-8"));
-                if (file.getParentFile() != null) {
-                    file.getParentFile().mkdirs();
+        private String downloadImage(String urlString) throws UnsupportedEncodingException,
+                MalformedURLException, IOException {
+            File file = null;
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                // 使用SD卡
+                file = new File(ExplorerApplication.getGlobalContext().getExternalCacheDir(),
+                        URLEncoder.encode(urlString, "UTF-8"));
+            } else {
+                // 安装目录
+                file = new File(ExplorerApplication.getGlobalContext().getCacheDir(),
+                        URLEncoder.encode(
+                                urlString, "UTF-8"));
+            }
+            if (file.getParentFile() != null) {
+                file.getParentFile().mkdirs();
+            }
+            if (file.isFile()) {
+                return file.getAbsolutePath();
+            }
+            String path = file.getAbsolutePath();
+            URL url;
+            url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(10000);
+            connection.connect();
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                InputStream input = connection.getInputStream();
+                FileOutputStream output = new FileOutputStream(path);
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(input);
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(output);
+                byte[] buffer = new byte[1];
+                while (bufferedInputStream.read(buffer) != -1) {
+                    bufferedOutputStream.write(buffer);
                 }
-                if (file.isFile()) {
-                    return file.getAbsolutePath();
-                }
-                String path = file.getAbsolutePath();
-                URL url;
-                url = new URL(urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(10000);
-                connection.connect();
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    try {
-                        InputStream input = connection.getInputStream();
-                        FileOutputStream output = new FileOutputStream(path);
-                        BufferedInputStream bufferedInputStream = new BufferedInputStream(input);
-                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(output);
-                        byte[] buffer = new byte[1];
-                        while (bufferedInputStream.read(buffer) != -1) {
-                            bufferedOutputStream.write(buffer);
-                        }
-                        bufferedOutputStream.flush();
-                        bufferedInputStream.close();
-                        bufferedOutputStream.close();
-                        input.close();
-                        return path;
-                    } catch (Exception e) {
-
-                    }
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                bufferedOutputStream.flush();
+                bufferedInputStream.close();
+                bufferedOutputStream.close();
+                input.close();
+                return path;
             }
             return null;
         }
@@ -1279,7 +1330,17 @@ public class ZoomImageView extends View {
                             String realSource = source;
                             if (sourceType == SourceType.UrlSource) {
                                 // TODO
-                                realSource = downloadImage(source);
+                                try {
+                                    realSource = downloadImage(source);
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                } catch (MalformedURLException e) {
+                                    typeError = ErrorType.UrlError;
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    typeError = ErrorType.DownloadError;
+                                    e.printStackTrace();
+                                }
                             }
                             if (realSource == null) {
                                 return null;
@@ -1306,13 +1367,16 @@ public class ZoomImageView extends View {
                             }
 
                         }
+                        typeError = ErrorType.NoError;
                         return new int[] {
                                 decoder.getWidth(), decoder.getHeight(), exifOrientation
                         };
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Log.e(TAG, "Failed to initialise bitmap decoder", e);
+                typeError = ErrorType.DecodeError;
+                e.printStackTrace();
             }
             return null;
         }
@@ -1329,7 +1393,10 @@ public class ZoomImageView extends View {
                         subsamplingScaleImageView.onImageInited(decoder, xyo[0], xyo[1], xyo[2]);
                         return;
                     }
-                    subsamplingScaleImageView.onInitError();
+                    if (typeError == ErrorType.NoError) {
+                        typeError = ErrorType.UnknownError;
+                    }
+                    subsamplingScaleImageView.onInitError(typeError);
                 }
             }
         }
