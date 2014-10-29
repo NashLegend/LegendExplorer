@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="15"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PickerActivity"
+            android:name="com.example.legendexplorer.PickerActivity"
             android:label="@string/title_activity_picker"
             android:theme="@style/AppThemeWithActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustPan" >
@@ -45,16 +45,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SearchActivity"
+            android:name="com.example.legendexplorer.SearchActivity"
             android:label="@string/title_activity_search" >
         </activity>
         <activity
-            android:name=".ImageBrowseActivity"
+            android:name="com.example.legendexplorer.ImageBrowseActivity"
             android:label="@string/title_activity_image_browse" >
-        </activity>
-        <activity
-            android:name=".AudioActivity"
-            android:label="@string/title_activity_audio" >
         </activity>
     </application>
 
