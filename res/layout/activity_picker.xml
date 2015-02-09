@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#ffffff" >
 
-    <com.example.legendutils.BuildIn.FileDialogView
+    <net.nashlegend.legendutils.BuildIn.FileDialogView
         android:id="@+id/picker"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

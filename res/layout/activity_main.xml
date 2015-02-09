@@ -5,10 +5,10 @@
     android:background="#ffffff"
     tools:context=".MainActivity" >
 
-    <com.example.legendexplorer.view.FolderViewPager
+    <net.nashlegend.legendexplorer.view.FolderViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-    </com.example.legendexplorer.view.FolderViewPager>
+    </net.nashlegend.legendexplorer.view.FolderViewPager>
 
 </RelativeLayout>
