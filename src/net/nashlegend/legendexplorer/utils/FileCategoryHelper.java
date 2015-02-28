@@ -173,7 +173,7 @@ public class FileCategoryHelper {
 					+ "application/zip" + "')";
 			break;
 		case Apk:
-			selection = FileColumns.DATA + " LIKE '%.apk'";
+		    selection = FileColumns.DATA + " LIKE '%.apk' AND " + FileColumns.SIZE + " > 12288";//大于12k
 			break;
 		default:
 			selection = null;
