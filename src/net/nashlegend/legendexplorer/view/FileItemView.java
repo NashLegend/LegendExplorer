@@ -257,7 +257,7 @@ public class FileItemView extends FrameLayout implements OnClickListener,
 		try {
 			getContext().startActivity(intent);
 		} catch (ActivityNotFoundException e) {
-			Toast.makeText(getContext(), "Cannot open this file type",
+			Toast.makeText(getContext(), "打不开此文件类型",
 					Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 		}

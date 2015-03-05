@@ -28,7 +28,7 @@ public class FilePropertyDialog extends Dialog {
 
 	public static class Builder {
 		private boolean allInOneFolder = true;
-		private String title = "Property";
+		private String title = "属性";
 		private File[] files;
 		private Context mContext;
 

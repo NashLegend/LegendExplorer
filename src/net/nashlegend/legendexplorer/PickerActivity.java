@@ -43,7 +43,7 @@ public class PickerActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_picker);
-		setTitle("Pick A File");
+		setTitle("选择文件");
 		Intent intent = getIntent();
 		if (intent != null
 				&& Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {

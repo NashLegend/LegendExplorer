@@ -72,9 +72,9 @@ public class FilePropertyView extends FrameLayout {
 			fileNameTextView.setText(file.getName());
 			filePathTextView.setText(file.getParent());
 			if (file.isDirectory()) {
-				fileVolumeTextView.setText("Calculating...");
-				fileNumberTextView.setText("Calculating...");
-				fileTypeTextView.setText("Folder");
+				fileVolumeTextView.setText("计算中...");
+				fileNumberTextView.setText("计算中...");
+				fileTypeTextView.setText("文件夹");
 				needTask = true;
 			} else {
 				fileTypeTextView.setText(FileUtil.getFileSuffix(file));
@@ -96,8 +96,8 @@ public class FilePropertyView extends FrameLayout {
 			} else {
 				filePathTextView.setText("N/A");
 			}
-			fileVolumeTextView.setText("Calculating...");
-			fileNumberTextView.setText("Calculating...");
+			fileVolumeTextView.setText("计算中...");
+			fileNumberTextView.setText("计算中...");
 			needTask = true;
 		}
 		if (needTask) {

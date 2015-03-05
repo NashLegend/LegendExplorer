@@ -230,7 +230,7 @@ public class FileListFragment extends Fragment {
 				&& !FileConst.Value_Bookmark_Path.equals(filePath);
 		if (files.length > 0) {
 			new FilePropertyDialog.Builder(getActivity()).setAllInOneFolder(in)
-					.setFiles(files).setTitle("Property").create().show();
+					.setFiles(files).setTitle("文件属性").create().show();
 		}
 	}
 
@@ -238,9 +238,9 @@ public class FileListFragment extends Fragment {
 		if (filePath.equals(FileConst.Value_Bookmark_Path)) {
 			// add new book mark
 		} else {
-			String[] values = { "File", "Folder" };
+			String[] values = { "文件", "文件夹" };
 			ListDialog dialog = new ListDialog.Builder(getActivity())
-					.setTitle("choose").setMultiSelect(false)
+					.setTitle("选择").setMultiSelect(false)
 					.setDisplayedValues(values)
 					.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -264,8 +264,8 @@ public class FileListFragment extends Fragment {
 	}
 
 	private void addOneNewFile() {
-		new InputDialog.Builder(getActivity()).setTitle("Input File Name")
-				.setButtonText("Okay", "Nay").setCancelable(true)
+		new InputDialog.Builder(getActivity()).setTitle("输入文件名")
+				.setButtonText("确定", "取消").setCancelable(true)
 				.setCanceledOnTouchOutside(true)
 				.setOnClickListener(new OnClickListener() {
 
@@ -278,7 +278,7 @@ public class FileListFragment extends Fragment {
 										dialog.InputString);
 								if (file.exists()) {
 									ToastUtil.showToast(getActivity(),
-											"File already Exsited");
+											"文件已存在");
 									return;
 								}
 								try {
@@ -291,7 +291,7 @@ public class FileListFragment extends Fragment {
 										refreshFileList();
 									} else {
 										ToastUtil.showToast(getActivity(),
-												"Creating File Failed");
+												"创建文件失败");
 									}
 								} catch (IOException e) {
 									e.printStackTrace();
@@ -303,8 +303,8 @@ public class FileListFragment extends Fragment {
 	}
 
 	private void addOneNewFolder() {
-		new InputDialog.Builder(getActivity()).setTitle("Input Folder Name")
-				.setButtonText("Okay", "Nay").setCancelable(true)
+		new InputDialog.Builder(getActivity()).setTitle("输入文件夹名")
+				.setButtonText("确实", "取消").setCancelable(true)
 				.setCanceledOnTouchOutside(true)
 				.setOnClickListener(new OnClickListener() {
 
@@ -317,14 +317,14 @@ public class FileListFragment extends Fragment {
 										dialog.InputString);
 								if (file.exists()) {
 									ToastUtil.showToast(getActivity(),
-											"Folder already Exsited");
+											"文件夹已存在");
 									return;
 								}
 								if (file.mkdir()) {
 									refreshFileList();
 								} else {
 									ToastUtil.showToast(getActivity(),
-											"Creating Folder Failed");
+											"创建文件夹失败");
 								}
 							}
 						}
@@ -348,7 +348,7 @@ public class FileListFragment extends Fragment {
 		FileDialog dialog = new FileDialog.Builder(getActivity())
 				.setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE)
 				.setCancelable(true).setCanceledOnTouchOutside(false)
-				.setTitle("selectFolder")
+				.setTitle("选择目标文件夹")
 				.setFileSelectListener(new FileDialogListener() {
 
 					@Override
@@ -360,14 +360,13 @@ public class FileListFragment extends Fragment {
 
 					@Override
 					public void onFileCanceled() {
-						ToastUtil.showToast(getActivity(), "Copy Cancelled!");
+						ToastUtil.showToast(getActivity(), "复制已取消");
 					}
 				}).create(getActivity());
 		dialog.show();
 	}
 
 	private void copy2Folder(File[] files, File destFile) {
-		Log.i("copy", "cops");
 		final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(
 				getActivity()).setCancelable(false)
 				.setCanceledOnTouchOutside(false).create();
@@ -384,14 +383,14 @@ public class FileListFragment extends Fragment {
 					public void onError(String e) {
 						dialog.dismiss();
 						operationDone();
-						ToastUtil.showToast(getActivity(), "Copy Error!");
+						ToastUtil.showToast(getActivity(), "复制失败");
 					}
 
 					@Override
 					public void onComplete() {
 						dialog.dismiss();
 						operationDone();
-						ToastUtil.showToast(getActivity(), "Copy OK!");
+						ToastUtil.showToast(getActivity(), "复制成功");
 					}
 				});
 	}
@@ -403,7 +402,7 @@ public class FileListFragment extends Fragment {
 		FileDialog dialog = new FileDialog.Builder(getActivity())
 				.setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE)
 				.setCancelable(false).setCanceledOnTouchOutside(false)
-				.setTitle("selectFolder")
+				.setTitle("选择文件夹")
 				.setFileSelectListener(new FileDialogListener() {
 
 					@Override
@@ -436,14 +435,14 @@ public class FileListFragment extends Fragment {
 					public void onError(String e) {
 						dialog.dismiss();
 						operationDone();
-						ToastUtil.showToast(getActivity(), "Move Error!");
+						ToastUtil.showToast(getActivity(), "文件移动失败");
 					}
 
 					@Override
 					public void onComplete() {
 						dialog.dismiss();
 						operationDone();
-						ToastUtil.showToast(getActivity(), "Move OK!");
+						ToastUtil.showToast(getActivity(), "文件移动成功");
 					}
 				});
 	}
@@ -452,16 +451,16 @@ public class FileListFragment extends Fragment {
 		if (adapter.getSelectedFiles().size() == 0) {
 			return;
 		}
-		new AlertDialog.Builder(getActivity()).setMessage("Confirm to delete?")
-				.setTitle("Message")
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		new AlertDialog.Builder(getActivity()).setMessage("确定要删除吗？")
+				.setTitle("提示")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						deleteFiles();
 					}
 				})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				.setNegativeButton("取消", new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -480,8 +479,8 @@ public class FileListFragment extends Fragment {
 			boolean isok = helper.deleteBookmark(adapter.getSelectedFiles());
 			helper.close();
 			operationDone();
-			ToastUtil.showToast(getActivity(), isok ? "Delete OK!"
-					: "Delete Error!");
+			ToastUtil.showToast(getActivity(), isok ? "删除成功"
+					: "删除失败");
 		} else {
 			final Win8ProgressDialog dialog = new Win8ProgressDialog.Builder(
 					getActivity()).setCancelable(false)
@@ -500,7 +499,7 @@ public class FileListFragment extends Fragment {
 						public void onError(String e) {
 							dialog.dismiss();
 							operationDone();
-							ToastUtil.showToast(getActivity(), "Delete Error!");
+							ToastUtil.showToast(getActivity(), "删除失败");
 						}
 
 						@Override
@@ -511,7 +510,7 @@ public class FileListFragment extends Fragment {
 							MediaScannerConnection.scanFile(getActivity(),
 									new String[] { file.getAbsolutePath() },
 									null, null);
-							ToastUtil.showToast(getActivity(), "Delete OK!");
+							ToastUtil.showToast(getActivity(), "删除成功");
 						}
 					});
 		}
@@ -534,10 +533,10 @@ public class FileListFragment extends Fragment {
 		String input = "";
 		if (files.length > 0) {
 			if (files.length == 1) {
-				title = "Rename file";
+				title = "重命名";
 				input = files[0].getName();
 			} else {
-				title = "Rename multi-files";
+				title = "重命名多个文件";
 			}
 
 			new InputDialog.Builder(getActivity()).setTitle(title)
@@ -569,7 +568,7 @@ public class FileListFragment extends Fragment {
 				String suffix = FileUtil.getFileSuffix(sourceFile);
 				if (suffix.length() > 0) {
 					path = sourceFile.getAbsolutePath().replaceAll(
-							suffix + "$", "zip");
+							suffix + "$", "压缩为zip");
 				} else {
 					path = sourceFile.getAbsolutePath() + ".zip";
 				}
@@ -577,8 +576,8 @@ public class FileListFragment extends Fragment {
 				zipWithDialog(files, destFile);
 			} else {
 				new InputDialog.Builder(getActivity())
-						.setTitle("Input File Name")
-						.setButtonText("Okay", "Nay").setCancelable(true)
+						.setTitle("输入文件名")
+						.setButtonText("确定", "取消").setCancelable(true)
 						.setCanceledOnTouchOutside(true)
 						.setOnClickListener(new OnClickListener() {
 
@@ -626,21 +625,21 @@ public class FileListFragment extends Fragment {
 			public void onError(String e) {
 				dialog.dismiss();
 				operationDone();
-				ToastUtil.showToast(getActivity(), "Zip Error!");
+				ToastUtil.showToast(getActivity(), "压缩文件出错");
 			}
 
 			@Override
 			public void onComplete() {
 				dialog.dismiss();
 				operationDone();
-				ToastUtil.showToast(getActivity(), "Zip OK!");
+				ToastUtil.showToast(getActivity(), "压缩文件成功");
 			}
 
 			@Override
 			public void onCancelled() {
 				dialog.dismiss();
 				operationDone();
-				ToastUtil.showToast(getActivity(), "Zip Cancelled!");
+				ToastUtil.showToast(getActivity(), "压缩文件已取消");
 			}
 		});
 	}
@@ -655,16 +654,16 @@ public class FileListFragment extends Fragment {
 
 					} else {
 						ToastUtil.showToast(getActivity(),
-								"Not a valid zip file!");
+								"zip文件格式不对");
 					}
 				} catch (IOException e1) {
 					ToastUtil.showToast(getActivity(),
-							"Maybe not a valid zip file!");
+							"zip文件格式不对");
 				}
 				FileDialog dialog = new FileDialog.Builder(getActivity())
 						.setFileMode(FileDialog.FILE_MODE_OPEN_FOLDER_SINGLE)
 						.setCancelable(true).setCanceledOnTouchOutside(false)
-						.setTitle("selectFolder")
+						.setTitle("选择文件夹")
 						.setFileSelectListener(new FileDialogListener() {
 
 							@Override
@@ -676,9 +675,9 @@ public class FileListFragment extends Fragment {
 												.isZipfileEncrypted(sourceFile)) {
 											new InputDialog.Builder(
 													getActivity())
-													.setTitle("Input Password")
-													.setButtonText("Okay",
-															"Nay")
+													.setTitle("输入密码")
+													.setButtonText("确定",
+															"取消")
 													.setCancelable(true)
 													.setCanceledOnTouchOutside(
 															false)
@@ -699,7 +698,7 @@ public class FileListFragment extends Fragment {
 																		ToastUtil
 																				.showToast(
 																						getActivity(),
-																						"Unzip cancelled!");
+																						"解压已取消");
 																	}
 																}
 															}).create().show();
@@ -709,7 +708,7 @@ public class FileListFragment extends Fragment {
 										}
 									} catch (IOException e) {
 										ToastUtil.showToast(getActivity(),
-												"Something error Happened");
+												"出错了");
 									}
 
 								}
@@ -718,7 +717,7 @@ public class FileListFragment extends Fragment {
 							@Override
 							public void onFileCanceled() {
 								ToastUtil.showToast(getActivity(),
-										"Unzip Cancelled!");
+										"解压取消");
 							}
 						}).create(getActivity());
 				dialog.show();
@@ -745,21 +744,21 @@ public class FileListFragment extends Fragment {
 					public void onError(String e) {
 						dialog.dismiss();
 						operationDone();
-						ToastUtil.showToast(getActivity(), "Unzip Error!");
+						ToastUtil.showToast(getActivity(), "解压出错");
 					}
 
 					@Override
 					public void onComplete() {
 						dialog.dismiss();
 						operationDone();
-						ToastUtil.showToast(getActivity(), "Unzip OK!");
+						ToastUtil.showToast(getActivity(), "解压成功");
 					}
 
 					@Override
 					public void onCancelled() {
 						dialog.dismiss();
 						operationDone();
-						ToastUtil.showToast(getActivity(), "Unzip Cancelled!");
+						ToastUtil.showToast(getActivity(), "解压已取消");
 					}
 				});
 	}
@@ -777,11 +776,11 @@ public class FileListFragment extends Fragment {
 				helper.close();
 
 				operationDone();
-				ToastUtil.showToast(getActivity(), isok ? "Favor OK!"
-						: "Favor Error!");
+				ToastUtil.showToast(getActivity(), isok ? "收藏成功"
+						: "收藏失败");
 			} else {
 				ToastUtil
-						.showToast(getActivity(), "Only Folder Can Be Favored");
+						.showToast(getActivity(), "只能收藏文件夹");
 			}
 		}
 	}
