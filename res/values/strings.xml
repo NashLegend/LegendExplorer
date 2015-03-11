@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Legend Explorer</string>
+    <string name="app_name">LeX</string>
     <string name="action_settings">设置</string>
     <string name="action_copy">复制</string>
     <string name="action_cut">剪切</string>
