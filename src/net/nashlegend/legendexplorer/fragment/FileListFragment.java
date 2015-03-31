@@ -375,7 +375,7 @@ public class FileListFragment extends Fragment {
 				new FileOperationListener() {
 
 					@Override
-					public void onProgress(int progress) {
+					public void onProgress(long progress,long total) {
 
 					}
 
@@ -427,7 +427,7 @@ public class FileListFragment extends Fragment {
 				new FileOperationListener() {
 
 					@Override
-					public void onProgress(int progress) {
+					public void onProgress(long progress,long total) {
 
 					}
 
@@ -491,7 +491,7 @@ public class FileListFragment extends Fragment {
 					new FileOperationListener() {
 
 						@Override
-						public void onProgress(int progress) {
+						public void onProgress(long progress,long total) {
 
 						}
 
